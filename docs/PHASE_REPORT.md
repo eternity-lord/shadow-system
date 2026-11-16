@@ -60,7 +60,7 @@ Delivered: AES-256-GCM encrypted backup (UI in Settings), PIN lock (PBKDF2), bio
 ## Open (honest list)
 - Gold shop: one real item (dungeon boost ×1.5 XP, 40 gold). More items are not designed yet.
 - Rank-up: a dialog appears when the rank increases. There is no full cutscene.
-- Artwork: 6 gates and 8 of 12 soldiers are real. Four soldiers (Kaisel, Nova, Scribe, Bellion) and six rank avatars are still placeholders. Listed in ASSETS_MANIFEST.md. The image generator limit of 10 per turn was reached, so they could not be generated in the same turn.
+- Artwork: 6 gate images, 12 soldier portraits (stage 1) and 6 rank avatars are real. Higher soldier stages, wisdom art and monster art still use procedural placeholders (see ASSETS_MANIFEST.md).
 - Accessibility: touch targets are 48dp and text scales, but no TalkBack audit has been run (no device in the sandbox).
 - Release signing: debug key placeholder. The owner must supply a real key.
 - Not run: emulator or device tests; no screenshots verified visually.

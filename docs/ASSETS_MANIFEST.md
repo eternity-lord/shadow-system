@@ -7,12 +7,10 @@ All artwork is either generated for this project with the image generator or dra
 | File | Source | Used by | Notes |
 |---|---|---|---|
 | `gate_e.png` … `gate_s.png` (6 files) | Generated with the image generator for this project (prompt: dark fantasy rune gate, one per rank, no text, no people) | Dungeon tab, gate card (`AssetRegistry.gateAssetName`) | Downscaled to 512×512 PNG. About 2.1 MB total. |
-| `shadow_{igris,beru,iron,tank,tusk,fang,jima,blue}_stage1.png` (8 files) | Generated with the image generator (one dark bust portrait per soldier, no text) | Hunter tab, soldier tiles (`AssetRegistry.soldierAssetName(key, 1)`) | Downscaled to 512×512. About 2.7 MB total. |
+| `shadow_{igris,beru,iron,tank,tusk,fang,jima,blue,kaisel,nova,scribe,bellion}_stage1.png` (12 files) | Generated with the image generator (one dark bust portrait per soldier, no text) | Hunter tab, soldier tiles (`AssetRegistry.soldierAssetName(key, 1)`) | Downscaled to 512×512. About 4.5 MB total. |
+| `avatar_rank_{e,d,c,b,a,s}.png` (6 files) | Generated with the image generator (one dark bust portrait per rank, no text) | Hunter tab avatar (`AvatarData.rankAssetName`) | Downscaled to 512×512. About 2.1 MB total. |
 
-### Still to generate (placeholder in the app until these files exist)
-- `shadow_kaisel_stage1.png`, `shadow_nova_stage1.png`, `shadow_scribe_stage1.png`, `shadow_bellion_stage1.png`
-- `avatar_rank_e.png` … `avatar_rank_s.png` (6 files, Hunter avatar per rank, `AvatarData.rankAssetName`)
-- Higher soldier stages (`shadow_<key>_stage2..5`), wisdom art, and monster art are not planned for this build. `AssetRegistry` falls back to the procedural placeholder for them.
+Higher soldier stages (`shadow_<key>_stage2..5`), wisdom art and monster art are not planned for this build. `AssetRegistry` falls back to a procedural placeholder for them.
 
 The app works without these files: `AssetImage` draws a procedural silhouette when no drawable with the name exists. Adding the PNG with the same name replaces it with no code change.
 

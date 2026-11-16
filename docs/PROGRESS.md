@@ -29,3 +29,6 @@ Branch: `arena/05d6808d-shadow-system` (base `cb65486`)
 ## Update 2
 - Gold shop (dungeon boost), rank-up dialog, 8 soldier portraits, 6 gate images: done. CI green at `00f6e45`.
 - Still open: 4 soldier portraits, 6 rank avatars (to generate next turn), accessibility audit, real release key, PR merge.
+
+## Update 3
+- All 12 soldier portraits (stage 1), 6 rank avatars and 6 gate images generated and included.

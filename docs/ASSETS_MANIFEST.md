@@ -52,6 +52,14 @@ Stage 3 done for all 12 soldiers. Stage 4 done for all 12 soldiers. Stage 5 done
 |---|---|---|
 | `wisdom_tank_3.png`, `wisdom_tusk_3.png` | Soldier overlay at tier 3 | Wisdom tier 3 now done for all 12 soldiers |
 | `monster_e_1.png` ... `monster_s_1.png` (6 files, one per gate rank) | Active dungeon run | 512×512 |
-| `bg_gate.png` | Shop item `bg_gate` | 768×768; not yet wired to a screen |
+| `bg_gate.png` | Shop item `bg_gate` | 768×768; shown at 25% behind the dungeon screen when equipped |
 
 Still missing: monster variants (`_2`, `_3`) if wanted, category icons (`icon_cat_*`), other backgrounds, soldier and wisdom art beyond this batch.
+
+## Batch: category icons
+
+| File | Used by | Notes |
+|---|---|---|
+| `icon_cat_outfit.png`, `icon_cat_weapon.png`, `icon_cat_aura.png`, `icon_cat_frame.png`, `icon_cat_background.png` | Avatar shop category headers | 512×512 |
+
+Still missing: more background art (only `bg_gate` and `bg_throne` exist for the shop), monster variants beyond level 1.

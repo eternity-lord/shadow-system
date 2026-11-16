@@ -17,6 +17,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.shadowsystem.R
+import com.shadowsystem.core.AssetImage
+import com.shadowsystem.core.AssetRegistry
 import com.shadowsystem.core.AvatarData
 import com.shadowsystem.core.PersianText
 import com.shadowsystem.core.ShopItem
@@ -34,7 +36,13 @@ fun AvatarShop(
     ShadowCard {
         SectionTitle(stringResource(R.string.avatar_shop_title))
         listOf("outfit", "weapon", "aura", "frame", "background").forEach { category ->
-            Text(categoryLabel(category), style = MaterialTheme.typography.titleSmall, color = ShadowColors.Gold)
+            androidx.compose.foundation.layout.Row(
+                verticalAlignment = androidx.compose.ui.Alignment.CenterVertically,
+                horizontalArrangement = androidx.compose.foundation.layout.Arrangement.spacedBy(8.dp)
+            ) {
+                AssetImage(name = AssetRegistry.categoryAssetName(category), size = 28.dp, contentDescription = null)
+                Text(categoryLabel(category), style = MaterialTheme.typography.titleSmall, color = ShadowColors.Gold)
+            }
             AvatarData.SHOP_ITEMS.filter { it.category == category }.forEach { item ->
                 Row(
                     verticalAlignment = Alignment.CenterVertically,

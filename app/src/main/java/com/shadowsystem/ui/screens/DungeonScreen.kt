@@ -6,6 +6,7 @@ import androidx.compose.material3.FilterChip
 import com.shadowsystem.ui.components.soldierDisplayName
 import com.shadowsystem.data.db.QuestEntity
 import com.shadowsystem.core.GateRules
+import androidx.compose.ui.draw.paint
 import com.shadowsystem.ShadowApp
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -64,8 +65,22 @@ fun DungeonScreen(vm: GameViewModel) {
     var pickedQuest by remember { mutableStateOf<Long?>(null) }
     val state by vm.state.collectAsStateWithLifecycle()
     var confirmExit by remember { mutableStateOf(false) }
+    var equippedBg by remember { mutableStateOf<String?>(null) }
+    LaunchedEffect(Unit) {
+        equippedBg = app.container.game.equippedAvatarKeys().firstOrNull { it.startsWith("bg_") }
+    }
+    val ctx = androidx.compose.ui.platform.LocalContext.current
+    val bgId = equippedBg?.let { com.shadowsystem.core.AssetRegistry.drawableId(ctx, it) }?.takeIf { it != 0 }
     Column(
-        modifier = Modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(16.dp),
+        modifier = Modifier.fillMaxSize()
+            .then(
+                if (bgId != null) Modifier.paint(
+                    androidx.compose.ui.res.painterResource(bgId),
+                    alpha = 0.25f,
+                    contentScale = androidx.compose.ui.layout.ContentScale.Crop
+                ) else Modifier
+            )
+            .verticalScroll(rememberScrollState()).padding(16.dp),
         verticalArrangement = Arrangement.spacedBy(12.dp)
     ) {
         Text(stringResource(R.string.dungeon_title), style = MaterialTheme.typography.headlineMedium)

@@ -49,6 +49,9 @@ interface QuestDao {
     @Query("SELECT * FROM quests WHERE id = :id")
     suspend fun get(id: Long): QuestEntity?
 
+    @Query("SELECT COUNT(*) FROM quests WHERE status = 'DONE' AND gameDay >= :from")
+    suspend fun doneSince(from: Long): Int
+
     @Query("SELECT COUNT(*) FROM quests WHERE gameDay = :day")
     suspend fun countForDay(day: Long): Int
 

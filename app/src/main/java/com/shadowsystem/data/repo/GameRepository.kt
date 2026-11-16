@@ -9,6 +9,8 @@ import com.shadowsystem.core.QuestPlanner
 import com.shadowsystem.data.db.AppDatabase
 import com.shadowsystem.data.db.DailyScoreEntity
 import com.shadowsystem.data.db.DungeonSessionEntity
+import com.shadowsystem.core.RankTrial
+import com.shadowsystem.core.RankTrialState
 import com.shadowsystem.data.db.KeyValueEntity
 import com.shadowsystem.data.db.ProfileEntity
 import com.shadowsystem.data.db.QuestEntity
@@ -61,6 +63,51 @@ class GameRepository(
         profileDao.upsert(p.copy(onboarded = true))
     }
 
+    private suspend fun unlockedIndex(): Int = kvDao.get(RankTrial.KEY_UNLOCKED)?.value?.toInt() ?: 0
+
+    private suspend fun trialStart(): Long = kvDao.get(RankTrial.KEY_START)?.value ?: 0L
+
+    private suspend fun setKey(key: String, value: Long) = kvDao.upsert(KeyValueEntity(key, value))
+
+    /** Current rank trial for the UI. Quests finished since the trial started count toward it. */
+    suspend fun rankTrialState(): RankTrialState {
+        val levelIdx = RankTrial.levelRankIndex(profile().totalXp)
+        val unlocked = unlockedIndex()
+        val pending = RankTrial.isPending(levelIdx, unlocked)
+        val start = trialStart()
+        val done = if (pending && start > 0) questDao.doneSince(start) else 0
+        return RankTrialState(
+            pending = pending,
+            target = RankTrial.targetRank(unlocked),
+            done = done,
+            effective = RankTrial.effectiveRank(levelIdx, unlocked)
+        )
+    }
+
+    /**
+     * Starts, advances or completes the rank trial after XP or quest changes. Unlocks are permanent.
+     * Recursion is bounded: each completed trial raises the unlocked index toward the level rank.
+     */
+    suspend fun updateRankTrial() {
+        val day = today()
+        val unlocked = unlockedIndex()
+        val levelIdx = RankTrial.levelRankIndex(profile().totalXp)
+        if (!RankTrial.isPending(levelIdx, unlocked)) {
+            if (trialStart() != 0L) setKey(RankTrial.KEY_START, 0L)
+            return
+        }
+        var start = trialStart()
+        if (start == 0L || RankTrial.windowExpired(start, day)) {
+            start = day
+            setKey(RankTrial.KEY_START, start)
+        }
+        if (questDao.doneSince(start) >= RankTrial.TARGET_QUESTS) {
+            setKey(RankTrial.KEY_UNLOCKED, (unlocked + 1).toLong())
+            setKey(RankTrial.KEY_START, 0L)
+            updateRankTrial()
+        }
+    }
+
     /** Generates the day's quests once. Returns false if they already exist. */
     suspend fun generateDay(mood: Mood): Boolean {
         val day = today()
@@ -69,7 +116,8 @@ class GameRepository(
         val comeback = DayRules.isComeback(profile.lastActiveDay, day)
         val level = GameMath.levelForXp(profile.totalXp)
         var comebackLeft = if (comeback) DayRules.COMEBACK_QUESTS else 0
-        for (planned in QuestPlanner.plan(level, mood)) {
+        val cap = RankTrial.effectiveRank(RankTrial.levelRankIndex(profile.totalXp), unlockedIndex())
+        for (planned in QuestPlanner.plan(level, mood, rankCap = cap)) {
             val t = planned.template
             val reward = GameMath.questReward(t.rank)
             val boosted = comebackLeft > 0
@@ -123,6 +171,7 @@ class GameRepository(
         )
         addXp(gained, quest.stat, gold = if (finished) quest.goldReward else 0)
         if (finished) touchActiveDay()
+        updateRankTrial()
         return ProgressResult(gained, finished, levelBefore, GameMath.levelForXp(profile().totalXp))
     }
 
@@ -139,6 +188,7 @@ class GameRepository(
             )
         )
         addXp(-gained, stat, gold = if (finished) -gold else 0)
+        updateRankTrial()
     }
 
     /** "Make it smaller": drops the undone steps after the next one, so only one step remains. */
@@ -237,6 +287,7 @@ class GameRepository(
         )
         if (xp > 0) addXp(xp, Stat.INT.name, gold = if (completed) GameMath.questReward(rank).gold else 0)
         if (doneSeconds >= 60) touchActiveDay()
+        updateRankTrial()
         return xp
     }
 

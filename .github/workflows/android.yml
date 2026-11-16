@@ -30,7 +30,7 @@ jobs:
         id: build
         run: |
           set -o pipefail
-          ./gradlew assembleDebug testDebugUnitTest --stacktrace 2>&1 | tee build.log
+          ./gradlew assembleDebug assembleRelease testDebugUnitTest --stacktrace 2>&1 | tee build.log
 
       - name: Post error excerpt on failure
         if: failure()

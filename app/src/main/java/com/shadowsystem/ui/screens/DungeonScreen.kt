@@ -25,6 +25,8 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.shadowsystem.R
+import com.shadowsystem.core.AssetImage
+import com.shadowsystem.core.AssetRegistry
 import com.shadowsystem.core.GameMath
 import com.shadowsystem.core.GameMath.Rank
 import com.shadowsystem.core.PersianText
@@ -87,7 +89,8 @@ fun DungeonScreen(vm: GameViewModel) {
 private fun GateCard(rank: Rank, onEnter: () -> Unit) {
     ShadowCard {
         Row(verticalAlignment = Alignment.CenterVertically) {
-            Column(modifier = Modifier.weight(1f)) {
+            AssetImage(AssetRegistry.gateAssetName(rank.name), size = 64.dp, placeholderColor = ShadowColors.Primary)
+            Column(modifier = Modifier.weight(1f).padding(start = 12.dp)) {
                 Text(stringResource(R.string.gate_rank, rank.name), style = MaterialTheme.typography.titleMedium)
                 Text(
                     stringResource(R.string.gate_minutes, PersianText.toFa(GameMath.dungeonMinutes(rank))),

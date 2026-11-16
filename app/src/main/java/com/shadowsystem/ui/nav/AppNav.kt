@@ -71,11 +71,14 @@ fun AppRoot(app: ShadowApp) {
 
     when {
         !gameState.loaded -> Unit
-        locked -> LockScreen { pin ->
-            val ok = app.container.prefs.checkPin(pin)
-            if (ok) app.container.lock.locked.value = false
-            ok
-        }
+        locked -> LockScreen(
+            onSubmit = { pin ->
+                val ok = app.container.prefs.checkPin(pin)
+                if (ok) app.container.lock.locked.value = false
+                ok
+            },
+            onBiometricOk = { app.container.lock.locked.value = false }
+        )
         !gameState.profile.onboarded -> OnboardingScreen { game.finishOnboarding() }
         else -> MainNavigation(app, game)
     }

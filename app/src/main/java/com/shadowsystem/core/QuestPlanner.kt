@@ -21,8 +21,8 @@ object QuestPlanner {
 
     fun maxRankFor(level: Int): Rank = GameMath.rankForLevel(level)
 
-    fun plan(level: Int, mood: Mood, random: Random = Random): List<PlannedQuest> {
-        val maxRank = maxRankFor(level)
+    fun plan(level: Int, mood: Mood, random: Random = Random, rankCap: GameMath.Rank? = null): List<PlannedQuest> {
+        val maxRank = rankCap ?: maxRankFor(level)
         val eligible = Templates.ALL.filter { rankOrder.indexOf(it.rank) <= rankOrder.indexOf(maxRank) }
         if (mood.isHard) {
             val easy = eligible.filter { it.lowEnergy || it.rank == Rank.E }.shuffled(random)

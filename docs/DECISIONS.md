@@ -38,3 +38,26 @@ one pass, the simplest reasonable option was chosen and recorded here.
 
 ## Swipe to complete (phase 1 leftover)
 - Not implemented. Steps are completed with a tap (48dp rows), and the 5-second undo banner exists. Swipe is a later polish item.
+
+## Rank trial (phase 2)
+- Reaching a new rank's level is not enough: the player must first pass a weekly trial (5 finished quests within 7 days). Stored in the key-value table (`rank_unlocked_index`, `rank_trial_start`). No schema change.
+- Unlocks are permanent. The effective rank is `min(level rank, unlocked rank)`, and the quest planner uses it as a cap.
+- The rank-up cutscene is not implemented. The Now tab shows the trial card instead.
+
+## Tags (phase 2)
+- A tag is a `#word` in the transaction note. Search already matches note text, so `#food` finds those rows. A separate tag table was not added to avoid a schema migration for a small feature.
+
+## Biometric unlock (phase 3)
+- `androidx.biometric` 1.1.0 with `BIOMETRIC_WEAK`. The PIN stays the fallback. The button only appears when the device reports biometrics as available.
+
+## Numpad quick-add (phase 1)
+- An on-screen numpad under the amount field: digits, `000`, and an erase key. Each key is 48dp or taller.
+
+## Swipe to complete (phase 1)
+- A horizontal swipe of 120px or more on a step completes it, like a tap. The 5-second undo banner still applies.
+
+## Release build (phase 3)
+- `assembleRelease` runs in CI with R8 (`isMinifyEnabled`, resource shrinking). It is signed with the debug key as a placeholder. A real release key must be supplied by the owner and is not stored in the repository.
+
+## Accessibility (phase 3)
+- Touch targets are 48dp or taller. Text uses the Material type scale and the app supports large fonts through the system. A full TalkBack audit has not been run, because there is no device in the sandbox.

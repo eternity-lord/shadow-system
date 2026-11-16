@@ -82,6 +82,10 @@ fun EntryCard(form: MoneyForm, onIncome: (Boolean) -> Unit, onAmount: (String) -
             )
         }
         AmountField(form.amountText, onAmount, stringResource(R.string.money_amount_hint), form.error)
+        NumPad(
+            onDigit = { if (form.amountText.length < 12) onAmount(form.amountText + it) },
+            onErase = { onAmount(form.amountText.dropLast(1)) }
+        )
         if (form.error) {
             Text(stringResource(R.string.money_amount_invalid), color = ShadowColors.Danger, style = MaterialTheme.typography.bodyMedium)
         }

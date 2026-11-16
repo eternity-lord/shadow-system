@@ -23,10 +23,15 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.shadowsystem.R
 import com.shadowsystem.ui.theme.ShadowColors
+import androidx.compose.ui.platform.LocalContext
+import androidx.fragment.app.FragmentActivity
+import com.shadowsystem.util.BiometricGate
 
 /** PIN gate shown when the app returns from background. Four digits. */
 @Composable
-fun LockScreen(onSubmit: (String) -> Boolean) {
+fun LockScreen(onSubmit: (String) -> Boolean, onBiometricOk: () -> Unit) {
+    val context = LocalContext.current
+    val canUseBiometric = remember { BiometricGate.available(context) }
     var pin by remember { mutableStateOf("") }
     var wrong by remember { mutableStateOf(false) }
 
@@ -62,7 +67,14 @@ fun LockScreen(onSubmit: (String) -> Boolean) {
             Spacer(Modifier.height(12.dp))
         }
         Row(horizontalArrangement = Arrangement.spacedBy(12.dp), modifier = Modifier.fillMaxWidth()) {
-            Spacer(Modifier.weight(1f))
+            if (canUseBiometric) {
+                TextButton(
+                    onClick = { (context as? FragmentActivity)?.let { BiometricGate.prompt(it, onBiometricOk) } },
+                    modifier = Modifier.weight(1f).heightIn(min = 48.dp)
+                ) { Text(stringResource(R.string.bio_button), color = ShadowColors.TextMuted) }
+            } else {
+                Spacer(Modifier.weight(1f))
+            }
             Key("0", Modifier.weight(1f)) { if (pin.length < 4) { pin += "0"; wrong = false } }
             TextButton(
                 onClick = { if (pin.isNotEmpty()) pin = pin.dropLast(1) },

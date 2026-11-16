@@ -6,6 +6,7 @@ import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.CreationExtras
 import com.shadowsystem.ShadowApp
 import com.shadowsystem.core.GameMath
+import com.shadowsystem.core.RankTrialState
 import com.shadowsystem.core.GameMath.Rank
 import com.shadowsystem.core.GameMath.Stat
 import com.shadowsystem.core.Mood
@@ -21,6 +22,9 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.merge
+import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 
@@ -54,7 +58,8 @@ data class NowState(
     val message: String? = null,
     val run: DungeonRun? = null,
     val maxRank: Rank = Rank.E,
-    val undo: UndoInfo? = null
+    val undo: UndoInfo? = null,
+    val trial: RankTrialState = RankTrialState()
 )
 
 class GameViewModel(private val game: GameRepository) : ViewModel() {
@@ -74,7 +79,8 @@ class GameViewModel(private val game: GameRepository) : ViewModel() {
         game.observeDungeonSeconds(day),
         message,
         run,
-        undo
+        undo,
+        trialFlow()
     ) { values ->
         @Suppress("UNCHECKED_CAST")
         val profile = values[0] as ProfileEntity
@@ -87,6 +93,8 @@ class GameViewModel(private val game: GameRepository) : ViewModel() {
         val msg = values[5] as String?
         val activeRun = values[6] as DungeonRun?
         val undoInfo = values[7] as UndoInfo?
+        @Suppress("UNCHECKED_CAST")
+        val trial = values[8] as RankTrialState
         NowState(
             loaded = true,
             profile = profile,
@@ -96,10 +104,16 @@ class GameViewModel(private val game: GameRepository) : ViewModel() {
             dungeonSeconds = dungeonSeconds,
             message = msg,
             run = activeRun,
-            maxRank = GameMath.rankForLevel(GameMath.levelForXp(profile.totalXp)),
-            undo = undoInfo
+            maxRank = trial.effective,
+            undo = undoInfo,
+            trial = trial
         )
     }.stateIn(viewModelScope, SharingStarted.Eagerly, NowState())
+
+    /** Re-reads the rank trial whenever profile or quests change. */
+    private fun trialFlow() = merge(game.observeProfile().map { }, game.observeQuests(day).map { })
+        .onStart { emit(Unit) }
+        .map { game.rankTrialState() }
 
     val stats: StateFlow<Map<Stat, Long>> = game.observeStats()
         .stateIn(viewModelScope, SharingStarted.Eagerly, emptyMap())

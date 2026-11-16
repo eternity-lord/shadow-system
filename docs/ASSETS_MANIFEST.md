@@ -1,30 +1,27 @@
 # Assets Manifest
 
-## Status
-No bitmap art is bundled in this build. Every art slot resolves through
-`core/AssetRegistry.kt`:
+All artwork is either generated for this project with the image generator or drawn in code. Nothing is downloaded at runtime (the app is offline).
 
-1. If `res/drawable-nodpi/<name>.webp|png` exists, it is used.
-2. Otherwise a procedural Compose Canvas silhouette is drawn (size and detail grow with stage, colour from the soldier's palette).
+## Bundled raster images (`app/src/main/res/drawable-nodpi/`)
 
-Adding art later requires only dropping files with these names; no code change.
+| File | Source | Used by | Notes |
+|---|---|---|---|
+| `gate_e.png` … `gate_s.png` (6 files) | Generated with the image generator for this project (prompt: dark fantasy rune gate, one per rank, no text, no people) | Dungeon tab, gate card (`AssetRegistry.gateAssetName`) | Downscaled to 512×512 PNG. About 2.1 MB total. |
 
-## Naming convention (spec section 14)
+## Fonts (`app/src/main/res/font/`)
 
-| Asset | File name | Status |
+| File | Source | License |
 |---|---|---|
-| Shadow soldier, stage 1–5 | `shadow_<key>_stage<n>.webp` | placeholder (procedural) |
-| Wisdom overlay, tier 1–3 | `wisdom_<key>_<tier>.webp` | not wired into screens yet |
-| Avatar per rank E–S | `avatar_rank_<e..s>.webp` | placeholder (procedural) |
-| Monster per rank | `monster_<rank>_<n>.webp` | not used yet |
-| Gate per rank | `gate_<rank>.webp` | not used yet |
-| Category icon | `icon_cat_<name>.webp` | not used yet |
-| Background | `bg_<name>.webp` | not used yet |
+| `vazirmatn_regular.ttf`, `vazirmatn_medium.ttf`, `vazirmatn_bold.ttf` | Vazirmatn v33.003, rastikerdar/vazirmatn (codeload) | SIL Open Font License 1.1 |
 
-Soldier keys: `igris, beru, iron, tank, tusk, kaisel, fang, jima, nova, blue, scribe, bellion`.
+## Launcher icon
 
-## Sources
-- Typeface: **Vazirmatn v33.003** (OFL), `app/src/main/res/font/vazirmatn_{regular,medium,bold}.ttf`,
-  from https://github.com/rastikerdar/vazirmatn (downloaded from the GitHub codeload archive).
-- App icon: hand-written vector drawable `drawable-nodpi/ic_launcher_foreground.xml` (original, no third-party art).
-- Shadow soldier and avatar art: none bundled (see status above).
+`mipmap-anydpi-v26/ic_launcher.xml` and `drawable-nodpi/ic_launcher_foreground.xml`: vector drawables written in code.
+
+## Procedural placeholders (no file)
+
+`AssetRegistry` resolves names such as `shadow_<key>_stage<1-5>`, `wisdom_<key>_<1-3>`, `avatar_rank_<e..s>`, `monster_<rank>_<n>`, `rank_<rank>`, `stat_<stat>` and `icon_cat_<name>`. If a drawable with that name is missing, `AssetImage` draws a `ProceduralPlaceholder` (a Canvas silhouette). Soldier stages, wisdom art, avatar art and monster art are not yet generated, so the placeholder is what the user sees for them. Adding a PNG with the right name replaces the placeholder with no code change.
+
+## Not used
+
+No photos, no third-party icons, no sounds, no network assets.

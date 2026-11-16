@@ -25,6 +25,7 @@ import com.shadowsystem.ui.components.MoodPicker
 import com.shadowsystem.ui.components.QuestCard
 import com.shadowsystem.ui.components.ShadowCard
 import com.shadowsystem.ui.components.UndoBanner
+import com.shadowsystem.ui.components.RankTrialCard
 import com.shadowsystem.ui.components.XpBar
 import com.shadowsystem.ui.theme.ShadowColors
 import com.shadowsystem.ui.vm.GameViewModel
@@ -74,6 +75,10 @@ fun NowScreen(vm: GameViewModel) {
                 progress = if (levelSize > 0) inLevel.toFloat() / levelSize else 0f,
                 label = stringResource(R.string.xp_progress, PersianText.toFa(inLevel), PersianText.toFa(levelSize))
             )
+        }
+
+        if (state.trial.pending) {
+            RankTrialCard(state.trial)
         }
 
         if (state.quests.isEmpty()) {

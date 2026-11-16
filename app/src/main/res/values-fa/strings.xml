@@ -48,6 +48,9 @@
     <string name="onb_start">شروع</string>
 
     <!-- Lock -->
+    <string name="bio_button">اثر انگشت</string>
+    <string name="bio_title">باز کردن قفل سیستم سایه</string>
+    <string name="bio_cancel">استفاده از رمز</string>
     <string name="lock_title">قفل سیستم</string>
     <string name="lock_hint">رمز چهار رقمی را وارد کن</string>
     <string name="lock_wrong">رمز اشتباه است</string>
@@ -173,6 +176,11 @@
     <string name="notice_backup_ready">پشتیبان ساخته شد.</string>
     <string name="notice_restore_done">بازیابی انجام شد.</string>
     <string name="notice_restore_failed">بازیابی ناموفق بود. رمز یا فایل را بررسی کن.</string>
+
+    <!-- Rank trial -->
+    <string name="rank_trial_title">آزمون رتبه %1$s</string>
+    <string name="rank_trial_hint">با انجام %1$s مأموریت در %2$s روز، رتبه بعدی باز می‌شود.</string>
+    <string name="rank_trial_progress">%1$s از %2$s مأموریت</string>
 
     <!-- Gold shop -->
     <string name="shop_title">فروشگاه طلا</string>

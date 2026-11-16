@@ -1,6 +1,10 @@
 package com.shadowsystem.ui.components
 
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.gestures.detectHorizontalDragGestures
+import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.runtime.mutableFloatStateOf
+import kotlin.math.abs
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -92,10 +96,23 @@ fun QuestCard(
 
 @Composable
 private fun StepRow(step: QuestStepEntity, enabled: Boolean, onClick: () -> Unit) {
+    var drag by remember(step.id) { mutableFloatStateOf(0f) }
     Row(
         modifier = Modifier
             .fillMaxWidth()
             .heightIn(min = 48.dp)
+            .pointerInput(enabled, step.id) {
+                // A horizontal swipe past SWIPE_THRESHOLD_PX completes the step, like a tap.
+                detectHorizontalDragGestures(
+                    onDragStart = { drag = 0f },
+                    onDragEnd = {
+                        if (enabled && abs(drag) > SWIPE_THRESHOLD_PX) onClick()
+                        drag = 0f
+                    },
+                    onDragCancel = { drag = 0f },
+                    onHorizontalDrag = { _, amount -> drag += amount }
+                )
+            }
             .clickable(enabled = enabled, onClick = onClick),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(8.dp)
@@ -109,3 +126,5 @@ private fun StepRow(step: QuestStepEntity, enabled: Boolean, onClick: () -> Unit
         )
     }
 }
+
+private const val SWIPE_THRESHOLD_PX = 120f

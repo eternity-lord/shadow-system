@@ -1,6 +1,8 @@
 package com.shadowsystem.ui.screens
 
+import android.Manifest
 import android.net.Uri
+import android.os.Build
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.Arrangement
@@ -50,6 +52,10 @@ fun SettingsScreen(vm: SettingsViewModel, onBack: () -> Unit) {
     val context = LocalContext.current
     val hidden by vm.hidden.collectAsStateWithLifecycle()
     val pinSet by vm.pinSet.collectAsStateWithLifecycle()
+    val reminders by vm.reminders.collectAsStateWithLifecycle()
+    val notifPermission = rememberLauncherForActivityResult(ActivityResultContracts.RequestPermission()) { granted ->
+        vm.setReminders(granted)
+    }
     val notice by vm.notice.collectAsStateWithLifecycle()
     var pin by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
@@ -84,6 +90,20 @@ fun SettingsScreen(vm: SettingsViewModel, onBack: () -> Unit) {
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Text(stringResource(R.string.hide_balances_setting), modifier = Modifier.weight(1f))
                 Switch(checked = hidden, onCheckedChange = { vm.toggleHidden() })
+            }
+        }
+
+        ShadowCard {
+            SectionTitle(stringResource(R.string.reminders_toggle))
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Text(stringResource(R.string.reminders_help), color = ShadowColors.TextMuted, modifier = Modifier.weight(1f))
+                Switch(checked = reminders, onCheckedChange = { wantOn ->
+                    if (wantOn && Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                        notifPermission.launch(Manifest.permission.POST_NOTIFICATIONS)
+                    } else {
+                        vm.setReminders(wantOn)
+                    }
+                })
             }
         }
 

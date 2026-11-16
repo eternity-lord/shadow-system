@@ -16,6 +16,14 @@ class AppPrefs(context: Context) {
         hidden.value = value
     }
 
+    /** Whether the daily morning and night reminders are enabled. */
+    val reminders = MutableStateFlow(sp.getBoolean(KEY_REMINDERS, false))
+
+    fun setReminders(value: Boolean) {
+        sp.edit().putBoolean(KEY_REMINDERS, value).apply()
+        reminders.value = value
+    }
+
     val isPinSet: Boolean
         get() = sp.contains(KEY_PIN_HASH)
 
@@ -39,6 +47,7 @@ class AppPrefs(context: Context) {
 
     private companion object {
         const val KEY_HIDE = "hide_balances"
+        const val KEY_REMINDERS = "reminders_on"
         const val KEY_PIN_HASH = "pin_hash"
         const val KEY_PIN_SALT = "pin_salt"
     }

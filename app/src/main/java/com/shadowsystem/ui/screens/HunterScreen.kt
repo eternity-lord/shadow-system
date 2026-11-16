@@ -28,6 +28,7 @@ import com.shadowsystem.core.PersianText
 import com.shadowsystem.core.SoldierData
 import com.shadowsystem.core.SoldierDef
 import com.shadowsystem.core.AssetImage
+import com.shadowsystem.ui.components.SectionTitle
 import com.shadowsystem.ui.components.ShadowCard
 import com.shadowsystem.ui.components.XpBar
 import com.shadowsystem.ui.theme.ShadowColors
@@ -93,6 +94,10 @@ fun HunterScreen(vm: GameViewModel, onSettings: () -> Unit) {
             }
         }
 
+        ShadowCard {
+            SectionTitle(stringResource(R.string.shop_title))
+            Text(stringResource(R.string.shop_coming_soon), color = ShadowColors.TextMuted, style = MaterialTheme.typography.bodyMedium)
+        }
         Text(stringResource(R.string.soldiers_title), style = MaterialTheme.typography.titleMedium, color = ShadowColors.TextMuted)
         SoldierData.ALL.chunked(3).forEach { row ->
             Row(horizontalArrangement = Arrangement.spacedBy(8.dp), modifier = Modifier.fillMaxWidth()) {

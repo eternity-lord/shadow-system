@@ -27,3 +27,14 @@ one pass, the simplest reasonable option was chosen and recorded here.
 | 20 | Build verification | Built and tested on GitHub Actions (`.github/workflows/android.yml`) because the sandbox has no JDK/Android SDK and Google Maven is blocked | Environment limit, see PHASE_REPORT.md. |
 | 21 | Release signing | Release uses the debug signing config as a placeholder | Spec allows a placeholder; no keystore is stored in the repo. |
 | 22 | Icons | Material core icons only (no extended icon set) | Keeps dependency small. |
+
+## Reminders (phase 1 leftover)
+- Morning (08:00) and night (21:00) reminders use `AlarmManager.setInexactRepeating`. This needs no exact-alarm permission. Alarms do not survive reboot, so they are re-applied at app start when the setting is on.
+- The only added permission is `POST_NOTIFICATIONS` (Android 13+), requested when the user turns reminders on. No network permission.
+- WorkManager was not added, to keep the dependency set small.
+
+## Gold shop (phase 1 leftover)
+- Shown as an honest "coming soon" card on the Hunter tab. Gold is collected now; spending it needs item design, so it is not faked.
+
+## Swipe to complete (phase 1 leftover)
+- Not implemented. Steps are completed with a tap (48dp rows), and the 5-second undo banner exists. Swipe is a later polish item.

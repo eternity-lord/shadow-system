@@ -31,9 +31,9 @@ Delivered:
 - CI workflow that builds the APK, runs tests, and posts errors as a commit comment on failure.
 
 Not yet delivered from Phase 1 in the spec:
-- Morning briefing / night report notifications (not yet scheduled).
+- Morning and night reminders are added: AlarmManager, optional in Settings, `POST_NOTIFICATIONS` only.
 - Swipe-complete with 5s undo (undo banner exists; swipe gesture not wired).
-- Numpad quick-add, receipt photo, tags, Gold shop.
+- Numpad quick-add, receipt photo, tags. Gold shop is a 'coming soon' card (see DECISIONS.md).
 - Foreground-service dungeon timer, monster HP, loot journal, weekly boss.
 - Full soldier system (summon ritual, XP, evolution, voice lines in UI, wisdom overlay).
 - Avatar layering, stat-based class visuals, rank trial boss, rank-up cutscene.

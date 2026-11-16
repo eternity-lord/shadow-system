@@ -10,5 +10,6 @@ class ShadowApp : Application() {
     override fun onCreate() {
         super.onCreate()
         container = AppContainer(this)
+        if (container.prefs.reminders.value) com.shadowsystem.util.Reminders.apply(this, true)
     }
 }

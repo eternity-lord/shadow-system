@@ -21,8 +21,17 @@ enum class SettingsNotice {
 class SettingsViewModel(
     private val prefs: AppPrefs,
     private val lock: LockState,
-    private val backup: BackupService
+    private val backup: BackupService,
+    private val onRemindersChanged: (Boolean) -> Unit
 ) : ViewModel() {
+
+    val reminders: StateFlow<Boolean> = prefs.reminders
+
+    /** Called after the notification permission has been granted or the toggle is turned off. */
+    fun setReminders(on: Boolean) {
+        prefs.setReminders(on)
+        onRemindersChanged(on)
+    }
 
     private val _pinSet = MutableStateFlow(prefs.isPinSet)
     val pinSet: StateFlow<Boolean> = _pinSet.asStateFlow()
@@ -90,7 +99,9 @@ class SettingsViewModel(
         fun factory(app: ShadowApp): ViewModelProvider.Factory = object : ViewModelProvider.Factory {
             @Suppress("UNCHECKED_CAST")
             override fun <T : ViewModel> create(modelClass: Class<T>, extras: CreationExtras): T =
-                SettingsViewModel(app.container.prefs, app.container.lock, app.container.backup) as T
+                SettingsViewModel(app.container.prefs, app.container.lock, app.container.backup) { on ->
+                    com.shadowsystem.util.Reminders.apply(app, on)
+                } as T
         }
     }
 }

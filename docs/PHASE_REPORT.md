@@ -58,6 +58,11 @@ Delivered: gold shop with a dungeon boost, rank-up dialog, budgets (80%/100% war
 Delivered: AES-256-GCM encrypted backup (UI in Settings), PIN lock (PBKDF2), biometric unlock, FLAG_SECURE, hide-balances toggle, R8 release build in CI, numpad.
 
 ## Open (honest list)
+Spec items not yet built (these keep PR #1 open):
+- Dungeon monster HP, loot journal, foreground-service dungeon timer.
+- Soldier summon ritual, soldier XP and evolution UI, voice lines and wisdom overlay.
+- Avatar layering and stat-based class visuals.
+- Weekly boss beyond the rank trial; monster and wisdom art.
 - Higher soldier stages (2–5) use the stage 1 portrait with a stage label. Wisdom art and monster art are not used in the UI, so no placeholders are visible.
 - A TalkBack audit on a real device has not been run.
 - The release key is committed to the public repo by the owner's decision (see DECISIONS.md).

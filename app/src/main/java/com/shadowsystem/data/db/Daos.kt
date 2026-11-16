@@ -38,8 +38,22 @@ interface StatDao {
     suspend fun upsert(stat: StatProgressEntity)
 }
 
+/** A completed quest that belongs to a soldier. */
+data class LinkedQuestRow(
+    val soldierKey: String?,
+    val gameDay: Long,
+    val title: String,
+    val stepsDone: Int
+)
+
 @Dao
 interface QuestDao {
+    @Query("SELECT soldierKey, gameDay, title, stepsDone FROM quests WHERE status = 'DONE' AND soldierKey IS NOT NULL")
+    fun observeLinkedDone(): Flow<List<LinkedQuestRow>>
+
+    @Query("SELECT DISTINCT gameDay FROM quests WHERE status = 'DONE'")
+    fun observeActiveDays(): Flow<List<Long>>
+
     @Query("DELETE FROM quest_steps WHERE questId = :questId AND position > :position AND done = 0")
     suspend fun deleteUndoneStepsAfter(questId: Long, position: Int)
 
@@ -156,4 +170,16 @@ interface TransactionDao {
 
     @Delete
     suspend fun delete(tx: TransactionEntity)
+}
+
+@Dao
+interface SoldierDao {
+    @Query("SELECT * FROM soldiers")
+    fun observeAll(): Flow<List<SoldierEntity>>
+
+    @Query("SELECT * FROM soldiers WHERE `key` = :key")
+    suspend fun get(key: String): SoldierEntity?
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun upsert(soldier: SoldierEntity)
 }

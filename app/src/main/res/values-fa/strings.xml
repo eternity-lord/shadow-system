@@ -214,6 +214,34 @@
     <string name="dungeon_notif_paused">متوقف شده؛ برای ادامه برگرد</string>
     <string name="dungeon_notif_done">زمان تمام شد؛ غنیمت منتظر توست</string>
 
+    <!-- Soldiers -->
+    <string name="soldier_habit">عادت: %1$s</string>
+    <string name="soldier_level">سطح %1$s</string>
+    <string name="soldier_xp">تجربه: %1$s از %2$s</string>
+    <string name="soldier_power">قدرت: %1$s روز فعال</string>
+    <string name="soldier_wisdom_none">حکمت: هنوز لایه‌ای ندارد</string>
+    <string name="soldier_wisdom_simple">حکمت: ساده</string>
+    <string name="soldier_wisdom_medium">حکمت: متوسط</string>
+    <string name="soldier_wisdom_full">حکمت: کامل</string>
+    <string name="soldier_state_awake">بیدار</string>
+    <string name="soldier_state_tired">خسته</string>
+    <string name="soldier_state_sleeping">در خواب (آرام، بدون سرزنش)</string>
+    <string name="soldier_wake_task">برای بیدار کردنش یک کار کوچک کافی است: یک دقیقه روی «%1$s».</string>
+    <string name="soldier_egg">تخم سایه</string>
+    <string name="soldier_egg_progress">%1$s از %2$s روز فعال برای احضار</string>
+    <string name="soldier_summon">احضار سرباز</string>
+    <string name="soldier_summon_ready">آماده‌ی احضار</string>
+    <string name="soldier_rule_bellion">نیازمند رتبه S و ۱۰۰ روز فعال کل</string>
+    <string name="soldier_linked_done">کوئست‌های مرتبه‌ی انجام‌شده: %1$s</string>
+    <string name="soldier_rename_label">نام سرباز</string>
+    <string name="soldier_rename_save">ذخیره نام</string>
+    <string name="soldier_close">بستن</string>
+    <string name="ritual_title">احضار سایه</string>
+    <string name="ritual_text">سایه‌ی %1$s از تاریکی بیرون می‌آید…</string>
+    <string name="ritual_skip">رد کردن</string>
+    <string name="evolution_title">تکامل</string>
+    <string name="evolution_skip">رد کردن</string>
+
     <!-- Gold shop -->
     <string name="shop_quest_name">تقویت مأموریت</string>
     <string name="shop_quest_desc">تجربه‌ی مأموریت بعدی ×۱٫۵ می‌شود.</string>

@@ -168,7 +168,8 @@ class GameRepository(
                     xpReward = reward.xp,
                     goldReward = reward.gold,
                     stepsTotal = t.steps.size,
-                    comebackApplied = boosted
+                    comebackApplied = boosted,
+                    soldierKey = t.soldierKey
                 )
             )
             questDao.insertSteps(

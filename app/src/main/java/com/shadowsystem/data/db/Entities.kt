@@ -42,7 +42,8 @@ data class QuestEntity(
     val stepsDone: Int = 0,
     val stepsTotal: Int,
     val comebackApplied: Boolean = false,
-    val completedAt: Long = 0
+    val completedAt: Long = 0,
+    val soldierKey: String? = null
 ) {
     companion object {
         const val STATUS_OPEN = "OPEN"
@@ -154,4 +155,12 @@ data class InboxEntity(
     @PrimaryKey(autoGenerate = true) val id: Long = 0,
     val text: String,
     val createdAt: Long
+)
+
+/** Only what cannot be derived from quests: the custom name and when the soldier was summoned. */
+@Entity(tableName = "soldiers")
+data class SoldierEntity(
+    @PrimaryKey val key: String,
+    val customName: String? = null,
+    val summonedAt: Long? = null
 )

@@ -77,3 +77,18 @@ one pass, the simplest reasonable option was chosen and recorded here.
 
 ## Accessibility (phase 3, code review only)
 - Icons and images have content descriptions. Gate and soldier images are described. Tab items have text labels. Touch targets are at least 48dp. A TalkBack run on a device has not been done.
+
+## Batch: dungeon timer service and soldier system
+
+- **Foreground service permissions.** The spec asks for a foreground service so the dungeon timer survives the app closing. This needs `FOREGROUND_SERVICE` and `FOREGROUND_SERVICE_SPECIAL_USE` (targetSdk 34). They are not network permissions, so the "no network permission" rule still holds. The service type is `specialUse`. Notifications are silent and low importance.
+- **Timer state.** The active run lives in SharedPreferences (`DungeonTimerStore`), so a killed process resumes the timer. Pause time does not count as work. While paused, the monster regenerates 1% per 30 s, up to 10%. This is cosmetic only and does not change XP.
+- **Haptics and ambient sound.** A haptic tick every full minute (toggleable). Ambient sound is generated brown noise, off by default, and plays only while the timer runs.
+- **Soldier progress is derived.** XP, active days and wisdom come from completed quests linked to a soldier (`quests.soldierKey`, filled from quest templates). Nothing is counted twice and nothing can drift. Only the custom name and the summon time are stored in `soldiers`.
+- **Soldier XP.** 20 XP per completed linked quest. Level uses the spec curve `round(50·n^1.3)` (`GameMath.soldierXpForLevel`).
+- **Active day.** A game day with at least one completed linked quest. Summoning needs 7 active days (5 s ritual, skippable). The stage now comes from soldier level, replacing the earlier stat-level rule, because the spec defines stages by soldier level.
+- **Two axes.** Power is the active-day count, shown in the detail sheet. Stage (1–5) follows level. Wisdom is `2 × distinct linked quest titles + completed steps`, with tiers at 10, 40 and 100 (simple, medium, full). Wisdom art is not in the repo yet, so the tier is shown as text.
+- **States.** Gap since the last active day: 0–1 awake, 2–4 tired, 5 or more sleeping. The sleeping message is gentle and suggests one tiny task.
+- **Bellion.** Locked until rank S and 100 total active days. Counts all linked quests.
+- **Evolution cutscene.** 3 s, skippable, shows the new stage's voice line. It plays when a summoned soldier's stage passes the last stage the user saw (`kv` key `soldier_seen_<key>`). It does not play at summon time. Known gap: no morph animation from the old silhouette yet.
+- **Voice lines.** Rotated by active days within the current stage (the existing data has 3 lines per stage).
+- **Known gaps.** Users cannot re-link a quest to another soldier yet, and dungeons do not yet link to a soldier or quest. Soldier art for stages 2–5, wisdom overlays and the egg image are placeholders.

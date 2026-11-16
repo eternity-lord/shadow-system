@@ -34,11 +34,28 @@ import com.shadowsystem.ui.components.ShadowCard
 import com.shadowsystem.ui.components.XpBar
 import com.shadowsystem.ui.theme.ShadowColors
 import com.shadowsystem.ui.vm.GameViewModel
+import com.shadowsystem.ui.vm.SoldierViewModel
+import com.shadowsystem.core.SoldierRow
+import com.shadowsystem.ui.components.EvolutionDialog
+import com.shadowsystem.ui.components.SoldierDetailDialog
+import com.shadowsystem.ui.components.SoldierImage
+import com.shadowsystem.ui.components.SummonRitualDialog
+import com.shadowsystem.ui.components.stateLabelRes
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
+import androidx.compose.runtime.getValue
 
 /** Hunter profile: level, rank, the five stats, class and the shadow soldiers. */
 @Composable
-fun HunterScreen(vm: GameViewModel, onSettings: () -> Unit) {
+fun HunterScreen(vm: GameViewModel, soldiers: SoldierViewModel, onSettings: () -> Unit) {
     val state by vm.state.collectAsStateWithLifecycle()
+    val roster by soldiers.roster.collectAsStateWithLifecycle()
+    val ritual by soldiers.ritual.collectAsStateWithLifecycle()
+    val evolution by soldiers.evolution.collectAsStateWithLifecycle()
+    var selectedKey by remember { mutableStateOf<String?>(null) }
     val stats by vm.stats.collectAsStateWithLifecycle()
     val level = GameMath.levelForXp(state.profile.totalXp)
     val rank = GameMath.rankForLevel(level)
@@ -97,41 +114,62 @@ fun HunterScreen(vm: GameViewModel, onSettings: () -> Unit) {
 
         GoldShop(state.profile.gold, state.boosts) { item, onResult -> vm.buyBoost(item, onResult) }
         Text(stringResource(R.string.soldiers_title), style = MaterialTheme.typography.titleMedium, color = ShadowColors.TextMuted)
-        SoldierData.ALL.chunked(3).forEach { row ->
+        roster.chunked(3).forEach { row ->
             Row(horizontalArrangement = Arrangement.spacedBy(8.dp), modifier = Modifier.fillMaxWidth()) {
                 row.forEach { soldier ->
-                    val unlocked = isUnlocked(soldier, statLevels, rank)
-                    val stage = SoldierData.stageForLevel(soldier.stat?.let { statLevels[it] } ?: level)
-                    SoldierTile(soldier, unlocked, stage, Modifier.weight(1f))
+                    SoldierTile(soldier, Modifier.weight(1f)) { selectedKey = soldier.def.key }
                 }
+                repeat(3 - row.size) { Spacer(Modifier.weight(1f)) }
             }
         }
     }
-}
 
-private fun isUnlocked(soldier: SoldierDef, statLevels: Map<Stat, Int>, rank: GameMath.Rank): Boolean {
-    if (soldier.stat == null) return rank == GameMath.Rank.S
-    return (statLevels[soldier.stat] ?: 1) >= 5
+    roster.firstOrNull { it.def.key == selectedKey }?.let { selected ->
+        SoldierDetailDialog(
+            row = selected,
+            onRename = { soldiers.rename(selected.def.key, it) },
+            onSummon = {
+                selectedKey = null
+                soldiers.startRitual(selected.def.key)
+            },
+            onClose = { selectedKey = null }
+        )
+    }
+    ritual?.let { row -> SummonRitualDialog(row) { soldiers.finishRitual() } }
+    evolution?.let { row -> EvolutionDialog(row) { soldiers.finishEvolution(row) } }
 }
 
 @Composable
-private fun SoldierTile(soldier: SoldierDef, unlocked: Boolean, stage: Int, modifier: Modifier) {
-    val context = LocalContext.current
-    ShadowCard(modifier = modifier) {
-        AssetImage(
-            name = AssetRegistry.soldierBestAsset(context, soldier.key, stage),
-            size = 72.dp,
-            placeholderColor = Color(soldier.colorHex),
-            stage = stage,
-            contentDescription = soldier.name
-        )
-        Text(soldier.name, style = MaterialTheme.typography.bodyMedium)
-        Text(stringResource(R.string.soldier_stage, PersianText.toFa(stage)), style = MaterialTheme.typography.bodyMedium, color = ShadowColors.TextMuted)
+private fun SoldierTile(row: SoldierRow, modifier: Modifier, onClick: () -> Unit) {
+    val stage = row.displayStage
+    ShadowCard(modifier = modifier.clickable(onClick = onClick)) {
+        if (row.summoned) {
+            SoldierImage(row, stage, 72.dp)
+        } else {
+            AssetImage(
+                name = "egg_placeholder",
+                size = 72.dp,
+                placeholderColor = Color(row.def.colorHex),
+                stage = 1,
+                contentDescription = row.name
+            )
+        }
+        Text(row.name, style = MaterialTheme.typography.bodyMedium)
         Text(
-            if (unlocked) stringResource(R.string.soldier_unlocked) else stringResource(R.string.soldier_locked),
-            color = if (unlocked) ShadowColors.Secondary else ShadowColors.TextMuted,
-            style = MaterialTheme.typography.bodyMedium
+            when {
+                row.summoned -> stringResource(R.string.soldier_stage, PersianText.toFa(stage))
+                row.locked -> stringResource(R.string.soldier_locked)
+                else -> stringResource(R.string.soldier_egg)
+            },
+            style = MaterialTheme.typography.bodyMedium,
+            color = ShadowColors.TextMuted
         )
+        if (row.summoned) {
+            Text(stringResource(stateLabelRes(row.progress.state)), style = MaterialTheme.typography.bodyMedium, color = ShadowColors.Secondary)
+        }
+        if (row.canSummon) {
+            Text(stringResource(R.string.soldier_summon_ready), style = MaterialTheme.typography.bodyMedium, color = ShadowColors.Gold)
+        }
     }
 }
 

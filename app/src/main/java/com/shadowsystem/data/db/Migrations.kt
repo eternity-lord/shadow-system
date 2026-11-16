@@ -38,4 +38,15 @@ object Migrations {
             )
         }
     }
+
+    /** v4: soldier link on quests, and the soldiers table (custom name and summon time). */
+    val MIGRATION_3_4: Migration = object : Migration(3, 4) {
+        override fun migrate(db: SupportSQLiteDatabase) {
+            db.execSQL("ALTER TABLE `quests` ADD COLUMN `soldierKey` TEXT")
+            db.execSQL(
+                "CREATE TABLE IF NOT EXISTS `soldiers` (`key` TEXT NOT NULL, `customName` TEXT, " +
+                    "`summonedAt` INTEGER, PRIMARY KEY(`key`))"
+            )
+        }
+    }
 }

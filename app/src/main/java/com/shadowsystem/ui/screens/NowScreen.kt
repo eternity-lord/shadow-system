@@ -16,6 +16,12 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.shadowsystem.R
+import com.shadowsystem.ui.components.ConfirmDialog
+import com.shadowsystem.core.GameMath.Rank
+import androidx.compose.runtime.setValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.LaunchedEffect
 import com.shadowsystem.core.GameMath
 import com.shadowsystem.core.Jalali
 import com.shadowsystem.core.PersianText
@@ -34,6 +40,22 @@ import com.shadowsystem.ui.vm.GameViewModel
 @Composable
 fun NowScreen(vm: GameViewModel) {
     val state by vm.state.collectAsStateWithLifecycle()
+    var prevRank by remember { mutableStateOf<Rank?>(null) }
+    var rankUp by remember { mutableStateOf<Rank?>(null) }
+    LaunchedEffect(state.loaded, state.maxRank) {
+        if (!state.loaded) return@LaunchedEffect
+        val before = prevRank
+        if (before != null && state.maxRank > before) rankUp = state.maxRank
+        prevRank = state.maxRank
+    }
+    rankUp?.let { rank ->
+        ConfirmDialog(
+            text = stringResource(R.string.rank_up_text, rank.name),
+            confirmText = stringResource(R.string.rank_up_ok),
+            onConfirm = { rankUp = null },
+            onDismiss = { rankUp = null }
+        )
+    }
     val yesterday by vm.yesterdayScore.collectAsStateWithLifecycle()
     val level = GameMath.levelForXp(state.profile.totalXp)
     val rank = GameMath.rankForLevel(level)

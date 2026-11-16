@@ -184,7 +184,14 @@
 
     <!-- Gold shop -->
     <string name="shop_title">فروشگاه طلا</string>
-    <string name="shop_coming_soon">فروشگاه طلا به‌زودی اضافه می‌شود. طلا از هم‌اکنون جمع می‌شود.</string>
+    <string name="shop_boost_name">تقویت دروازه</string>
+    <string name="shop_boost_desc">تجربه‌ی دروازه‌ی بعدی ×۱٫۵ می‌شود.</string>
+    <string name="shop_buy">خرید · %1$s طلا</string>
+    <string name="shop_active">تقویت فعال است</string>
+    <string name="shop_bought">تقویت خریداری شد. دروازه‌ی بعدی آماده است.</string>
+    <string name="shop_not_enough">طلای کافی نیست.</string>
+    <string name="rank_up_text">رتبه‌ی %1$s باز شد!</string>
+    <string name="rank_up_ok">ادامه</string>
 
     <!-- Reminders -->
     <string name="reminder_channel">یادآوری روزانه</string>

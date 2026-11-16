@@ -108,6 +108,16 @@ class GameRepository(
         }
     }
 
+    suspend fun isDungeonBoostActive(): Boolean = kvDao.get(DUNGEON_BOOST_KEY)?.value == 1L
+
+    /** Shop: the next dungeon run that pays XP gets a 1.5× bonus. Costs gold; returns false if not possible. */
+    suspend fun buyDungeonBoost(): Boolean {
+        if (isDungeonBoostActive() || profile().gold < DUNGEON_BOOST_COST) return false
+        setKey(DUNGEON_BOOST_KEY, 1L)
+        addXp(0, "", gold = -DUNGEON_BOOST_COST)
+        return true
+    }
+
     /** Generates the day's quests once. Returns false if they already exist. */
     suspend fun generateDay(mood: Mood): Boolean {
         val day = today()
@@ -274,6 +284,9 @@ class GameRepository(
         val rank = GameMath.Rank.valueOf(rankName)
         val full = GameMath.questReward(rank).xp * 2
         val xp = if (completed) full else GameMath.partialDungeonXp(plannedMinutes, doneSeconds / 60, full)
+        val boosted = isDungeonBoostActive()
+        val paidXp = if (boosted && xp > 0) GameMath.applyMultiplier(xp, DUNGEON_BOOST_MULTIPLIER) else xp
+        if (boosted && xp > 0) setKey(DUNGEON_BOOST_KEY, 0L)
         dungeonDao.insert(
             DungeonSessionEntity(
                 gameDay = today(),
@@ -281,11 +294,11 @@ class GameRepository(
                 plannedMinutes = plannedMinutes,
                 doneSeconds = doneSeconds,
                 completed = completed,
-                xpGained = xp,
+                xpGained = paidXp,
                 createdAt = clock()
             )
         )
-        if (xp > 0) addXp(xp, Stat.INT.name, gold = if (completed) GameMath.questReward(rank).gold else 0)
+        if (paidXp > 0) addXp(paidXp, Stat.INT.name, gold = if (completed) GameMath.questReward(rank).gold else 0)
         if (doneSeconds >= 60) touchActiveDay()
         updateRankTrial()
         return xp
@@ -294,5 +307,8 @@ class GameRepository(
     companion object {
         const val DUNGEON_GOAL_MINUTES = 25
         const val SHADOW_BONUS_KEY = "shadow_bonus_day"
+        const val DUNGEON_BOOST_KEY = "dungeon_boost"
+        const val DUNGEON_BOOST_COST = 40
+        const val DUNGEON_BOOST_MULTIPLIER = 1.5
     }
 }

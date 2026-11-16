@@ -59,8 +59,11 @@ data class NowState(
     val run: DungeonRun? = null,
     val maxRank: Rank = Rank.E,
     val undo: UndoInfo? = null,
-    val trial: RankTrialState = RankTrialState()
+    val trial: RankTrialState = RankTrialState(),
+    val boostActive: Boolean = false
 )
+
+private data class SideState(val trial: RankTrialState, val boost: Boolean)
 
 class GameViewModel(private val game: GameRepository) : ViewModel() {
 
@@ -68,6 +71,7 @@ class GameViewModel(private val game: GameRepository) : ViewModel() {
     private val message = MutableStateFlow<String?>(null)
     private val run = MutableStateFlow<DungeonRun?>(null)
     private val undo = MutableStateFlow<UndoInfo?>(null)
+    private val refresh = MutableStateFlow(0)
     private var ticker: Job? = null
     private var undoTimer: Job? = null
 
@@ -94,7 +98,8 @@ class GameViewModel(private val game: GameRepository) : ViewModel() {
         val activeRun = values[6] as DungeonRun?
         val undoInfo = values[7] as UndoInfo?
         @Suppress("UNCHECKED_CAST")
-        val trial = values[8] as RankTrialState
+        val side = values[8] as SideState
+        val trial = side.trial
         NowState(
             loaded = true,
             profile = profile,
@@ -106,14 +111,20 @@ class GameViewModel(private val game: GameRepository) : ViewModel() {
             run = activeRun,
             maxRank = trial.effective,
             undo = undoInfo,
-            trial = trial
+            trial = trial,
+            boostActive = side.boost
         )
     }.stateIn(viewModelScope, SharingStarted.Eagerly, NowState())
 
     /** Re-reads the rank trial whenever profile or quests change. */
-    private fun trialFlow() = merge(game.observeProfile().map { }, game.observeQuests(day).map { })
+    /** Forces the derived rank-trial and boost state to be re-read after an action finishes. */
+    private fun bump() {
+        refresh.value = refresh.value + 1
+    }
+
+    private fun trialFlow() = merge(game.observeProfile().map { }, game.observeQuests(day).map { }, refresh)
         .onStart { emit(Unit) }
-        .map { game.rankTrialState() }
+        .map { SideState(game.rankTrialState(), game.isDungeonBoostActive()) }
 
     val stats: StateFlow<Map<Stat, Long>> = game.observeStats()
         .stateIn(viewModelScope, SharingStarted.Eagerly, emptyMap())
@@ -128,7 +139,17 @@ class GameViewModel(private val game: GameRepository) : ViewModel() {
     fun generate(mood: Mood) {
         viewModelScope.launch {
             game.generateDay(mood)
+            bump()
             message.value = if (mood == Mood.HARD) PhraseBank.hardDay() else PhraseBank.morning()
+        }
+    }
+
+    /** Shop purchase. Returns false when gold is short or the boost is already active. */
+    fun buyDungeonBoost(onResult: (Boolean) -> Unit) {
+        viewModelScope.launch {
+            val ok = game.buyDungeonBoost()
+            bump()
+            onResult(ok)
         }
     }
 
@@ -145,6 +166,7 @@ class GameViewModel(private val game: GameRepository) : ViewModel() {
             val quest = state.value.quests.firstOrNull { it.id == step.questId } ?: return@launch
             val result = game.tickStep(step) ?: return@launch
             game.refreshScore()
+            bump()
             message.value = when {
                 result.levelAfter > result.levelBefore -> PhraseBank.levelUp()
                 result.questFinished -> PhraseBank.questDone()
@@ -161,6 +183,7 @@ class GameViewModel(private val game: GameRepository) : ViewModel() {
         viewModelScope.launch {
             game.undoStep(info.step, info.gained, info.finished, info.stat, info.gold)
             game.refreshScore()
+            bump()
             message.value = null
         }
     }
@@ -175,7 +198,10 @@ class GameViewModel(private val game: GameRepository) : ViewModel() {
     }
 
     fun makeSmaller(quest: QuestEntity) {
-        viewModelScope.launch { game.makeSmaller(quest) }
+        viewModelScope.launch {
+            game.makeSmaller(quest)
+            bump()
+        }
     }
 
     fun startDungeon(rank: Rank) {
@@ -205,6 +231,7 @@ class GameViewModel(private val game: GameRepository) : ViewModel() {
             val done = current.elapsedSeconds.coerceAtMost(current.plannedSeconds)
             game.recordDungeon(current.rank.name, current.plannedMinutes, done, completed)
             game.refreshScore()
+            bump()
             if (completed) message.value = PhraseBank.questDone()
         }
     }

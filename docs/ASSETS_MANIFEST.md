@@ -7,6 +7,14 @@ All artwork is either generated for this project with the image generator or dra
 | File | Source | Used by | Notes |
 |---|---|---|---|
 | `gate_e.png` … `gate_s.png` (6 files) | Generated with the image generator for this project (prompt: dark fantasy rune gate, one per rank, no text, no people) | Dungeon tab, gate card (`AssetRegistry.gateAssetName`) | Downscaled to 512×512 PNG. About 2.1 MB total. |
+| `shadow_{igris,beru,iron,tank,tusk,fang,jima,blue}_stage1.png` (8 files) | Generated with the image generator (one dark bust portrait per soldier, no text) | Hunter tab, soldier tiles (`AssetRegistry.soldierAssetName(key, 1)`) | Downscaled to 512×512. About 2.7 MB total. |
+
+### Still to generate (placeholder in the app until these files exist)
+- `shadow_kaisel_stage1.png`, `shadow_nova_stage1.png`, `shadow_scribe_stage1.png`, `shadow_bellion_stage1.png`
+- `avatar_rank_e.png` … `avatar_rank_s.png` (6 files, Hunter avatar per rank, `AvatarData.rankAssetName`)
+- Higher soldier stages (`shadow_<key>_stage2..5`), wisdom art, and monster art are not planned for this build. `AssetRegistry` falls back to the procedural placeholder for them.
+
+The app works without these files: `AssetImage` draws a procedural silhouette when no drawable with the name exists. Adding the PNG with the same name replaces it with no code change.
 
 ## Fonts (`app/src/main/res/font/`)
 
@@ -20,7 +28,7 @@ All artwork is either generated for this project with the image generator or dra
 
 ## Procedural placeholders (no file)
 
-`AssetRegistry` resolves names such as `shadow_<key>_stage<1-5>`, `wisdom_<key>_<1-3>`, `avatar_rank_<e..s>`, `monster_<rank>_<n>`, `rank_<rank>`, `stat_<stat>` and `icon_cat_<name>`. If a drawable with that name is missing, `AssetImage` draws a `ProceduralPlaceholder` (a Canvas silhouette). Soldier stages, wisdom art, avatar art and monster art are not yet generated, so the placeholder is what the user sees for them. Adding a PNG with the right name replaces the placeholder with no code change.
+`AssetRegistry` resolves names such as `shadow_<key>_stage<1-5>`, `wisdom_<key>_<1-3>`, `avatar_rank_<e..s>`, `monster_<rank>_<n>`, `rank_<rank>`, `stat_<stat>` and `icon_cat_<name>`. If a drawable with that name is missing, `AssetImage` draws a `ProceduralPlaceholder` (a Canvas silhouette). See "Still to generate" above for the exact files that remain.
 
 ## Not used
 

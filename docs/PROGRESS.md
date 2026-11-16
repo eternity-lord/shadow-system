@@ -25,3 +25,7 @@ Branch: `arena/05d6808d-shadow-system` (base `cb65486`)
 - Rank trial, numpad, biometric unlock, swipe complete, gate artwork, release build in CI: done (`dcb6107`, CI green).
 - Still open: gold shop, rank-up cutscene, soldier/avatar/monster artwork, accessibility audit, real release signing key.
 - PR #1 is NOT merged. It will be merged only when the open items are closed.
+
+## Update 2
+- Gold shop (dungeon boost), rank-up dialog, 8 soldier portraits, 6 gate images: done. CI green at `00f6e45`.
+- Still open: 4 soldier portraits, 6 rank avatars (to generate next turn), accessibility audit, real release key, PR merge.

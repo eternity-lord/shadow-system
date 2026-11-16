@@ -52,15 +52,15 @@ Verified on CI (`assembleDebug assembleRelease testDebugUnitTest`) at `dcb6107`.
 Delivered: onboarding, PIN lock, Jalali calendar, game math, quest planner, Now/Quests/Dungeon/Money/Hunter tabs, numpad quick-add, swipe to complete with a 5-second undo, daily reminders, gate artwork.
 
 ## Phase 2 — Depth — MOSTLY DONE
-Delivered: budgets (80%/100% warnings), recurring rules with Jalali catch-up, savings goals as bosses, debts and installments, reports (donut, bars, 30-day line), search and income/expense filter, tags (via `#` in notes), CSV export, rank trial (weekly, 5 quests in 7 days) that gates rank-up, reminders.
+Delivered: gold shop with a dungeon boost, rank-up dialog, budgets (80%/100% warnings), recurring rules with Jalali catch-up, savings goals as bosses, debts and installments, reports (donut, bars, 30-day line), search and income/expense filter, tags (via `#` in notes), CSV export, rank trial (weekly, 5 quests in 7 days) that gates rank-up, reminders.
 
 ## Phase 3 — Completion — PARTLY DONE
 Delivered: AES-256-GCM encrypted backup (UI in Settings), PIN lock (PBKDF2), biometric unlock, FLAG_SECURE, hide-balances toggle, R8 release build in CI, numpad.
 
 ## Open (honest list)
-- Gold shop: "coming soon" card only. Gold is collected, nothing can be bought yet.
-- Rank-up cutscene: not built.
-- Artwork: only the six gate images are real. Soldiers, avatars, monsters, wisdom and category icons use procedural placeholders.
+- Gold shop: one real item (dungeon boost ×1.5 XP, 40 gold). More items are not designed yet.
+- Rank-up: a dialog appears when the rank increases. There is no full cutscene.
+- Artwork: 6 gates and 8 of 12 soldiers are real. Four soldiers (Kaisel, Nova, Scribe, Bellion) and six rank avatars are still placeholders. Listed in ASSETS_MANIFEST.md. The image generator limit of 10 per turn was reached, so they could not be generated in the same turn.
 - Accessibility: touch targets are 48dp and text scales, but no TalkBack audit has been run (no device in the sandbox).
 - Release signing: debug key placeholder. The owner must supply a real key.
 - Not run: emulator or device tests; no screenshots verified visually.

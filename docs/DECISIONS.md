@@ -92,3 +92,6 @@ one pass, the simplest reasonable option was chosen and recorded here.
 - **Evolution cutscene.** 3 s, skippable, shows the new stage's voice line. It plays when a summoned soldier's stage passes the last stage the user saw (`kv` key `soldier_seen_<key>`). It does not play at summon time. Known gap: no morph animation from the old silhouette yet.
 - **Voice lines.** Rotated by active days within the current stage (the existing data has 3 lines per stage).
 - **Known gaps.** Users cannot re-link a quest to another soldier yet, and dungeons do not yet link to a soldier or quest. Soldier art for stages 2–5, wisdom overlays and the egg image are placeholders.
+| 27 | Wallet on transactions | Nullable `walletId` on `transactions`. Null means the first wallet, so v4 data needs no backfill (migration 4→5). | Spec wants wallets without losing old entries. |
+| 28 | Transfers | Separate `transfers` table. They never count as spending and give no XP or Gold. | Spec: spending must never give XP or Gold, and moving money is not spending. |
+| 29 | Cheques | One table for issued and received cheques, due date stored as epoch day from the Jalali date. "Due soon" means within 3 days. | Keeps one list with a single status rule (`ChequeRules`). |

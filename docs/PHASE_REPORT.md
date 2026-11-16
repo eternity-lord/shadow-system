@@ -44,6 +44,10 @@ Latest green CI on the branch: `5e` batch — run 43887565776 (weekly boss, budg
 - Budgets with 80% warning and 100% over state. Recurring rules with Jalali catch-up (cap 60). Savings goals as bosses. Debts and installments.
 - Reports: donut, six-month bars, 30-day line (Compose Canvas). CSV export.
 - Money entries never give XP or Gold (spending is separate from the game economy).
+- Wallets with an opening balance. Each entry can be booked to a wallet; entries without one count toward the first wallet. Balances are live.
+- Transfers between wallets. They are not spending: no XP, no Gold, and they do not count in budgets or reports.
+- Cheques, issued or received, with a Jalali due date (day/month/year steppers), status (cleared, overdue, due in 3 days, later), mark-cleared and delete with confirmation.
+- Unit tests: wallet balances and transfers, cheque status, Jalali leap years, month lengths, clamping and round trip.
 
 **Inbox, screens and settings**
 - Inbox "park a thought" card on the Now tab, with delete confirmation.
@@ -52,7 +56,7 @@ Latest green CI on the branch: `5e` batch — run 43887565776 (weekly boss, budg
 - Debug-only 60-day seed generator (`app/src/debug`; a no-op stub in release).
 
 **Data and quality**
-- Room database v4 with migrations 1→2, 2→3 and 3→4. Exported schema.
+- Room database v5 with migrations 1→2, 2→3, 3→4 and 4→5 (wallets, transfers, cheques, `transactions.walletId`). Exported schema.
 - Unit tests: Jalali, game math, planner, rank trial, day rules, text and money, dungeon rules and timer math, soldier progress and roster, title rules, weekly boss, budget thresholds, backup crypto round trip.
 - Release build signed with the project keystore (committed by the owner's decision; see DECISIONS.md).
 
@@ -60,7 +64,7 @@ Latest green CI on the branch: `5e` batch — run 43887565776 (weekly boss, budg
 
 These keep PR #1 open.
 
-- **Money:** wallets and transfers, receipt photos, cheques, and the Jalali date picker. Not verified in code.
+- **Money:** receipt photos. Wallets, transfers, cheques and the Jalali date picker are built, but the new tables are not yet in the encrypted backup or CSV export.
 - **Dungeon:** linking a dungeon to a quest or soldier, body-doubling soldier animation, and gate minutes that the user can change.
 - **Soldiers:** user re-linking of quests to soldiers (only template links exist), the morph animation for evolution, and a wisdom overlay image.
 - **Avatar:** layered body, hair, face, outfit, weapon and aura art (only rank avatars exist), stat overlays, and the old-avatar break-apart in the rank-up cutscene. Titles are not yet shown on the profile header.

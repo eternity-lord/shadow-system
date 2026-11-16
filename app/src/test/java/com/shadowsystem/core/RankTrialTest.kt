@@ -18,7 +18,7 @@ class RankTrialTest {
     fun effectiveRankIsCappedByUnlockedRank() {
         assertEquals(Rank.E, RankTrial.effectiveRank(levelIdx = 3, unlockedIdx = 0))
         assertEquals(Rank.C, RankTrial.effectiveRank(levelIdx = 3, unlockedIdx = 2))
-        assertEquals(Rank.B, RankTrial.effectiveRank(levelIdx = 2, unlockedIdx = 5))
+        assertEquals(Rank.C, RankTrial.effectiveRank(levelIdx = 2, unlockedIdx = 5))
     }
 
     @Test

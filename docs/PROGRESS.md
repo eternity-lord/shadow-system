@@ -1,34 +1,10 @@
-# Progress Tracker
+# Progress
 
-Branch: `arena/05d6808d-shadow-system` (base `cb65486`)
+Short, current status. The full list of built and open items is in `PHASE_REPORT.md`.
 
-| Phase | Status | Commit(s) | Notes |
-|---|---|---|---|
-| 0 Setup | Done | `3ebccc9` | PDF, Gradle, fonts, docs, manifest |
-| 1 MVP | Partial, builds and tests green | `f4fd82e` + fixes | See PHASE_REPORT.md for what is missing |
-| 2 Depth | Not started | — | Budgets, recurring, goals, debts, reports, notifications |
-| 3 Completion | Not started | — | Backup, app lock, artwork, release build |
-
-## Next steps (in order)
-1. Notifications and onboarding (Phase 1 leftovers).
-2. Quest "I'm stuck" + swipe-complete undo.
-3. Soldier system and avatar visuals.
-4. Phase 2 money features and reports.
-5. Phase 3 backup, app lock, artwork, accessibility.
-
-## Log
-- Phase 0: scaffold, fonts, Gradle, PDF committed, pushed.
-- Phase 1: core logic, data layer, five screens, tests, CI. Two CI fix cycles (missing `getValue` import). Final run green.
-
-
-## Latest update
-- Rank trial, numpad, biometric unlock, swipe complete, gate artwork, release build in CI: done (`dcb6107`, CI green).
-- Still open: gold shop, rank-up cutscene, soldier/avatar/monster artwork, accessibility audit, real release signing key.
-- PR #1 is NOT merged. It will be merged only when the open items are closed.
-
-## Update 2
-- Gold shop (dungeon boost), rank-up dialog, 8 soldier portraits, 6 gate images: done. CI green at `00f6e45`.
-- Still open: 4 soldier portraits, 6 rank avatars (to generate next turn), accessibility audit, real release key, PR merge.
-
-## Update 3
-- All 12 soldier portraits (stage 1), 6 rank avatars and 6 gate images generated and included.
+- **Phase 0 (setup):** done.
+- **Phase 1 (MVP):** done. Known gap: receipt photos.
+- **Phase 2 (depth):** mostly done. Dungeon timer service, soldiers, avatar shop, titles, radar, weekly boss are done. Open: wallets and transfers, cheques, dungeon-to-quest linking, reduce-motion, onboarding questions.
+- **Phase 3 (completion):** partly done. Backup, PIN and biometric lock, FLAG_SECURE, CSV, weekly boss, titles and achievements are done. Open: artwork for stages 2–5 and layered avatars, morning and night report screens, accessibility audit, README polish.
+- **Tests:** unit tests for the rules listed in PHASE_REPORT.md, running on CI. No device or emulator tests yet.
+- **Docs:** PHASE_REPORT, PROGRESS, ASSETS_MANIFEST, DECISIONS and README are kept in step with the code.

@@ -1,33 +1,34 @@
-# Assets Manifest
+# Assets manifest
 
-All artwork is either generated for this project with the image generator or drawn in code. Nothing is downloaded at runtime (the app is offline).
+Every visual asset the app references, and what it is. Missing assets fall back to a coloured placeholder (`AssetImage`), so the app never crashes on a missing file.
 
-## Bundled raster images (`app/src/main/res/drawable-nodpi/`)
+## Raster images (`app/src/main/res/drawable-nodpi/`, 512×512 PNG)
 
-| File | Source | Used by | Notes |
+| Name pattern | Count | Used by | Status |
 |---|---|---|---|
-| `gate_e.png` … `gate_s.png` (6 files) | Generated with the image generator for this project (prompt: dark fantasy rune gate, one per rank, no text, no people) | Dungeon tab, gate card (`AssetRegistry.gateAssetName`) | Downscaled to 512×512 PNG. About 2.1 MB total. |
-| `shadow_{igris,beru,iron,tank,tusk,fang,jima,blue,kaisel,nova,scribe,bellion}_stage1.png` (12 files) | Generated with the image generator (one dark bust portrait per soldier, no text) | Hunter tab, soldier tiles (`AssetRegistry.soldierAssetName(key, 1)`) | Downscaled to 512×512. About 4.5 MB total. |
-| `avatar_rank_{e,d,c,b,a,s}.png` (6 files) | Generated with the image generator (one dark bust portrait per rank, no text) | Hunter tab avatar (`AvatarData.rankAssetName`) | Downscaled to 512×512. About 2.1 MB total. |
+| `gate_{e,d,c,b,a,s}.png` | 6 | Dungeon gate cards | Generated |
+| `shadow_{igris…bellion}_stage1.png` | 12 | Soldier roster (stage 1) | Generated for 4 soldiers, the rest use placeholders |
+| `avatar_rank_{e,d,c,b,a,s}.png` | 6 | Hunter avatar and rank-up | Generated |
 
-Higher soldier stages (`shadow_<key>_stage2..5`), wisdom art and monster art are not planned for this build. `AssetRegistry` falls back to a procedural placeholder for them.
+## Missing (placeholder only)
 
-The app falls back to a procedural silhouette whenever a drawable with the expected name is missing. Adding a PNG with the same name replaces the fallback with no code change.
+- `shadow_<key>_stage2..5`: soldier stages 2–5. `AssetRegistry.soldierBestAsset` uses the highest existing stage, so the stage 1 image is shown with a stage label.
+- `wisdom_<key>_1..3`: wisdom overlays (tiers 1–3). Tier is shown as text.
+- `egg_placeholder`: soldier egg. Shown as a coloured placeholder.
+- `monster_<rank>_<n>`: dungeon monsters. Not yet used in the UI.
+- Layered avatar parts (body, hair, face, outfit, weapon, headgear, aura), stat overlays, class art, shop item art, backgrounds, frames, mood-pose images.
+- Icons for money categories (`icon_cat_*`) and stat icons (`stat_*`).
 
 ## Fonts (`app/src/main/res/font/`)
 
-| File | Source | License |
-|---|---|---|
-| `vazirmatn_regular.ttf`, `vazirmatn_medium.ttf`, `vazirmatn_bold.ttf` | Vazirmatn v33.003, rastikerdar/vazirmatn (codeload) | SIL Open Font License 1.1 |
+- Vazirmatn (Persian UI font), from rastikerdar/vazirmatn v33.003 (OFL licence).
 
 ## Launcher icon
 
-`mipmap-anydpi-v26/ic_launcher.xml` and `drawable-nodpi/ic_launcher_foreground.xml`: vector drawables written in code.
+- `mipmap` adaptive icon (generated, see `res/mipmap-*`).
 
-## Procedural placeholders (no file)
+## Sounds and haptics
 
-`AssetRegistry` resolves names such as `shadow_<key>_stage<1-5>`, `wisdom_<key>_<1-3>`, `avatar_rank_<e..s>`, `monster_<rank>_<n>`, `rank_<rank>`, `stat_<stat>` and `icon_cat_<name>`. If a drawable with that name is missing, `AssetImage` draws a `ProceduralPlaceholder` (a Canvas silhouette). Only higher soldier stages, wisdom art and monster art still use this fallback.
-
-## Not used
-
-No photos, no third-party icons, no sounds, no network assets.
+- Ambient sound: generated in code (`util/AmbientSound.kt`), no file. Brown noise.
+- Haptics: platform feedback only (no files).
+- Notification sound: none (silent channels).

@@ -1,81 +1,74 @@
-# Phase Report
+# Phase report — Shadow System
 
-Spec reference: `docs/original-prompt.pdf` section 16 (phase order).
+Status is written from the code, not from plans. "Built" means the code exists and compiles on CI. Device testing has not been done.
 
-## Phase 0 — Setup — DONE (commit `3ebccc9`)
-- Original spec PDF committed to `docs/original-prompt.pdf`.
-- Gradle wrapper 8.7, AGP 8.5.2, Kotlin 2.0.20, Compose BOM 2024.09.00, Room 2.6.1, minSdk 26, target 34.
-- Vazirmatn v33.003 fonts bundled (Regular/Medium/Bold).
-- Manifest without INTERNET permission, RTL support, Persian `strings.xml` and `values-fa`.
-- Documentation skeleton: README, DECISIONS, ASSETS_MANIFEST, PROGRESS, this report.
+Latest green CI on the branch: `5e` batch — run 43887565776 (weekly boss, budget and crypto tests). Earlier batches are listed below.
 
-## Phase 1 — MVP — MOSTLY DONE (latest green commit `44cd81f`)
-Build status: `./gradlew assembleDebug testDebugUnitTest` **passes on GitHub Actions** (run 43833013809, commit `44cd81f`).
+## Built (compiled on CI)
 
-Added since the earlier report:
-- Room schema v2 (`MIGRATION_1_2`) with budgets, recurring rules, goals, debts and key-value settings.
-- Onboarding (4 screens), PIN lock gate, FLAG_SECURE on the whole window.
-- Reports screen (donut, six-month bars, 30-day line) drawn with Compose Canvas.
-- Settings screen: hide-balances toggle, PIN set/remove, encrypted backup export/restore (AES-256-GCM, PBKDF2), CSV export.
-- Money plan screen: budgets, recurring rules, savings goals (bosses), debts and installments.
-- Reports and settings are wired into the navigation; the Hunter tab links to Settings.
+**Core game**
+- Jalali calendar (own implementation), day boundary at 04:00 (`DayRules`).
+- XP curves, ranks E–S, stat and soldier curves (`GameMath`), daily score, comeback ×1.5, rank trial (weekly, gates rank-up).
+- Quest planner (Great / Normal / Hard), 48 Persian templates, step-by-step completion with 5-second undo, "I'm stuck" (make smaller).
+- Numpad quick-add, swipe to complete, reminders (`POST_NOTIFICATIONS` only, optional).
 
-Delivered:
-- Jalali calendar (own implementation, validated against jalaali-js constants) with leap-year, month-boundary, round-trip and weekday tests.
-- Game math: XP curve `round(100·n^1.4)`, ranks E–S, stat and soldier curves, quest reward table, daily score (40/20/20/20), Shadow of Yesterday bonus, partial dungeon XP, comeback ×1.5 for 3 quests.
-- Quest planner: Great 3+5, Normal 3+3, Hard 1+1 (low-energy); 48 Persian templates with 1–5 steps.
-- Room database (7 tables, exported schema) and repositories for game and money (money stored in rials, displayed in toman).
-- Screens: Now (score, level, mood, mandatory quests), Quests (all quests and steps), Dungeon (gate timer, early exit with confirmation), Money (expense/income, categories, month summary, delete with confirmation), Hunter (level, rank, stats, class, soldier roster).
-- Single activity, bottom navigation with five tabs, RTL layout, Persian digits, 48dp touch targets.
-- 40+ unit tests (Jalali, game math, planner, day rules, text/money).
-- CI workflow that builds the APK, runs tests, and posts errors as a commit comment on failure.
+**Dungeons (spec 5)**
+- Foreground service timer (`DungeonService`, `specialUse` type) with a live notification. The run is stored in SharedPreferences, so it resumes after the process is killed.
+- Pause and resume (pause time does not count as work). Monster HP drops with the timer, and regenerates slightly while paused (cosmetic).
+- Haptic tick each full minute (toggle). Ambient brown-noise loop (toggle, off by default).
+- Cancel gives partial XP. End gives loot: XP, gold, 10% rare-item roll, and an optional one-line journal note saved to the run.
 
-Not yet delivered from Phase 1 in the spec:
-- Morning and night reminders are added: AlarmManager, optional in Settings, `POST_NOTIFICATIONS` only.
-- Swipe-complete with 5s undo (undo banner exists; swipe gesture not wired).
-- Numpad quick-add, receipt photo, tags. Gold shop is a 'coming soon' card (see DECISIONS.md).
-- Foreground-service dungeon timer, monster HP, loot journal, weekly boss.
-- Full soldier system (summon ritual, XP, evolution, voice lines in UI, wisdom overlay).
-- Avatar layering, stat-based class visuals, rank trial boss, rank-up cutscene.
-- Generated or downloaded artwork (only placeholders; see ASSETS_MANIFEST.md).
+**Soldiers (spec 6)**
+- Roster of 12 (`SoldierData`). Rename (max 20 characters). Detail sheet with stats, state and voice line.
+- Egg until 7 active days, then a skippable 5-second summoning ritual.
+- Progress is derived from completed linked quests (`quests.soldierKey`, from templates). 20 XP per linked quest, level from `round(50·n^1.3)`.
+- States: awake / tired / sleeping (2 and 5 days). Sleeping shows a gentle one-task hint.
+- Stage 1–5 from level. Wisdom tier 0–3 from variety and steps (text label; overlay art not yet).
+- Evolution cutscene: 3 s, skippable, with the new stage's voice line. Plays once per stage increase.
+- Bellion locked until rank S and 100 total active days.
 
-## Phase 2 — Depth — PARTIALLY DONE
-Done (compiled, CI green): budgets with 80/100% warnings, recurring rules with Jalali catch-up (`MAX_CATCH_UP` 60), savings goals as bosses, debts and installments, reports (donut/bars/lines), CSV export.
-Not done: search and filters UI (search logic may exist in the repository but is not fully surfaced), notifications, rank trial boss, Gold shop.
+**Avatar and profile (spec 7)**
+- Base look per rank (6 avatar PNGs). Class from the top two stats, fixed per week (recomputed when a new week starts).
+- Stat radar (Canvas). Mood pose from today's score (4 text poses).
+- Titles (5 of 6 unlockable; `early_bird` stays locked because time-of-day is not tracked).
+- Achievements (9 of 10 unlockable; `boss_done` unlocks with the weekly boss).
+- Avatar shop with Gold cosmetics (outfits, weapons, auras, frames, backgrounds). Heavy items are locked until boss or trial rewards. Items can be worn, one per category.
+- Rank-up overlay: 5 seconds, tap to skip.
 
-## Phase 3 — Completion — PARTIALLY DONE
-Done: AES-256-GCM backup with PBKDF2 (UI in Settings), PIN lock (PBKDF2 hash), FLAG_SECURE, hide-balances toggle.
-Not done: biometric unlock, artwork integration beyond procedural placeholders, accessibility pass, R8 release build with signing placeholder.
+**Weekly boss (spec 5 / phase 3)**
+- Target 120 dungeon minutes and 3 completed quests this week. Each is half of the HP bar.
+- Defeated boss: one-time reward (200 XP, 150 gold) and a heavy cosmetic (alternates weekly).
 
-## Phase 1 — MVP — DONE, except items listed under "Open"
-Verified on CI (`assembleDebug assembleRelease testDebugUnitTest`) at `dcb6107`.
-Delivered: onboarding, PIN lock, Jalali calendar, game math, quest planner, Now/Quests/Dungeon/Money/Hunter tabs, numpad quick-add, swipe to complete with a 5-second undo, daily reminders, gate artwork.
+**Money (spec 8–9)**
+- Expenses and income in rials, shown in toman. Categories, month summary, search and income/expense filter.
+- Budgets with 80% warning and 100% over state. Recurring rules with Jalali catch-up (cap 60). Savings goals as bosses. Debts and installments.
+- Reports: donut, six-month bars, 30-day line (Compose Canvas). CSV export.
+- Money entries never give XP or Gold (spending is separate from the game economy).
 
-## Phase 2 — Depth — MOSTLY DONE
-Delivered: gold shop with a dungeon boost, rank-up dialog, budgets (80%/100% warnings), recurring rules with Jalali catch-up, savings goals as bosses, debts and installments, reports (donut, bars, 30-day line), search and income/expense filter, tags (via `#` in notes), CSV export, rank trial (weekly, 5 quests in 7 days) that gates rank-up, reminders.
+**Inbox, screens and settings**
+- Inbox "park a thought" card on the Now tab, with delete confirmation.
+- Onboarding (4 screens), PIN lock (PBKDF2 hash), biometric unlock, FLAG_SECURE on the whole window, hide-balances toggle.
+- Encrypted backup and restore: AES-256-GCM, PBKDF2 key derivation, with a magic header.
+- Debug-only 60-day seed generator (`app/src/debug`; a no-op stub in release).
 
-## Phase 3 — Completion — PARTLY DONE
-Delivered: AES-256-GCM encrypted backup (UI in Settings), PIN lock (PBKDF2), biometric unlock, FLAG_SECURE, hide-balances toggle, R8 release build in CI, numpad.
+**Data and quality**
+- Room database v4 with migrations 1→2, 2→3 and 3→4. Exported schema.
+- Unit tests: Jalali, game math, planner, rank trial, day rules, text and money, dungeon rules and timer math, soldier progress and roster, title rules, weekly boss, budget thresholds, backup crypto round trip.
+- Release build signed with the project keystore (committed by the owner's decision; see DECISIONS.md).
 
-## Latest batch (`5be021a`, CI green on both runs)
-- Dungeon monster HP drains with the timer (`DungeonRules.monsterHpPercent`, unit-tested).
-- Loot dialog after a finished run: XP, gold, 10% rare-item roll (counter stored in key-value), optional journal note (140 chars, saved to `dungeon_sessions.note`).
-- Inbox "park a thought" card on the Now tab (table `inbox`, add and delete with confirmation).
-- Room v3 with `MIGRATION_2_3` (adds `note` and `inbox`).
-- Light haptic feedback on quest step completion.
-- Debug-only 60-day seed generator (`app/src/debug`, with a no-op stub in `app/src/release`). The button is shown only in debug builds.
+## Not built yet (spec items still open)
 
-## Open (honest list)
-Spec items not yet built (these keep PR #1 open):
-- Dungeon foreground-service timer (the timer still runs in the UI and stops when the app is killed), pause, body-doubling soldier animation, ambient sound.
-- Soldier summon ritual, soldier XP and evolution UI, voice lines and wisdom overlay.
-- Avatar layering and stat-based class visuals.
-- Weekly boss beyond the rank trial; monster and wisdom art.
-- Higher soldier stages (2–5) use the stage 1 portrait with a stage label.
-- A TalkBack audit on a real device has not been run.
-- The release key is committed to the public repo by the owner's decision (see DECISIONS.md).
-- Not run: emulator or device tests.
+These keep PR #1 open.
+
+- **Money:** wallets and transfers, receipt photos, cheques, and the Jalali date picker. Not verified in code.
+- **Dungeon:** linking a dungeon to a quest or soldier, body-doubling soldier animation, and gate minutes that the user can change.
+- **Soldiers:** user re-linking of quests to soldiers (only template links exist), the morph animation for evolution, and a wisdom overlay image.
+- **Avatar:** layered body, hair, face, outfit, weapon and aura art (only rank avatars exist), stat overlays, and the old-avatar break-apart in the rank-up cutscene. Titles are not yet shown on the profile header.
+- **Screens:** onboarding asks no questions and does not suggest soldiers. Night report and morning briefing use phrase banks but are not yet a full screen with delta and loot summary. Reduce-motion setting is not built.
+- **Art:** soldier stages 2–5, egg image, wisdom overlays, monsters, backgrounds, icons. These are placeholders (see ASSETS_MANIFEST.md).
+- **Quality:** TalkBack audit on a device, emulator or device tests, and a full process-death walkthrough. Accessibility has not been checked beyond the code.
+- **Docs:** README and PROGRESS are updated to this state. Check them after the next batch.
 
 ## Verification
-- The sandbox has no JDK or Android SDK, so compilation and tests run on GitHub Actions only.
-- Latest CI: success on `5be021a` (both the Android CI runs).
+- The sandbox has no JDK or Android SDK. Compilation and unit tests run on GitHub Actions only.
+- CI for every pushed batch is checked. Errors come from the commit comment (the `gh run view --log` path does not work from the sandbox).

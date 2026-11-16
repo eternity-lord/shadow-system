@@ -43,4 +43,4 @@ Every visual asset the app references, and what it is. Missing assets fall back 
 | `bg_throne.png` | Heavy item `bg_throne` (weekly boss reward) | 768×768; shown at 35% behind the hunter card when equipped |
 | `shadow_<key>_stage2.png` for all 12 soldiers | Soldier card at stage 2 | 512×512; made from each stage-1 image for consistency |
 
-Stage 3 done for all 12 soldiers. Stage 4 done for igris, beru, blue, bellion, fang, iron, jima, kaisel. Still missing: stage 4 for nova, scribe, tank, tusk; stage 5 for all 12. wisdom overlays (`wisdom_<key>_<tier>`), monsters, category icons, other backgrounds.
+Stage 3 done for all 12 soldiers. Stage 4 done for all 12 soldiers. Stage 5 done for igris, beru, blue, bellion, fang, iron. Still missing: stage 5 for jima, kaisel, nova, scribe, tank, tusk. wisdom overlays (`wisdom_<key>_<tier>`), monsters, category icons, other backgrounds.

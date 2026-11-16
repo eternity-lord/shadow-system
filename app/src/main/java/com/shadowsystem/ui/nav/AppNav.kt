@@ -83,7 +83,7 @@ fun AppRoot(app: ShadowApp) {
             },
             onBiometricOk = { app.container.lock.locked.value = false }
         )
-        !gameState.profile.onboarded -> OnboardingScreen { game.finishOnboarding() }
+        !gameState.profile.onboarded -> OnboardingScreen { focus -> game.finishOnboarding(focus) }
         else -> MainNavigation(app, game)
     }
 }

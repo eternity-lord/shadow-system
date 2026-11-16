@@ -16,6 +16,8 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.shadowsystem.R
+import com.shadowsystem.ui.components.DailyReportCard
+import com.shadowsystem.core.DailyReport
 import com.shadowsystem.ui.components.ConfirmDialog
 import com.shadowsystem.core.GameMath.Rank
 import androidx.compose.runtime.setValue
@@ -71,6 +73,14 @@ fun NowScreen(vm: GameViewModel, inbox: InboxViewModel, boss: BossViewModel) {
     ) {
         Text(Jalali.format(Jalali.fromMillis(System.currentTimeMillis())), style = MaterialTheme.typography.bodyMedium, color = ShadowColors.TextMuted)
         Text(stringResource(R.string.now_title), style = MaterialTheme.typography.headlineMedium)
+        if (state.loaded) {
+            DailyReportCard(
+                morning = !DailyReport.isNightHour(java.time.LocalTime.now().hour),
+                score = state.score?.score,
+                yesterday = yesterday,
+                dungeonMinutes = state.dungeonSeconds / 60
+            )
+        }
 
         state.message?.let { MessageBanner(it) { vm.dismissMessage() } }
         state.undo?.let { info ->

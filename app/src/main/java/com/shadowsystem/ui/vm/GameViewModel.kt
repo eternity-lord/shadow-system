@@ -185,8 +185,8 @@ class GameViewModel(private val game: GameRepository, private val timer: Dungeon
         message.value = null
     }
 
-    fun finishOnboarding() {
-        viewModelScope.launch { game.finishOnboarding() }
+    fun finishOnboarding(focus: Int) {
+        viewModelScope.launch { game.finishOnboarding(focus) }
     }
 
     fun tickStep(step: QuestStepEntity) {

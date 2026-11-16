@@ -348,4 +348,20 @@
     <string name="reduce_motion_setting">کاهش حرکت (انیمیشن‌های کم)</string>
     <string name="body_double_fallback">سرباز</string>
     <string name="body_double_text">%1$s کنارت راه می‌آید.</string>
+    <string name="onb_title_5">کدام بخش برایت مهم‌تر است؟</string>
+    <string name="onb_focus_1">عادت‌ها و کارها</string>
+    <string name="onb_focus_2">پول و بودجه</string>
+    <string name="onb_focus_3">سلامت و تمرکز</string>
+    <string name="onb_soldier_hint">پیشنهاد: بعد از ۷ روز فعال بودن، اولین سربازت احضار می‌شود. سربازها همراه پیشرفتت رشد می‌کنند.</string>
+    <string name="onb_pick_one">یکی از گزینه‌ها را انتخاب کن.</string>
+    <string name="report_morning_title">گزارش صبحگاهی</string>
+    <string name="report_night_title">گزارش شبانه</string>
+    <string name="report_yesterday_score">امتیاز دیروز: %1$s</string>
+    <string name="report_no_yesterday">امتیاز دیروز ثبت نشده است.</string>
+    <string name="report_no_score">امروز هنوز امتیازی ثبت نشده. یک کار کوچک را تمام کن.</string>
+    <string name="report_today_score">امتیاز امروز: %1$s</string>
+    <string name="report_trend_up">بالاتر از دیروز به اندازه %1$s امتیاز.</string>
+    <string name="report_trend_same">برابر با دیروز. ثابت بمان.</string>
+    <string name="report_trend_down">پایین‌تر از دیروز به اندازه %1$s امتیاز. فردا دوباره شروع کن.</string>
+    <string name="report_dungeon_minutes">زمان دانجن امروز: %1$s دقیقه</string>
 </resources>

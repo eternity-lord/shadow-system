@@ -82,7 +82,8 @@ These keep PR #1 open.
 - Dungeon: body-doubling soldier (the linked one, or the first summoned), gate length per rank (5–120 min, steps of 5), optional soldier and quest link saved on the session, rare loot flag per session.
 - Quests: a quest can be relinked to another summoned soldier from its card (cycles through "no soldier" and each summoned soldier).
 - Reports: morning and night card on the Now tab, and a full daily report screen (score and trend, quests, XP, dungeon time, rare loot, spending). Spending never gives XP or gold.
-- Onboarding: five screens, one focus question, soldier suggestion.
+- Onboarding: four intro pages, then four question screens (focus, hardest part, daily time, reminders), with back and a required answer on each question. Reminders are switched on from the last answer. Answers are stored in kv for later use; the daily time is not yet used to change gameplay.
+- Reminders: the morning and night notifications show today's real numbers (open quests, score) when available.
 - Goals: savings estimate on each goal card (average daily saving since the goal was made).
 
 ## Verification

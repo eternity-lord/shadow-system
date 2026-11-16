@@ -388,4 +388,20 @@
     <string name="goal_estimate">حدود %1$s روز تا رسیدن به هدف</string>
     <string name="goal_estimate_none">با پس‌انداز فعلی تخمینی نیست</string>
     <string name="stage_badge">مرحله %1$s</string>
+    <string name="onb_q_struggle_title">کدام بخش برایت سخت‌تر است؟</string>
+    <string name="onb_struggle_1">شروع کردن</string>
+    <string name="onb_struggle_2">ادامه دادن تا آخر</string>
+    <string name="onb_struggle_3">فراموش کردن</string>
+    <string name="onb_struggle_4">کارهای زیاد با هم</string>
+    <string name="onb_q_time_title">هر روز چقدر وقت می‌توانی بگذاری؟</string>
+    <string name="onb_time_1">حدود ۱۰ دقیقه</string>
+    <string name="onb_time_2">حدود ۲۰ دقیقه</string>
+    <string name="onb_time_3">۳۰ دقیقه یا بیشتر</string>
+    <string name="onb_q_reminder_title">یادآوری صبح و شب فعال باشد؟</string>
+    <string name="onb_reminder_on">بله، فعال کن</string>
+    <string name="onb_reminder_off">نه، فعلاً نه</string>
+    <string name="onb_reminder_note">یادآوری‌ها فقط اعلان‌اند و بدون اینترنت کار می‌کنند. بعداً در تنظیمات می‌توانی عوضشان کنی.</string>
+    <string name="onb_back">قبلی</string>
+    <string name="reminder_morning_stats">امروز %1$s از %2$s مأموریت مانده. با اولین قدم شروع کن.</string>
+    <string name="reminder_night_score">امتیاز امروزت %1$s است و %2$s مأموریت انجام شده.</string>
 </resources>

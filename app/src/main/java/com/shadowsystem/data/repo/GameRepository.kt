@@ -66,8 +66,10 @@ class GameRepository(
     suspend fun scoreOf(day: Long): Int? = scoreDao.get(day)?.score
 
     /** Marks onboarding done and stores the answer to the focus question (0 = habits, 1 = money, 2 = health). */
-    suspend fun finishOnboarding(focus: Int) {
+    suspend fun finishOnboarding(focus: Int, struggle: Int, minutes: Int) {
         kvDao.upsert(KeyValueEntity(ONBOARDING_FOCUS_KEY, focus.toLong()))
+        kvDao.upsert(KeyValueEntity(ONBOARDING_STRUGGLE_KEY, struggle.toLong()))
+        kvDao.upsert(KeyValueEntity(ONBOARDING_MINUTES_KEY, minutes.toLong()))
         val p = profile()
         profileDao.upsert(p.copy(onboarded = true))
     }
@@ -439,6 +441,8 @@ class GameRepository(
 
     companion object {
         const val ONBOARDING_FOCUS_KEY = "onboarding_focus"
+        const val ONBOARDING_STRUGGLE_KEY = "onboarding_struggle"
+        const val ONBOARDING_MINUTES_KEY = "onboarding_minutes"
         private fun gateKey(rank: String) = "gate_minutes_$rank"
         const val DUNGEON_GOAL_MINUTES = 25
         const val RARE_LOOT_KEY = "rare_loot_count"

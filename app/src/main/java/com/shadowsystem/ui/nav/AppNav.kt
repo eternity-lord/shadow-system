@@ -86,7 +86,11 @@ fun AppRoot(app: ShadowApp) {
             },
             onBiometricOk = { app.container.lock.locked.value = false }
         )
-        !gameState.profile.onboarded -> OnboardingScreen { focus -> game.finishOnboarding(focus) }
+        !gameState.profile.onboarded -> OnboardingScreen { a ->
+            game.finishOnboarding(a.focus, a.struggle, a.minutes)
+            app.container.prefs.setReminders(a.reminders)
+            com.shadowsystem.util.Reminders.apply(app, a.reminders)
+        }
         else -> MainNavigation(app, game)
     }
 }

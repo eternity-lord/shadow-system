@@ -101,3 +101,5 @@ one pass, the simplest reasonable option was chosen and recorded here.
 | 33 | Gate length | Stored per rank in kv (`gate_minutes_<RANK>`), 5–120 min in steps of 5 | Lets the user pick a session length without changing the rank scale. |
 | 34 | Dungeon links | Soldier and quest are stored on the run and on the session. They do not change XP. | Keeps XP rules unchanged; the link is for focus and history. |
 | 35 | Daily report | Full report reads the day's data only. Spending is shown but never adds XP or gold. | Spec: money never gives XP or gold. |
+| 36 | Onboarding questions | Four question screens (focus, hardest part, daily time, reminders). Answers stored in kv (`onboarding_struggle`, `onboarding_minutes`). Daily time does not yet change gameplay. | Spec asks for question screens; personalisation is a later step. |
+| 37 | Reminder content | Morning and night notifications read today's numbers from the repository; plain text when there is no data. | Spec: morning briefing and night report linked to notifications. |

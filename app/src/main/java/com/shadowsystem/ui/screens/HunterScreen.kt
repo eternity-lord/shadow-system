@@ -15,6 +15,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -94,13 +95,14 @@ fun HunterScreen(vm: GameViewModel, onSettings: () -> Unit) {
             }
         }
 
-        GoldShop(state.profile.gold, state.boostActive) { onResult -> vm.buyDungeonBoost(onResult) }
+        GoldShop(state.profile.gold, state.boosts) { item, onResult -> vm.buyBoost(item, onResult) }
         Text(stringResource(R.string.soldiers_title), style = MaterialTheme.typography.titleMedium, color = ShadowColors.TextMuted)
         SoldierData.ALL.chunked(3).forEach { row ->
             Row(horizontalArrangement = Arrangement.spacedBy(8.dp), modifier = Modifier.fillMaxWidth()) {
                 row.forEach { soldier ->
                     val unlocked = isUnlocked(soldier, statLevels, rank)
-                    SoldierTile(soldier, unlocked, Modifier.weight(1f))
+                    val stage = SoldierData.stageForLevel(soldier.stat?.let { statLevels[it] } ?: level)
+                    SoldierTile(soldier, unlocked, stage, Modifier.weight(1f))
                 }
             }
         }
@@ -113,16 +115,18 @@ private fun isUnlocked(soldier: SoldierDef, statLevels: Map<Stat, Int>, rank: Ga
 }
 
 @Composable
-private fun SoldierTile(soldier: SoldierDef, unlocked: Boolean, modifier: Modifier) {
+private fun SoldierTile(soldier: SoldierDef, unlocked: Boolean, stage: Int, modifier: Modifier) {
+    val context = LocalContext.current
     ShadowCard(modifier = modifier) {
         AssetImage(
-            name = AssetRegistry.soldierAssetName(soldier.key, 1),
+            name = AssetRegistry.soldierBestAsset(context, soldier.key, stage),
             size = 72.dp,
             placeholderColor = Color(soldier.colorHex),
-            stage = 1,
+            stage = stage,
             contentDescription = soldier.name
         )
         Text(soldier.name, style = MaterialTheme.typography.bodyMedium)
+        Text(stringResource(R.string.soldier_stage, PersianText.toFa(stage)), style = MaterialTheme.typography.bodyMedium, color = ShadowColors.TextMuted)
         Text(
             if (unlocked) stringResource(R.string.soldier_unlocked) else stringResource(R.string.soldier_locked),
             color = if (unlocked) ShadowColors.Secondary else ShadowColors.TextMuted,

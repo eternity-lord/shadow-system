@@ -89,7 +89,12 @@ fun DungeonScreen(vm: GameViewModel) {
 private fun GateCard(rank: Rank, onEnter: () -> Unit) {
     ShadowCard {
         Row(verticalAlignment = Alignment.CenterVertically) {
-            AssetImage(AssetRegistry.gateAssetName(rank.name), size = 64.dp, placeholderColor = ShadowColors.Primary)
+            AssetImage(
+                AssetRegistry.gateAssetName(rank.name),
+                size = 64.dp,
+                placeholderColor = ShadowColors.Primary,
+                contentDescription = stringResource(R.string.gate_rank, rank.name)
+            )
             Column(modifier = Modifier.weight(1f).padding(start = 12.dp)) {
                 Text(stringResource(R.string.gate_rank, rank.name), style = MaterialTheme.typography.titleMedium)
                 Text(

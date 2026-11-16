@@ -183,6 +183,13 @@
     <string name="rank_trial_progress">%1$s از %2$s مأموریت</string>
 
     <!-- Gold shop -->
+    <string name="shop_quest_name">تقویت مأموریت</string>
+    <string name="shop_quest_desc">تجربه‌ی مأموریت بعدی ×۱٫۵ می‌شود.</string>
+    <string name="shop_gold_name">طلای دوبل</string>
+    <string name="shop_gold_desc">طلای مأموریت بعدی ×۲ می‌شود.</string>
+    <string name="soldier_stage">مرحله %1$s</string>
+    <string name="rank_up_title">رتبه‌ی جدید</string>
+    <string name="rank_up_tap">برای ادامه لمس کن</string>
     <string name="shop_title">فروشگاه طلا</string>
     <string name="shop_boost_name">تقویت دروازه</string>
     <string name="shop_boost_desc">تجربه‌ی دروازه‌ی بعدی ×۱٫۵ می‌شود.</string>

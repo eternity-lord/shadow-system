@@ -14,6 +14,15 @@ data class SoldierDef(
 )
 
 object SoldierData {
+    /** Five stages by level: 1–9, 10–24, 25–49, 50–79, 80+. */
+    fun stageForLevel(level: Int): Int = when {
+        level >= 80 -> 5
+        level >= 50 -> 4
+        level >= 25 -> 3
+        level >= 10 -> 2
+        else -> 1
+    }
+
 
     private fun lines(vararg l: String): List<String> = l.toList()
 

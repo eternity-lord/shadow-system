@@ -31,6 +31,15 @@ object AssetRegistry {
     fun hasAsset(context: Context, name: String): Boolean = drawableId(context, name) != 0
 
     fun soldierAssetName(key: String, stage: Int): String = "shadow_${key}_stage$stage"
+
+    /** The highest stage art that exists at or below [stage]; falls back to stage 1. */
+    fun soldierBestAsset(context: Context, key: String, stage: Int): String {
+        for (s in stage.coerceIn(1, 5) downTo 1) {
+            val name = soldierAssetName(key, s)
+            if (hasAsset(context, name)) return name
+        }
+        return soldierAssetName(key, 1)
+    }
     fun wisdomAssetName(key: String, tier: Int): String = "wisdom_${key}_$tier"
     fun monsterAssetName(rank: String, n: Int): String = "monster_${rank.lowercase()}_$n"
     fun gateAssetName(rank: String): String = "gate_${rank.lowercase()}"

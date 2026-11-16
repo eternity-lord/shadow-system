@@ -5,6 +5,7 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.CreationExtras
 import com.shadowsystem.ShadowApp
+import com.shadowsystem.core.BoostItem
 import com.shadowsystem.core.GameMath
 import com.shadowsystem.core.RankTrialState
 import com.shadowsystem.core.GameMath.Rank
@@ -60,10 +61,10 @@ data class NowState(
     val maxRank: Rank = Rank.E,
     val undo: UndoInfo? = null,
     val trial: RankTrialState = RankTrialState(),
-    val boostActive: Boolean = false
+    val boosts: Set<String> = emptySet()
 )
 
-private data class SideState(val trial: RankTrialState, val boost: Boolean)
+private data class SideState(val trial: RankTrialState, val boosts: Set<String>)
 
 class GameViewModel(private val game: GameRepository) : ViewModel() {
 
@@ -112,7 +113,7 @@ class GameViewModel(private val game: GameRepository) : ViewModel() {
             maxRank = trial.effective,
             undo = undoInfo,
             trial = trial,
-            boostActive = side.boost
+            boosts = side.boosts
         )
     }.stateIn(viewModelScope, SharingStarted.Eagerly, NowState())
 
@@ -124,7 +125,7 @@ class GameViewModel(private val game: GameRepository) : ViewModel() {
 
     private fun trialFlow() = merge(game.observeProfile().map { }, game.observeQuests(day).map { }, refresh)
         .onStart { emit(Unit) }
-        .map { SideState(game.rankTrialState(), game.isDungeonBoostActive()) }
+        .map { SideState(game.rankTrialState(), game.activeBoosts()) }
 
     val stats: StateFlow<Map<Stat, Long>> = game.observeStats()
         .stateIn(viewModelScope, SharingStarted.Eagerly, emptyMap())
@@ -144,10 +145,10 @@ class GameViewModel(private val game: GameRepository) : ViewModel() {
         }
     }
 
-    /** Shop purchase. Returns false when gold is short or the boost is already active. */
-    fun buyDungeonBoost(onResult: (Boolean) -> Unit) {
+    /** Shop purchase. [onResult] gets false when gold is short or the boost is already active. */
+    fun buyBoost(item: BoostItem, onResult: (Boolean) -> Unit) {
         viewModelScope.launch {
-            val ok = game.buyDungeonBoost()
+            val ok = game.buyBoost(item)
             bump()
             onResult(ok)
         }

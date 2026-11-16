@@ -58,12 +58,10 @@ Delivered: gold shop with a dungeon boost, rank-up dialog, budgets (80%/100% war
 Delivered: AES-256-GCM encrypted backup (UI in Settings), PIN lock (PBKDF2), biometric unlock, FLAG_SECURE, hide-balances toggle, R8 release build in CI, numpad.
 
 ## Open (honest list)
-- Gold shop: one real item (dungeon boost ×1.5 XP, 40 gold). More items are not designed yet.
-- Rank-up: a dialog appears when the rank increases. There is no full cutscene.
-- Artwork: 6 gate images, 12 soldier portraits (stage 1) and 6 rank avatars are real. Higher soldier stages, wisdom art and monster art still use procedural placeholders (see ASSETS_MANIFEST.md).
-- Accessibility: touch targets are 48dp and text scales, but no TalkBack audit has been run (no device in the sandbox).
-- Release signing: a real key was generated and is used for local release builds from `release-keystore/` (git-ignored). CI release builds are still debug-signed because the sandbox cannot write repository secrets. See DECISIONS.md.
-- Not run: emulator or device tests; no screenshots verified visually.
+- Higher soldier stages (2–5) use the stage 1 portrait with a stage label. Wisdom art and monster art are not used in the UI, so no placeholders are visible.
+- A TalkBack audit on a real device has not been run.
+- The release key is committed to the public repo by the owner's decision (see DECISIONS.md).
+- Not run: emulator or device tests.
 
 ## Verification
 - The sandbox has no JDK or Android SDK, so compilation and tests run on GitHub Actions only.

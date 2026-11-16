@@ -58,9 +58,22 @@ one pass, the simplest reasonable option was chosen and recorded here.
 
 ## Release build (phase 3)
 - `assembleRelease` runs in CI with R8 (`isMinifyEnabled`, resource shrinking).
-- Release key: generated in the sandbox (RSA 2048, PKCS#12, alias `shadow`, 25-year self-signed certificate). The keystore and its random password are stored in `release-keystore/`, which is git-ignored, and are not in the repository (the repo is public).
-- Gradle reads `release-keystore/keystore.properties` locally, or `SHADOW_*` environment variables. If neither exists, it falls back to the debug key so CI still builds.
-- CI does not have the key. The sandbox token cannot write repository secrets (HTTP 403), so the CI release APK is debug-signed. To sign CI builds with the real key, add the secrets `SHADOW_KEYSTORE_FILE` (decoded keystore path), `SHADOW_STORE_PASSWORD`, `SHADOW_KEY_ALIAS` and `SHADOW_KEY_PASSWORD` in GitHub, then add a workflow step that decodes the keystore. Losing the keystore means future updates cannot be installed over existing installs, so keep a backup of the `release-keystore/` folder.
+- Release key: generated in the sandbox (RSA 2048, PKCS#12, alias `shadow`, 25-year self-signed certificate). **The keystore and its password are committed to `release-keystore/`.** The repository is public, so anyone with the repo can sign an app with this key. This is an explicit owner decision. Do not reuse this key for a store listing or for any other app. Use a separate key for that.
+- Gradle reads `release-keystore/keystore.properties`, or `SHADOW_*` environment variables. If neither exists, it falls back to the debug key.
+- CI therefore signs release builds with this key, with no GitHub secrets needed.
 
 ## Accessibility (phase 3)
 - Touch targets are 48dp or taller. Text uses the Material type scale and the app supports large fonts through the system. A full TalkBack audit has not been run, because there is no device in the sandbox.
+
+## Gold shop boosts (phase 3)
+- Three items: dungeon XP ×1.5 for the next run that pays XP (40 gold), quest XP ×1.5 (60 gold), and quest gold ×2 (50 gold). Quest boosts are applied when the quest's first step is ticked, and are then used up.
+- Undoing that first step does not give the boost back. This is accepted for simplicity and is noted here.
+
+## Rank-up moment (phase 3)
+- A full-screen overlay with an animated avatar grows in when the rank increases. Tap to continue.
+
+## Soldier stages (phase 3)
+- Stage comes from the linked stat level (the overall level for Bellion), using 1–9, 10–24, 25–49, 50–79, 80+. Art falls back to the highest stage that exists, so all stages show the stage 1 portrait until more art is made.
+
+## Accessibility (phase 3, code review only)
+- Icons and images have content descriptions. Gate and soldier images are described. Tab items have text labels. Touch targets are at least 48dp. A TalkBack run on a device has not been done.

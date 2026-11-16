@@ -14,8 +14,6 @@ captures/
 # Secrets / keystores
 *.jks
 *.keystore
-*.p12
-release-keystore/
 .env
 # OS
 .DS_Store

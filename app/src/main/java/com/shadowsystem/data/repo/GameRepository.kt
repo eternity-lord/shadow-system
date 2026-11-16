@@ -10,6 +10,8 @@ import com.shadowsystem.data.db.AppDatabase
 import com.shadowsystem.data.db.DailyScoreEntity
 import com.shadowsystem.data.db.DungeonSessionEntity
 import com.shadowsystem.core.RankTrial
+import com.shadowsystem.core.ShopCatalog
+import com.shadowsystem.core.BoostItem
 import com.shadowsystem.core.RankTrialState
 import com.shadowsystem.data.db.KeyValueEntity
 import com.shadowsystem.data.db.ProfileEntity
@@ -108,14 +110,34 @@ class GameRepository(
         }
     }
 
-    suspend fun isDungeonBoostActive(): Boolean = kvDao.get(DUNGEON_BOOST_KEY)?.value == 1L
+    suspend fun isBoostActive(key: String): Boolean = kvDao.get(key)?.value == 1L
 
-    /** Shop: the next dungeon run that pays XP gets a 1.5× bonus. Costs gold; returns false if not possible. */
-    suspend fun buyDungeonBoost(): Boolean {
-        if (isDungeonBoostActive() || profile().gold < DUNGEON_BOOST_COST) return false
-        setKey(DUNGEON_BOOST_KEY, 1L)
-        addXp(0, "", gold = -DUNGEON_BOOST_COST)
+    suspend fun activeBoosts(): Set<String> =
+        ShopCatalog.ITEMS.map { it.key }.filter { isBoostActive(it) }.toSet()
+
+    /** Shop purchase. Returns false when gold is short or the boost is already active. */
+    suspend fun buyBoost(item: BoostItem): Boolean {
+        if (isBoostActive(item.key) || profile().gold < item.cost) return false
+        setKey(item.key, 1L)
+        addXp(0, "", gold = -item.cost)
         return true
+    }
+
+    /**
+     * The first step of a quest consumes the quest boosts: XP ×1.5 and/or gold ×2.
+     * Undoing that first step does not give the boost back.
+     */
+    private suspend fun applyQuestBoosts(quest: QuestEntity): QuestEntity {
+        if (quest.stepsDone > 0) return quest
+        val xpBoost = isBoostActive(ShopCatalog.QUEST_XP)
+        val goldBoost = isBoostActive(ShopCatalog.QUEST_GOLD)
+        if (!xpBoost && !goldBoost) return quest
+        if (xpBoost) setKey(ShopCatalog.QUEST_XP, 0L)
+        if (goldBoost) setKey(ShopCatalog.QUEST_GOLD, 0L)
+        return quest.copy(
+            xpReward = if (xpBoost) GameMath.applyMultiplier(quest.xpReward, ShopCatalog.QUEST_XP_MULTIPLIER) else quest.xpReward,
+            goldReward = if (goldBoost) quest.goldReward * ShopCatalog.QUEST_GOLD_MULTIPLIER else quest.goldReward
+        )
     }
 
     /** Generates the day's quests once. Returns false if they already exist. */
@@ -158,10 +180,11 @@ class GameRepository(
 
     /** Ticks one step and pays its XP. Returns null if the step was already done. */
     suspend fun tickStep(step: QuestStepEntity): ProgressResult? {
-        val quest = questDao.get(step.questId) ?: return null
-        if (quest.status == QuestEntity.STATUS_DONE || step.done) return null
+        val stored = questDao.get(step.questId) ?: return null
+        if (stored.status == QuestEntity.STATUS_DONE || step.done) return null
         val levelBefore = GameMath.levelForXp(profile().totalXp)
         questDao.updateStep(step.copy(done = true))
+        val quest = applyQuestBoosts(stored)
 
         val multiplier = if (quest.comebackApplied) DayRules.COMEBACK_MULTIPLIER else 1.0
         val total = GameMath.applyMultiplier(quest.xpReward, multiplier)
@@ -284,9 +307,9 @@ class GameRepository(
         val rank = GameMath.Rank.valueOf(rankName)
         val full = GameMath.questReward(rank).xp * 2
         val xp = if (completed) full else GameMath.partialDungeonXp(plannedMinutes, doneSeconds / 60, full)
-        val boosted = isDungeonBoostActive()
-        val paidXp = if (boosted && xp > 0) GameMath.applyMultiplier(xp, DUNGEON_BOOST_MULTIPLIER) else xp
-        if (boosted && xp > 0) setKey(DUNGEON_BOOST_KEY, 0L)
+        val boosted = isBoostActive(ShopCatalog.DUNGEON)
+        val paidXp = if (boosted && xp > 0) GameMath.applyMultiplier(xp, ShopCatalog.DUNGEON_MULTIPLIER) else xp
+        if (boosted && xp > 0) setKey(ShopCatalog.DUNGEON, 0L)
         dungeonDao.insert(
             DungeonSessionEntity(
                 gameDay = today(),
@@ -307,8 +330,5 @@ class GameRepository(
     companion object {
         const val DUNGEON_GOAL_MINUTES = 25
         const val SHADOW_BONUS_KEY = "shadow_bonus_day"
-        const val DUNGEON_BOOST_KEY = "dungeon_boost"
-        const val DUNGEON_BOOST_COST = 40
-        const val DUNGEON_BOOST_MULTIPLIER = 1.5
     }
 }

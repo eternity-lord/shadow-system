@@ -32,6 +32,7 @@ import com.shadowsystem.ui.components.QuestCard
 import com.shadowsystem.ui.components.ShadowCard
 import com.shadowsystem.ui.components.UndoBanner
 import com.shadowsystem.ui.components.RankTrialCard
+import com.shadowsystem.ui.components.RankUpOverlay
 import com.shadowsystem.ui.components.XpBar
 import com.shadowsystem.ui.theme.ShadowColors
 import com.shadowsystem.ui.vm.GameViewModel
@@ -48,14 +49,7 @@ fun NowScreen(vm: GameViewModel) {
         if (before != null && state.maxRank > before) rankUp = state.maxRank
         prevRank = state.maxRank
     }
-    rankUp?.let { rank ->
-        ConfirmDialog(
-            text = stringResource(R.string.rank_up_text, rank.name),
-            confirmText = stringResource(R.string.rank_up_ok),
-            onConfirm = { rankUp = null },
-            onDismiss = { rankUp = null }
-        )
-    }
+    rankUp?.let { rank -> RankUpOverlay(rank) { rankUp = null } }
     val yesterday by vm.yesterdayScore.collectAsStateWithLifecycle()
     val level = GameMath.levelForXp(state.profile.totalXp)
     val rank = GameMath.rankForLevel(level)

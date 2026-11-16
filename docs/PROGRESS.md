@@ -19,3 +19,9 @@ Branch: `arena/05d6808d-shadow-system` (base `cb65486`)
 ## Log
 - Phase 0: scaffold, fonts, Gradle, PDF committed, pushed.
 - Phase 1: core logic, data layer, five screens, tests, CI. Two CI fix cycles (missing `getValue` import). Final run green.
+
+
+## Latest update
+- Rank trial, numpad, biometric unlock, swipe complete, gate artwork, release build in CI: done (`dcb6107`, CI green).
+- Still open: gold shop, rank-up cutscene, soldier/avatar/monster artwork, accessibility audit, real release signing key.
+- PR #1 is NOT merged. It will be merged only when the open items are closed.

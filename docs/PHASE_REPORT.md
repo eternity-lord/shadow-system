@@ -47,10 +47,24 @@ Not done: search and filters UI (search logic may exist in the repository but is
 Done: AES-256-GCM backup with PBKDF2 (UI in Settings), PIN lock (PBKDF2 hash), FLAG_SECURE, hide-balances toggle.
 Not done: biometric unlock, artwork integration beyond procedural placeholders, accessibility pass, R8 release build with signing placeholder.
 
-## Verification
-- Local sandbox has no JDK/Android SDK and Google Maven is unreachable, so all compilation and tests ran on GitHub Actions.
-- Not run: emulator/device tests, crash testing on device, UI screenshots.
-- Room schema JSON is generated into `app/schemas` on build; it is not committed yet.
+## Phase 1 — MVP — DONE, except items listed under "Open"
+Verified on CI (`assembleDebug assembleRelease testDebugUnitTest`) at `dcb6107`.
+Delivered: onboarding, PIN lock, Jalali calendar, game math, quest planner, Now/Quests/Dungeon/Money/Hunter tabs, numpad quick-add, swipe to complete with a 5-second undo, daily reminders, gate artwork.
 
-## Honest status
-The app covers most of Phase 1, a large part of Phase 2 and part of Phase 3. It is **not yet the full specification**. Remaining work is listed above. PR #1 stays open until those items are finished.
+## Phase 2 — Depth — MOSTLY DONE
+Delivered: budgets (80%/100% warnings), recurring rules with Jalali catch-up, savings goals as bosses, debts and installments, reports (donut, bars, 30-day line), search and income/expense filter, tags (via `#` in notes), CSV export, rank trial (weekly, 5 quests in 7 days) that gates rank-up, reminders.
+
+## Phase 3 — Completion — PARTLY DONE
+Delivered: AES-256-GCM encrypted backup (UI in Settings), PIN lock (PBKDF2), biometric unlock, FLAG_SECURE, hide-balances toggle, R8 release build in CI, numpad.
+
+## Open (honest list)
+- Gold shop: "coming soon" card only. Gold is collected, nothing can be bought yet.
+- Rank-up cutscene: not built.
+- Artwork: only the six gate images are real. Soldiers, avatars, monsters, wisdom and category icons use procedural placeholders.
+- Accessibility: touch targets are 48dp and text scales, but no TalkBack audit has been run (no device in the sandbox).
+- Release signing: debug key placeholder. The owner must supply a real key.
+- Not run: emulator or device tests; no screenshots verified visually.
+
+## Verification
+- The sandbox has no JDK or Android SDK, so compilation and tests run on GitHub Actions only.
+- Latest CI run: success on `dcb6107`.

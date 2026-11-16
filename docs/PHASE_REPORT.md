@@ -48,9 +48,11 @@ Latest green CI on the branch: `5e` batch — run 43887565776 (weekly boss, budg
 - Transfers between wallets. They are not spending: no XP, no Gold, and they do not count in budgets or reports.
 - Cheques, issued or received, with a Jalali due date (day/month/year steppers), status (cleared, overdue, due in 3 days, later), mark-cleared and delete with confirmation.
 - Encrypted backup and CSV include wallets, transfers, cheques and each transaction's wallet. Old backups (without these records) still restore.
-- Budget rollover rule: unspent amount carries forward, capped at one base limit; overspending does not carry a debt.
+- Budget rollover on the plan screen: unspent amount from last month carries forward, capped at one base limit; overspending does not carry a debt. Known approximation: last month's limit is taken as the current limit (budgets keep no history).
+- Installments: a debt can be split into N installments. Each payment adds one installment (the last absorbs rounding) and the progress is shown.
+- Reduce motion setting: shortens the rank-up overlay animation (`rememberReduceMotion`).
 - Rank-up overlay has an explicit skip button (in addition to tap-to-dismiss).
-- Unit tests: rollover, wallet balances and transfers, cheque status, Jalali leap years, month lengths, clamping and round trip.
+- Unit tests: recurrence catch-up and cap, month-end anchors, installment split, rollover, wallet balances and transfers, cheque status, Jalali leap years, month lengths, clamping and round trip.
 
 **Inbox, screens and settings**
 - Inbox "park a thought" card on the Now tab, with delete confirmation.
@@ -67,7 +69,7 @@ Latest green CI on the branch: `5e` batch — run 43887565776 (weekly boss, budg
 
 These keep PR #1 open.
 
-- **Money:** receipt photos. Budget rollover is a tested rule (`FinanceRules.rolloverLimit`) but is not yet applied to the budget screen. Wallets, transfers, cheques, the Jalali date picker, encrypted backup and CSV now include the new tables.
+- **Money:** no open items in code. Receipts (photo picked with the system document picker, stored as a persistable URI; the image stays on the device), installments on debts (count, progress, pay next), budget rollover on the plan screen, wallets, transfers and cheques are built. Known limit: receipt URIs in a backup only work on the device that made them.
 - **Dungeon:** linking a dungeon to a quest or soldier, body-doubling soldier animation, and gate minutes that the user can change.
 - **Soldiers:** user re-linking of quests to soldiers (only template links exist), the morph animation for evolution, and a wisdom overlay image.
 - **Avatar:** layered body, hair, face, outfit, weapon and aura art (only rank avatars exist), stat overlays, and the old-avatar break-apart in the rank-up cutscene. Titles are not yet shown on the profile header.

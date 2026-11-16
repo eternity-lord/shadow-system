@@ -1,0 +1,21 @@
+# Progress Tracker
+
+Branch: `arena/05d6808d-shadow-system` (base `cb65486`)
+
+| Phase | Status | Commit(s) | Notes |
+|---|---|---|---|
+| 0 Setup | Done | `3ebccc9` | PDF, Gradle, fonts, docs, manifest |
+| 1 MVP | Partial, builds and tests green | `f4fd82e` + fixes | See PHASE_REPORT.md for what is missing |
+| 2 Depth | Not started | — | Budgets, recurring, goals, debts, reports, notifications |
+| 3 Completion | Not started | — | Backup, app lock, artwork, release build |
+
+## Next steps (in order)
+1. Notifications and onboarding (Phase 1 leftovers).
+2. Quest "I'm stuck" + swipe-complete undo.
+3. Soldier system and avatar visuals.
+4. Phase 2 money features and reports.
+5. Phase 3 backup, app lock, artwork, accessibility.
+
+## Log
+- Phase 0: scaffold, fonts, Gradle, PDF committed, pushed.
+- Phase 1: core logic, data layer, five screens, tests, CI. Two CI fix cycles (missing `getValue` import). Final run green.

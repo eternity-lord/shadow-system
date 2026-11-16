@@ -92,6 +92,7 @@ private fun MainNavigation(app: ShadowApp, game: GameViewModel) {
     val current = backStack?.destination
     val money: MoneyViewModel = viewModel(factory = MoneyViewModel.factory(app))
     val inboxVm: InboxViewModel = viewModel(factory = InboxViewModel.factory(app))
+    val profileVm: com.shadowsystem.ui.vm.ProfileViewModel = viewModel(factory = com.shadowsystem.ui.vm.ProfileViewModel.factory(app))
     val soldierVm: com.shadowsystem.ui.vm.SoldierViewModel = viewModel(factory = com.shadowsystem.ui.vm.SoldierViewModel.factory(app))
 
     Scaffold(
@@ -123,7 +124,7 @@ private fun MainNavigation(app: ShadowApp, game: GameViewModel) {
                     onReports = { nav.navigate(Routes.REPORTS) }
                 )
             }
-            composable(Tab.HUNTER.route) { HunterScreen(game, soldierVm) { nav.navigate(Routes.SETTINGS) } }
+            composable(Tab.HUNTER.route) { HunterScreen(game, soldierVm, profileVm) { nav.navigate(Routes.SETTINGS) } }
             composable(Routes.PLAN) {
                 MoneyPlanScreen(viewModel(factory = PlanViewModel.factory(app))) { nav.popBackStack() }
             }

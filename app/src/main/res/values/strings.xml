@@ -242,6 +242,28 @@
     <string name="evolution_title">تکامل</string>
     <string name="evolution_skip">رد کردن</string>
 
+    <!-- Profile -->
+    <string name="radar_title">نمودار صفات</string>
+    <string name="pose_label">حال امروز: %1$s</string>
+    <string name="pose_standing">ایستاده و مطمئن</string>
+    <string name="pose_determined">مصمم</string>
+    <string name="pose_tired_satisfied">خسته اما راضی</string>
+    <string name="pose_low_energy">انرژی کم</string>
+    <string name="pose_none">هنوز امروز ثبت نشده</string>
+    <string name="titles_title">عنوان‌ها</string>
+    <string name="achievements_title">دستاوردها</string>
+    <string name="locked_label">قفل</string>
+    <string name="avatar_shop_title">فروشگاه ظاهر</string>
+    <string name="avatar_cat_outfit">لباس</string>
+    <string name="avatar_cat_weapon">سلاح</string>
+    <string name="avatar_cat_aura">هاله</string>
+    <string name="avatar_cat_frame">قاب پروفایل</string>
+    <string name="avatar_cat_background">پس‌زمینه</string>
+    <string name="shop_heavy_hint">فقط از پاداش باس یا محاکمه، نه با طلا</string>
+    <string name="shop_buy_price">خرید · %1$s طلا</string>
+    <string name="shop_equip">پوشیدن</string>
+    <string name="shop_unequip">درآوردن</string>
+
     <!-- Gold shop -->
     <string name="shop_quest_name">تقویت مأموریت</string>
     <string name="shop_quest_desc">تجربه‌ی مأموریت بعدی ×۱٫۵ می‌شود.</string>

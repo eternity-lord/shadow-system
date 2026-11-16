@@ -1,5 +1,7 @@
 package com.shadowsystem.data.repo
 
+import com.shadowsystem.core.AvatarData
+import com.shadowsystem.core.ShopItem
 import com.shadowsystem.core.DayRules
 import com.shadowsystem.core.FinanceRules
 import com.shadowsystem.core.GameMath
@@ -337,6 +339,64 @@ class GameRepository(
     /** Stores the optional journal note ("what did I build?") for a finished run. */
     suspend fun saveDungeonNote(sessionId: Long, note: String) {
         dungeonDao.setNote(sessionId, note.trim().take(NOTE_MAX_LENGTH).ifBlank { null })
+    }
+
+    private val KEY_CLASS_WEEK = "class_week"
+    private val KEY_CLASS_A = "class_a"
+    private val KEY_CLASS_B = "class_b"
+
+    private fun ownedKey(key: String) = "owned_$key"
+    private fun equipKey(category: String, key: String) = "equip_${category}_$key"
+
+    suspend fun isOwned(key: String): Boolean = kvDao.get(ownedKey(key))?.value == 1L
+
+    suspend fun ownedAvatarKeys(): Set<String> {
+        val out = mutableSetOf<String>()
+        for (item in AvatarData.SHOP_ITEMS) if (isOwned(item.key)) out.add(item.key)
+        return out
+    }
+
+    suspend fun equippedAvatarKeys(): Set<String> {
+        val out = mutableSetOf<String>()
+        for (item in AvatarData.SHOP_ITEMS) {
+            if (kvDao.get(equipKey(item.category, item.key))?.value == 1L) out.add(item.key)
+        }
+        return out
+    }
+
+    /** Buys an avatar item with Gold. Heavy items are never sold for Gold. Returns false when not allowed. */
+    suspend fun buyAvatarItem(item: ShopItem): Boolean {
+        if (item.heavy || isOwned(item.key) || profile().gold < item.priceGold) return false
+        setKey(ownedKey(item.key), 1L)
+        addXp(0, "", gold = -item.priceGold)
+        return true
+    }
+
+    /** Puts on an owned item (one per category). Tapping the worn item takes it off. */
+    suspend fun toggleEquip(item: ShopItem): Boolean {
+        if (!isOwned(item.key)) return false
+        val wasOn = kvDao.get(equipKey(item.category, item.key))?.value == 1L
+        for (other in AvatarData.SHOP_ITEMS) {
+            if (other.category == item.category) setKey(equipKey(other.category, other.key), 0L)
+        }
+        if (!wasOn) setKey(equipKey(item.category, item.key), 1L)
+        return true
+    }
+
+    /** The class stats are fixed for each week (7 game days) and recomputed when a new week starts. */
+    suspend fun weeklyTopStats(current: Set<Stat>): Set<Stat> {
+        if (current.size != 2) return current
+        val week = today() / 7
+        if (kvDao.get(KEY_CLASS_WEEK)?.value == week) {
+            val a = kvDao.get(KEY_CLASS_A)?.value?.toInt()
+            val b = kvDao.get(KEY_CLASS_B)?.value?.toInt()
+            if (a != null && b != null) return setOf(Stat.values()[a], Stat.values()[b])
+        }
+        val pair = current.toList()
+        setKey(KEY_CLASS_WEEK, week)
+        setKey(KEY_CLASS_A, pair[0].ordinal.toLong())
+        setKey(KEY_CLASS_B, pair[1].ordinal.toLong())
+        return current
     }
 
     companion object {

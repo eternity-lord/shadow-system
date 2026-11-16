@@ -37,6 +37,11 @@ import com.shadowsystem.ui.theme.ShadowColors
 fun RankUpOverlay(rank: GameMath.Rank, onDismiss: () -> Unit) {
     var shown by remember { mutableStateOf(false) }
     LaunchedEffect(Unit) { shown = true }
+    // The rank-up moment lasts 5 seconds; tapping skips it.
+    LaunchedEffect(Unit) {
+        kotlinx.coroutines.delay(5_000)
+        onDismiss()
+    }
     val scale by animateFloatAsState(
         targetValue = if (shown) 1f else 0.5f,
         animationSpec = tween(durationMillis = 700, easing = FastOutSlowInEasing),

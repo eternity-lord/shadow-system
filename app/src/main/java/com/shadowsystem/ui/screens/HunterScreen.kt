@@ -35,6 +35,11 @@ import com.shadowsystem.ui.components.XpBar
 import com.shadowsystem.ui.theme.ShadowColors
 import com.shadowsystem.ui.vm.GameViewModel
 import com.shadowsystem.ui.vm.SoldierViewModel
+import com.shadowsystem.ui.vm.ProfileViewModel
+import com.shadowsystem.ui.components.AvatarShop
+import com.shadowsystem.ui.components.StatRadar
+import com.shadowsystem.core.TitleRules
+import androidx.compose.runtime.LaunchedEffect
 import com.shadowsystem.core.SoldierRow
 import com.shadowsystem.ui.components.EvolutionDialog
 import com.shadowsystem.ui.components.SoldierDetailDialog
@@ -50,8 +55,9 @@ import androidx.compose.runtime.getValue
 
 /** Hunter profile: level, rank, the five stats, class and the shadow soldiers. */
 @Composable
-fun HunterScreen(vm: GameViewModel, soldiers: SoldierViewModel, onSettings: () -> Unit) {
+fun HunterScreen(vm: GameViewModel, soldiers: SoldierViewModel, profile: ProfileViewModel, onSettings: () -> Unit) {
     val state by vm.state.collectAsStateWithLifecycle()
+    val extras by profile.state.collectAsStateWithLifecycle()
     val roster by soldiers.roster.collectAsStateWithLifecycle()
     val ritual by soldiers.ritual.collectAsStateWithLifecycle()
     val evolution by soldiers.evolution.collectAsStateWithLifecycle()
@@ -61,6 +67,8 @@ fun HunterScreen(vm: GameViewModel, soldiers: SoldierViewModel, onSettings: () -
     val rank = GameMath.rankForLevel(level)
     val statLevels = Stat.values().associateWith { GameMath.statLevelForXp(stats[it] ?: 0L) }
     val top = statLevels.entries.sortedByDescending { it.value }.take(2).map { it.key }.toSet()
+    val weekly = extras.weeklyTop.takeIf { it.size == 2 } ?: top
+    LaunchedEffect(top) { profile.refresh(top) }
 
     Column(
         modifier = Modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(16.dp),
@@ -85,7 +93,7 @@ fun HunterScreen(vm: GameViewModel, soldiers: SoldierViewModel, onSettings: () -
                     Text(stringResource(R.string.level_label, PersianText.toFa(level)), style = MaterialTheme.typography.titleLarge)
                     Text(stringResource(R.string.rank_label, rank.name), color = ShadowColors.Gold)
                     Text(
-                        stringResource(R.string.class_label, GameMath.className(top)),
+                        stringResource(R.string.class_label, GameMath.className(weekly)),
                         color = ShadowColors.TextMuted,
                         style = MaterialTheme.typography.bodyMedium
                     )
@@ -113,6 +121,51 @@ fun HunterScreen(vm: GameViewModel, soldiers: SoldierViewModel, onSettings: () -
         }
 
         GoldShop(state.profile.gold, state.boosts) { item, onResult -> vm.buyBoost(item, onResult) }
+
+        ShadowCard {
+            SectionTitle(stringResource(R.string.radar_title))
+            Column(horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier.fillMaxWidth()) {
+                StatRadar(values = Stat.values().map { ((statLevels[it] ?: 1) / 10f).coerceIn(0.05f, 1f) })
+            }
+            Text(
+                Stat.values().joinToString(" · ") { "${statLabel(it)} ${PersianText.toFa(statLevels[it] ?: 1)}" },
+                style = MaterialTheme.typography.bodyMedium,
+                color = ShadowColors.TextMuted
+            )
+            Text(stringResource(R.string.pose_label, stringResource(poseRes(state.score?.score))), style = MaterialTheme.typography.bodyMedium)
+        }
+
+        ShadowCard {
+            SectionTitle(stringResource(R.string.titles_title))
+            AvatarData.TITLES.forEach { t ->
+                val ok = t.key in extras.titles
+                Text(
+                    if (ok) t.name else "${stringResource(R.string.locked_label)}: ${t.hint}",
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = if (ok) ShadowColors.Gold else ShadowColors.TextMuted
+                )
+            }
+        }
+
+        ShadowCard {
+            SectionTitle(stringResource(R.string.achievements_title))
+            AvatarData.ACHIEVEMENTS.forEach { a ->
+                val ok = a.key in extras.achievements
+                Text(
+                    if (ok) "✓ ${a.name}" else "○ ${a.name}: ${a.hint}",
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = if (ok) ShadowColors.Secondary else ShadowColors.TextMuted
+                )
+            }
+        }
+
+        AvatarShop(
+            gold = state.profile.gold,
+            owned = extras.owned,
+            equipped = extras.equipped,
+            onBuy = { item -> profile.buy(item, top) { } },
+            onEquip = { item -> profile.toggleEquip(item) }
+        )
         Text(stringResource(R.string.soldiers_title), style = MaterialTheme.typography.titleMedium, color = ShadowColors.TextMuted)
         roster.chunked(3).forEach { row ->
             Row(horizontalArrangement = Arrangement.spacedBy(8.dp), modifier = Modifier.fillMaxWidth()) {
@@ -180,4 +233,12 @@ private fun statLabel(stat: Stat): String = when (stat) {
     Stat.AGI -> stringResource(R.string.stat_agi)
     Stat.VIT -> stringResource(R.string.stat_vit)
     Stat.SENSE -> stringResource(R.string.stat_sense)
+}
+
+private fun poseRes(score: Int?): Int = when (TitleRules.pose(score)) {
+    1 -> R.string.pose_standing
+    2 -> R.string.pose_determined
+    3 -> R.string.pose_tired_satisfied
+    4 -> R.string.pose_low_energy
+    else -> R.string.pose_none
 }

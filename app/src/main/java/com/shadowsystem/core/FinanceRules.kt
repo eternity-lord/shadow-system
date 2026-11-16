@@ -7,6 +7,17 @@ object FinanceRules {
 
     const val WARN_PERCENT = 80
 
+    /**
+     * Rollover: the unspent part of last month's limit is added to this month's limit,
+     * but the carried amount never exceeds one full base limit (so a saved-up month cannot
+     * make the next month unlimited). Overspending does not carry a debt forward.
+     */
+    fun rolloverLimit(baseLimit: Long, prevLimit: Long, prevSpent: Long): Long {
+        if (baseLimit <= 0L) return 0L
+        val carried = (prevLimit - prevSpent).coerceIn(0L, baseLimit)
+        return baseLimit + carried
+    }
+
     fun budgetState(spent: Long, limit: Long): BudgetState = when {
         limit <= 0L -> BudgetState.OK
         spent >= limit -> BudgetState.OVER

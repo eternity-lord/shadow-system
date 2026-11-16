@@ -16,7 +16,10 @@ class BackupService(private val db: AppDatabase) {
         budgets = db.budgetDao().all(),
         recurring = db.recurringDao().all(),
         goals = db.goalDao().all(),
-        debts = db.debtDao().all()
+        debts = db.debtDao().all(),
+        wallets = db.walletDao().all(),
+        transfers = db.transferDao().all(),
+        cheques = db.chequeDao().all()
     )
 
     suspend fun exportEncrypted(password: CharArray): ByteArray = withContext(Dispatchers.IO) {
@@ -24,7 +27,7 @@ class BackupService(private val db: AppDatabase) {
     }
 
     suspend fun exportCsv(): String = withContext(Dispatchers.IO) {
-        CsvExport.transactions(db.transactionDao().all())
+        CsvExport.transactions(db.transactionDao().all(), db.walletDao().all())
     }
 
     /** Replaces all local data with the backup. Decryption fails before anything is touched. */
@@ -40,6 +43,9 @@ class BackupService(private val db: AppDatabase) {
             db.recurringDao().insertAll(s.recurring)
             db.goalDao().insertAll(s.goals)
             db.debtDao().insertAll(s.debts)
+            db.walletDao().insertAll(s.wallets)
+            db.transferDao().insertAll(s.transfers)
+            db.chequeDao().insertAll(s.cheques)
         }
     }
 }

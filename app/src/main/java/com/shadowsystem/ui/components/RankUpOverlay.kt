@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -79,6 +80,10 @@ fun RankUpOverlay(rank: GameMath.Rank, onDismiss: () -> Unit) {
                 Text(stringResource(R.string.rank_up_title), style = MaterialTheme.typography.headlineMedium, color = ShadowColors.Gold)
                 Text(stringResource(R.string.rank_up_text, rank.name), style = MaterialTheme.typography.titleLarge)
                 Text(stringResource(R.string.rank_up_tap), style = MaterialTheme.typography.bodyMedium, color = ShadowColors.TextMuted)
+                androidx.compose.material3.TextButton(
+                    onClick = onDismiss,
+                    modifier = Modifier.heightIn(min = 48.dp)
+                ) { Text(stringResource(R.string.rank_up_skip)) }
             }
         }
     }

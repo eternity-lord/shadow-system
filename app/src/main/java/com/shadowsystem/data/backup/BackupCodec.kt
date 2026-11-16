@@ -1,6 +1,9 @@
 package com.shadowsystem.data.backup
 
 import com.shadowsystem.data.db.BudgetEntity
+import com.shadowsystem.data.db.ChequeEntity
+import com.shadowsystem.data.db.TransferEntity
+import com.shadowsystem.data.db.WalletEntity
 import com.shadowsystem.data.db.DebtEntity
 import com.shadowsystem.data.db.GoalEntity
 import com.shadowsystem.data.db.ProfileEntity
@@ -16,7 +19,10 @@ data class BackupSnapshot(
     val budgets: List<BudgetEntity>,
     val recurring: List<RecurringEntity>,
     val goals: List<GoalEntity>,
-    val debts: List<DebtEntity>
+    val debts: List<DebtEntity>,
+    val wallets: List<WalletEntity> = emptyList(),
+    val transfers: List<TransferEntity> = emptyList(),
+    val cheques: List<ChequeEntity> = emptyList()
 )
 
 /**
@@ -34,7 +40,7 @@ object BackupCodec {
         s.profile?.let { line("profile", it.totalXp, it.gold, it.activeDays, it.lastActiveDay, it.onboarded) }
         s.stats.forEach { line("stat", it.stat, it.xp) }
         s.transactions.forEach {
-            line("tx", it.id, it.amountRial, it.category, it.note, it.isIncome, it.epochDay, it.createdAt)
+            line("tx", it.id, it.amountRial, it.category, it.note, it.isIncome, it.epochDay, it.createdAt, it.walletId ?: "")
         }
         s.budgets.forEach { line("budget", it.category, it.limitRial) }
         s.recurring.forEach {
@@ -42,6 +48,9 @@ object BackupCodec {
         }
         s.goals.forEach { line("goal", it.id, it.title, it.targetRial, it.savedRial, it.createdDay) }
         s.debts.forEach { line("debt", it.id, it.title, it.totalRial, it.paidRial, it.iOwe) }
+        s.wallets.forEach { line("wallet", it.id, it.name, it.openingRial) }
+        s.transfers.forEach { line("transfer", it.id, it.fromWalletId, it.toWalletId, it.amountRial, it.epochDay, it.createdAt) }
+        s.cheques.forEach { line("cheque", it.id, it.title, it.amountRial, it.dueEpochDay, it.issuedByMe, it.cleared) }
         return out.toString()
     }
 
@@ -53,6 +62,9 @@ object BackupCodec {
         val recs = mutableListOf<RecurringEntity>()
         val goals = mutableListOf<GoalEntity>()
         val debts = mutableListOf<DebtEntity>()
+        val wallets = mutableListOf<WalletEntity>()
+        val transfers = mutableListOf<TransferEntity>()
+        val cheques = mutableListOf<ChequeEntity>()
         for (raw in text.lineSequence()) {
             if (raw.isBlank()) continue
             val f = raw.split(SEP).map { unescape(it) }
@@ -64,7 +76,8 @@ object BackupCodec {
                 "stat" -> stats += StatProgressEntity(stat = f[1], xp = f[2].toLong())
                 "tx" -> txs += TransactionEntity(
                     id = f[1].toLong(), amountRial = f[2].toLong(), category = f[3], note = f[4],
-                    isIncome = f[5].toBoolean(), epochDay = f[6].toLong(), createdAt = f[7].toLong()
+                    isIncome = f[5].toBoolean(), epochDay = f[6].toLong(), createdAt = f[7].toLong(),
+                    walletId = f.getOrNull(8)?.toLongOrNull()
                 )
                 "budget" -> budgets += BudgetEntity(category = f[1], limitRial = f[2].toLong())
                 "rec" -> recs += RecurringEntity(
@@ -80,9 +93,18 @@ object BackupCodec {
                     id = f[1].toLong(), title = f[2], totalRial = f[3].toLong(),
                     paidRial = f[4].toLong(), iOwe = f[5].toBoolean()
                 )
+                "wallet" -> wallets += WalletEntity(id = f[1].toLong(), name = f[2], openingRial = f[3].toLong())
+                "transfer" -> transfers += TransferEntity(
+                    id = f[1].toLong(), fromWalletId = f[2].toLong(), toWalletId = f[3].toLong(),
+                    amountRial = f[4].toLong(), epochDay = f[5].toLong(), createdAt = f[6].toLong()
+                )
+                "cheque" -> cheques += ChequeEntity(
+                    id = f[1].toLong(), title = f[2], amountRial = f[3].toLong(), dueEpochDay = f[4].toLong(),
+                    issuedByMe = f[5].toBoolean(), cleared = f[6].toBoolean()
+                )
             }
         }
-        return BackupSnapshot(profile, stats, txs, budgets, recs, goals, debts)
+        return BackupSnapshot(profile, stats, txs, budgets, recs, goals, debts, wallets, transfers, cheques)
     }
 
     private fun escape(s: String): String =

@@ -335,4 +335,5 @@
     <string name="cheque_empty">هنوز چکی ثبت نشده.</string>
     <string name="money_wallets">حساب‌ها و چک‌ها</string>
     <string name="wallet_pick">حساب پرداخت</string>
+    <string name="rank_up_skip">رد شدن</string>
 </resources>

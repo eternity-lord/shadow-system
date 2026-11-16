@@ -182,6 +182,24 @@
     <string name="rank_trial_hint">با انجام %1$s مأموریت در %2$s روز، رتبه بعدی باز می‌شود.</string>
     <string name="rank_trial_progress">%1$s از %2$s مأموریت</string>
 
+    <!-- Loot, inbox, debug -->
+    <string name="monster_hp">جان هیولا: %1$s٪</string>
+    <string name="loot_title">غنیمت</string>
+    <string name="loot_xp">+%1$s تجربه</string>
+    <string name="loot_gold">+%1$s طلا</string>
+    <string name="loot_rare">یک نشان نادر سایه به دست آمد!</string>
+    <string name="loot_note_hint">امروز چه ساختی؟ (اختیاری)</string>
+    <string name="loot_save">ثبت و بستن</string>
+    <string name="inbox_title">صندوق ورودی</string>
+    <string name="inbox_hint">فکری داری؟ همین‌جا بگذارش؛ بعداً بررسی می‌کنیم.</string>
+    <string name="inbox_field">یادداشت سریع</string>
+    <string name="inbox_save">نگه‌دار</string>
+    <string name="inbox_empty">صندوق خالی است.</string>
+    <string name="inbox_delete_confirm">این یادداشت حذف شود؟</string>
+    <string name="debug_section">دیباگ</string>
+    <string name="debug_seed">ساخت ۶۰ روز داده آزمایشی</string>
+    <string name="notice_debug_seeded">داده‌ی آزمایشی ساخته شد.</string>
+
     <!-- Gold shop -->
     <string name="shop_quest_name">تقویت مأموریت</string>
     <string name="shop_quest_desc">تجربه‌ی مأموریت بعدی ×۱٫۵ می‌شود.</string>

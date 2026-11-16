@@ -33,7 +33,9 @@ import com.shadowsystem.core.PersianText
 import com.shadowsystem.ui.components.ConfirmDialog
 import com.shadowsystem.ui.components.MessageBanner
 import com.shadowsystem.ui.components.ShadowCard
+import com.shadowsystem.ui.components.LootDialog
 import com.shadowsystem.ui.components.XpBar
+import com.shadowsystem.core.DungeonRules
 import com.shadowsystem.ui.theme.ShadowColors
 import com.shadowsystem.ui.vm.DungeonRun
 import com.shadowsystem.ui.vm.GameViewModel
@@ -71,6 +73,8 @@ fun DungeonScreen(vm: GameViewModel) {
             )
         }
     }
+
+    state.loot?.let { loot -> LootDialog(loot) { note -> vm.dismissLoot(note) } }
 
     if (confirmExit) {
         ConfirmDialog(
@@ -128,6 +132,13 @@ private fun ActiveRun(run: DungeonRun, onFinish: () -> Unit, onExitRequest: () -
         XpBar(
             progress = if (run.plannedSeconds > 0) run.elapsedSeconds.toFloat() / run.plannedSeconds else 0f,
             label = stringResource(R.string.gate_rank, run.rank.name)
+        )
+        XpBar(
+            progress = DungeonRules.monsterHpPercent(run.plannedSeconds, run.elapsedSeconds) / 100f,
+            label = stringResource(
+                R.string.monster_hp,
+                PersianText.toFa(DungeonRules.monsterHpPercent(run.plannedSeconds, run.elapsedSeconds))
+            )
         )
         Button(
             onClick = onFinish,

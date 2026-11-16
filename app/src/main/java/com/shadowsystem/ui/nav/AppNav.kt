@@ -41,6 +41,7 @@ import com.shadowsystem.ui.screens.ReportsScreen
 import com.shadowsystem.ui.screens.SettingsScreen
 import com.shadowsystem.ui.theme.ShadowColors
 import com.shadowsystem.ui.vm.GameViewModel
+import com.shadowsystem.ui.vm.InboxViewModel
 import com.shadowsystem.ui.vm.MoneyViewModel
 import com.shadowsystem.ui.vm.PlanViewModel
 import com.shadowsystem.ui.vm.ReportsViewModel
@@ -90,6 +91,7 @@ private fun MainNavigation(app: ShadowApp, game: GameViewModel) {
     val backStack by nav.currentBackStackEntryAsState()
     val current = backStack?.destination
     val money: MoneyViewModel = viewModel(factory = MoneyViewModel.factory(app))
+    val inboxVm: InboxViewModel = viewModel(factory = InboxViewModel.factory(app))
 
     Scaffold(
         bottomBar = {
@@ -110,7 +112,7 @@ private fun MainNavigation(app: ShadowApp, game: GameViewModel) {
             startDestination = Tab.NOW.route,
             modifier = Modifier.padding(inner)
         ) {
-            composable(Tab.NOW.route) { NowScreen(game) }
+            composable(Tab.NOW.route) { NowScreen(game, inboxVm) }
             composable(Tab.QUESTS.route) { QuestsScreen(game) }
             composable(Tab.DUNGEON.route) { DungeonScreen(game) }
             composable(Tab.MONEY.route) {

@@ -26,6 +26,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.shadowsystem.R
+import androidx.compose.ui.hapticfeedback.HapticFeedbackType
+import androidx.compose.ui.platform.LocalHapticFeedback
 import com.shadowsystem.core.GameMath
 import com.shadowsystem.core.PersianText
 import com.shadowsystem.data.db.QuestEntity
@@ -96,6 +98,7 @@ fun QuestCard(
 
 @Composable
 private fun StepRow(step: QuestStepEntity, enabled: Boolean, onClick: () -> Unit) {
+    val haptic = LocalHapticFeedback.current
     var drag by remember(step.id) { mutableFloatStateOf(0f) }
     Row(
         modifier = Modifier
@@ -113,7 +116,10 @@ private fun StepRow(step: QuestStepEntity, enabled: Boolean, onClick: () -> Unit
                     onHorizontalDrag = { _, amount -> drag += amount }
                 )
             }
-            .clickable(enabled = enabled, onClick = onClick),
+            .clickable(enabled = enabled) {
+                haptic.performHapticFeedback(HapticFeedbackType.LongPress)
+                onClick()
+            },
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(8.dp)
     ) {

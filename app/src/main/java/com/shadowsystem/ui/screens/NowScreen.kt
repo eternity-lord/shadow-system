@@ -31,7 +31,9 @@ import com.shadowsystem.ui.components.MoodPicker
 import com.shadowsystem.ui.components.QuestCard
 import com.shadowsystem.ui.components.ShadowCard
 import com.shadowsystem.ui.components.UndoBanner
+import com.shadowsystem.ui.components.InboxCard
 import com.shadowsystem.ui.components.RankTrialCard
+import com.shadowsystem.ui.vm.InboxViewModel
 import com.shadowsystem.ui.components.RankUpOverlay
 import com.shadowsystem.ui.components.XpBar
 import com.shadowsystem.ui.theme.ShadowColors
@@ -39,8 +41,10 @@ import com.shadowsystem.ui.vm.GameViewModel
 
 /** Today: score, level, the System's briefing, mandatory and optional quests. */
 @Composable
-fun NowScreen(vm: GameViewModel) {
+fun NowScreen(vm: GameViewModel, inbox: InboxViewModel) {
     val state by vm.state.collectAsStateWithLifecycle()
+    val items by inbox.items.collectAsStateWithLifecycle()
+    val pendingDelete by inbox.pendingDelete.collectAsStateWithLifecycle()
     var prevRank by remember { mutableStateOf<Rank?>(null) }
     var rankUp by remember { mutableStateOf<Rank?>(null) }
     LaunchedEffect(state.loaded, state.maxRank) {
@@ -96,6 +100,15 @@ fun NowScreen(vm: GameViewModel) {
         if (state.trial.pending) {
             RankTrialCard(state.trial)
         }
+
+        InboxCard(
+            items = items,
+            pendingDelete = pendingDelete,
+            onAdd = { inbox.add(it) },
+            onAskDelete = { inbox.askDelete(it) },
+            onConfirmDelete = { inbox.confirmDelete() },
+            onCancelDelete = { inbox.cancelDelete() }
+        )
 
         if (state.quests.isEmpty()) {
             MoodPicker { vm.generate(it) }

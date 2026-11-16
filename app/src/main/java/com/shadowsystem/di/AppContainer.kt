@@ -6,6 +6,7 @@ import com.shadowsystem.data.db.AppDatabase
 import com.shadowsystem.data.prefs.AppPrefs
 import com.shadowsystem.data.prefs.LockState
 import com.shadowsystem.data.repo.GameRepository
+import com.shadowsystem.data.repo.InboxRepository
 import com.shadowsystem.data.repo.MoneyRepository
 import com.shadowsystem.data.repo.PlanRepository
 
@@ -15,6 +16,7 @@ class AppContainer(context: Context) {
     val game = GameRepository(database)
     val money = MoneyRepository(database, game)
     val plan = PlanRepository(database, game)
+    val inbox = InboxRepository(database)
     val backup = BackupService(database)
     val prefs = AppPrefs(context.applicationContext)
     val lock = LockState(initiallyLocked = prefs.isPinSet)

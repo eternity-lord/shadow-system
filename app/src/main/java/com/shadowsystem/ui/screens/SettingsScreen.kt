@@ -34,6 +34,7 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.shadowsystem.BuildConfig
 import com.shadowsystem.R
 import com.shadowsystem.ui.components.BackHeader
 import com.shadowsystem.ui.components.ConfirmDialog
@@ -162,6 +163,12 @@ fun SettingsScreen(vm: SettingsViewModel, onBack: () -> Unit) {
                 onClick = { vm.exportCsv { csv -> ShareUtil.share(context, "shadow-system-transactions.csv", csv.toByteArray(Charsets.UTF_8), "text/csv") } }
             )
         }
+        if (BuildConfig.DEBUG) {
+            ShadowCard {
+                SectionTitle(stringResource(R.string.debug_section))
+                PrimaryButton(stringResource(R.string.debug_seed), onClick = { vm.seedDebugData() })
+            }
+        }
         TextButton(onClick = onBack, modifier = Modifier.heightIn(min = 48.dp)) { Text(stringResource(R.string.back)) }
     }
 }
@@ -177,5 +184,6 @@ private fun noticeText(n: SettingsNotice): String = stringResource(
         SettingsNotice.BACKUP_READY -> R.string.notice_backup_ready
         SettingsNotice.RESTORE_DONE -> R.string.notice_restore_done
         SettingsNotice.RESTORE_FAILED -> R.string.notice_restore_failed
+        SettingsNotice.DEBUG_SEEDED -> R.string.notice_debug_seeded
     }
 )

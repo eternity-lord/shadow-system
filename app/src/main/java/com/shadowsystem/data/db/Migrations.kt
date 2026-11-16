@@ -27,4 +27,15 @@ object Migrations {
             db.execSQL("CREATE TABLE IF NOT EXISTS `kv` (`key` TEXT NOT NULL, `value` INTEGER NOT NULL, PRIMARY KEY(`key`))")
         }
     }
+
+    /** v3: dungeon journal note column and the inbox table. Nullable column, no default, matching the entity. */
+    val MIGRATION_2_3: Migration = object : Migration(2, 3) {
+        override fun migrate(db: SupportSQLiteDatabase) {
+            db.execSQL("ALTER TABLE `dungeon_sessions` ADD COLUMN `note` TEXT")
+            db.execSQL(
+                "CREATE TABLE IF NOT EXISTS `inbox` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, " +
+                    "`text` TEXT NOT NULL, `createdAt` INTEGER NOT NULL)"
+            )
+        }
+    }
 }

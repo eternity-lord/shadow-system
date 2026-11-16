@@ -61,10 +61,14 @@ data class NowState(
     val maxRank: Rank = Rank.E,
     val undo: UndoInfo? = null,
     val trial: RankTrialState = RankTrialState(),
-    val boosts: Set<String> = emptySet()
+    val boosts: Set<String> = emptySet(),
+    val loot: LootInfo? = null
 )
 
 private data class SideState(val trial: RankTrialState, val boosts: Set<String>)
+
+/** Loot from the last finished dungeon run, shown until the user closes it. */
+data class LootInfo(val sessionId: Long, val xp: Int, val gold: Int, val rare: Boolean)
 
 class GameViewModel(private val game: GameRepository) : ViewModel() {
 
@@ -73,6 +77,7 @@ class GameViewModel(private val game: GameRepository) : ViewModel() {
     private val run = MutableStateFlow<DungeonRun?>(null)
     private val undo = MutableStateFlow<UndoInfo?>(null)
     private val refresh = MutableStateFlow(0)
+    private val loot = MutableStateFlow<LootInfo?>(null)
     private var ticker: Job? = null
     private var undoTimer: Job? = null
 
@@ -85,7 +90,8 @@ class GameViewModel(private val game: GameRepository) : ViewModel() {
         message,
         run,
         undo,
-        trialFlow()
+        trialFlow(),
+        loot
     ) { values ->
         @Suppress("UNCHECKED_CAST")
         val profile = values[0] as ProfileEntity
@@ -101,6 +107,8 @@ class GameViewModel(private val game: GameRepository) : ViewModel() {
         @Suppress("UNCHECKED_CAST")
         val side = values[8] as SideState
         val trial = side.trial
+        @Suppress("UNCHECKED_CAST")
+        val lootInfo = values[9] as LootInfo?
         NowState(
             loaded = true,
             profile = profile,
@@ -113,7 +121,8 @@ class GameViewModel(private val game: GameRepository) : ViewModel() {
             maxRank = trial.effective,
             undo = undoInfo,
             trial = trial,
-            boosts = side.boosts
+            boosts = side.boosts,
+            loot = lootInfo
         )
     }.stateIn(viewModelScope, SharingStarted.Eagerly, NowState())
 
@@ -151,6 +160,15 @@ class GameViewModel(private val game: GameRepository) : ViewModel() {
             val ok = game.buyBoost(item)
             bump()
             onResult(ok)
+        }
+    }
+
+    /** Closes the loot screen. A non-blank journal note is saved to that run. */
+    fun dismissLoot(note: String) {
+        val current = loot.value ?: return
+        loot.value = null
+        viewModelScope.launch {
+            if (note.isNotBlank()) game.saveDungeonNote(current.sessionId, note)
         }
     }
 
@@ -230,7 +248,8 @@ class GameViewModel(private val game: GameRepository) : ViewModel() {
         run.value = null
         viewModelScope.launch {
             val done = current.elapsedSeconds.coerceAtMost(current.plannedSeconds)
-            game.recordDungeon(current.rank.name, current.plannedMinutes, done, completed)
+            val result = game.recordDungeon(current.rank.name, current.plannedMinutes, done, completed)
+            loot.value = LootInfo(result.sessionId, result.xp, result.gold, result.rare)
             game.refreshScore()
             bump()
             if (completed) message.value = PhraseBank.questDone()

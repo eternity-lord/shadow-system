@@ -115,6 +115,9 @@ interface DungeonDao {
     @Insert
     suspend fun insert(session: DungeonSessionEntity): Long
 
+    @Query("UPDATE dungeon_sessions SET note = :note WHERE id = :id")
+    suspend fun setNote(id: Long, note: String?)
+
     @Query("SELECT COALESCE(SUM(doneSeconds), 0) FROM dungeon_sessions WHERE gameDay = :day")
     fun observeSecondsForDay(day: Long): Flow<Int>
 

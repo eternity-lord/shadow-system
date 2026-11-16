@@ -14,7 +14,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 
 enum class SettingsNotice {
-    PIN_SAVED, PIN_INVALID, PIN_WRONG, PIN_REMOVED, PASSWORD_SHORT, BACKUP_READY, RESTORE_DONE, RESTORE_FAILED
+    PIN_SAVED, PIN_INVALID, PIN_WRONG, PIN_REMOVED, PASSWORD_SHORT, BACKUP_READY, RESTORE_DONE, RESTORE_FAILED, DEBUG_SEEDED
 }
 
 /** Privacy, PIN lock, encrypted backup and CSV export. */
@@ -22,8 +22,17 @@ class SettingsViewModel(
     private val prefs: AppPrefs,
     private val lock: LockState,
     private val backup: BackupService,
-    private val onRemindersChanged: (Boolean) -> Unit
+    private val onRemindersChanged: (Boolean) -> Unit,
+    private val seedDebug: suspend () -> Unit
 ) : ViewModel() {
+
+    /** Debug builds only: fills the database with 60 days of test data. */
+    fun seedDebugData() {
+        viewModelScope.launch {
+            seedDebug()
+            notify(SettingsNotice.DEBUG_SEEDED)
+        }
+    }
 
     val reminders: StateFlow<Boolean> = prefs.reminders
 
@@ -99,9 +108,13 @@ class SettingsViewModel(
         fun factory(app: ShadowApp): ViewModelProvider.Factory = object : ViewModelProvider.Factory {
             @Suppress("UNCHECKED_CAST")
             override fun <T : ViewModel> create(modelClass: Class<T>, extras: CreationExtras): T =
-                SettingsViewModel(app.container.prefs, app.container.lock, app.container.backup) { on ->
-                    com.shadowsystem.util.Reminders.apply(app, on)
-                } as T
+                SettingsViewModel(
+                    app.container.prefs,
+                    app.container.lock,
+                    app.container.backup,
+                    { on -> com.shadowsystem.util.Reminders.apply(app, on) },
+                    { com.shadowsystem.debug.DebugSeed.seed(app.container.database) }
+                ) as T
         }
     }
 }

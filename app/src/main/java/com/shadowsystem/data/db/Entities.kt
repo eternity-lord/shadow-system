@@ -88,7 +88,8 @@ data class DungeonSessionEntity(
     val doneSeconds: Int,
     val completed: Boolean,
     val xpGained: Int,
-    val createdAt: Long
+    val createdAt: Long,
+    val note: String? = null
 )
 
 @Entity(
@@ -146,4 +147,11 @@ data class DebtEntity(
 data class KeyValueEntity(
     @PrimaryKey val key: String,
     val value: Long
+)
+
+@Entity(tableName = "inbox")
+data class InboxEntity(
+    @PrimaryKey(autoGenerate = true) val id: Long = 0,
+    val text: String,
+    val createdAt: Long
 )

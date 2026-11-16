@@ -12,6 +12,8 @@ import com.shadowsystem.data.db.DungeonSessionEntity
 import com.shadowsystem.core.RankTrial
 import com.shadowsystem.core.ShopCatalog
 import com.shadowsystem.core.BoostItem
+import com.shadowsystem.core.DungeonRules
+import kotlin.random.Random
 import com.shadowsystem.core.RankTrialState
 import com.shadowsystem.data.db.KeyValueEntity
 import com.shadowsystem.data.db.ProfileEntity
@@ -303,14 +305,17 @@ class GameRepository(
      * Saves a dungeon run. Completed runs pay double the rank's quest XP to INT;
      * cancelled runs pay only the share of time spent.
      */
-    suspend fun recordDungeon(rankName: String, plannedMinutes: Int, doneSeconds: Int, completed: Boolean): Int {
+    /** Saves a dungeon run and pays XP and gold. Returns what was earned, for the loot screen. */
+    suspend fun recordDungeon(rankName: String, plannedMinutes: Int, doneSeconds: Int, completed: Boolean): DungeonResult {
         val rank = GameMath.Rank.valueOf(rankName)
         val full = GameMath.questReward(rank).xp * 2
         val xp = if (completed) full else GameMath.partialDungeonXp(plannedMinutes, doneSeconds / 60, full)
         val boosted = isBoostActive(ShopCatalog.DUNGEON)
         val paidXp = if (boosted && xp > 0) GameMath.applyMultiplier(xp, ShopCatalog.DUNGEON_MULTIPLIER) else xp
         if (boosted && xp > 0) setKey(ShopCatalog.DUNGEON, 0L)
-        dungeonDao.insert(
+        val gold = if (completed) GameMath.questReward(rank).gold else 0
+        val rare = completed && DungeonRules.isRareLoot(Random.nextInt(100))
+        val id = dungeonDao.insert(
             DungeonSessionEntity(
                 gameDay = today(),
                 rank = rankName,
@@ -321,14 +326,25 @@ class GameRepository(
                 createdAt = clock()
             )
         )
-        if (paidXp > 0) addXp(paidXp, Stat.INT.name, gold = if (completed) GameMath.questReward(rank).gold else 0)
+        if (rare) setKey(RARE_LOOT_KEY, (kvDao.get(RARE_LOOT_KEY)?.value ?: 0L) + 1)
+        if (paidXp > 0) addXp(paidXp, Stat.INT.name, gold = gold)
         if (doneSeconds >= 60) touchActiveDay()
         updateRankTrial()
-        return xp
+        return DungeonResult(sessionId = id, xp = paidXp, gold = gold, rare = rare)
+    }
+
+    /** Stores the optional journal note ("what did I build?") for a finished run. */
+    suspend fun saveDungeonNote(sessionId: Long, note: String) {
+        dungeonDao.setNote(sessionId, note.trim().take(NOTE_MAX_LENGTH).ifBlank { null })
     }
 
     companion object {
         const val DUNGEON_GOAL_MINUTES = 25
+        const val RARE_LOOT_KEY = "rare_loot_count"
+        const val NOTE_MAX_LENGTH = 140
         const val SHADOW_BONUS_KEY = "shadow_bonus_day"
     }
 }
+
+/** Result of a finished dungeon run. */
+data class DungeonResult(val sessionId: Long, val xp: Int, val gold: Int, val rare: Boolean)

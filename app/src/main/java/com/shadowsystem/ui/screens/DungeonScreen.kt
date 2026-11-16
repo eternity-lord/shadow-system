@@ -33,6 +33,7 @@ import com.shadowsystem.core.PersianText
 import com.shadowsystem.ui.components.ConfirmDialog
 import com.shadowsystem.ui.components.MessageBanner
 import com.shadowsystem.ui.components.ShadowCard
+import com.shadowsystem.ui.components.SoldierBodyDouble
 import com.shadowsystem.ui.components.LootDialog
 import com.shadowsystem.util.AmbientSound
 import com.shadowsystem.core.DungeonTimerMath
@@ -147,6 +148,7 @@ private fun ActiveRun(run: DungeonRun, onFinish: () -> Unit, onTogglePause: () -
 
     ShadowCard {
         Text(stringResource(R.string.dungeon_inside), style = MaterialTheme.typography.titleMedium)
+        SoldierBodyDouble(active = !run.paused && !run.finished)
         if (run.paused) {
             Text(stringResource(R.string.dungeon_paused_label), color = ShadowColors.Gold)
         }

@@ -346,4 +346,6 @@
     <string name="budget_carried">شامل %1$s انتقال از ماه قبل</string>
     <string name="reduce_motion_title">حرکت و انیمیشن</string>
     <string name="reduce_motion_setting">کاهش حرکت (انیمیشن‌های کم)</string>
+    <string name="body_double_fallback">سرباز</string>
+    <string name="body_double_text">%1$s کنارت راه می‌آید.</string>
 </resources>

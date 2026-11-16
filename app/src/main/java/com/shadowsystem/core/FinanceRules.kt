@@ -35,6 +35,16 @@ object FinanceRules {
     fun goalPercent(saved: Long, target: Long): Int =
         if (target <= 0L) 0 else ((saved * 100) / target).coerceIn(0L, 100L).toInt()
 
+    /**
+     * Days until a savings goal is reached at the average daily saving rate.
+     * Null when there is no saving yet (no estimate is possible). 0 when the goal is already met.
+     */
+    fun savingsEstimateDays(remaining: Long, savedPerDay: Double): Long? = when {
+        remaining <= 0L -> 0L
+        savedPerDay <= 0.0 || savedPerDay.isNaN() -> null
+        else -> Math.ceil(remaining / savedPerDay).toLong()
+    }
+
     fun debtRemaining(total: Long, paid: Long): Long = (total - paid).coerceAtLeast(0L)
 
     /** Epoch-day range [first, last] of the Jalali month [offset] months away from [nowMillis]. */

@@ -40,7 +40,7 @@ Every visual asset the app references, and what it is. Missing assets fall back 
 |---|---|---|
 | `egg_placeholder.png` | Hunter screen (soldier egg) | 512×512 |
 | `stat_str.png`, `stat_int.png`, `stat_agi.png`, `stat_vit.png`, `stat_sense.png` | Avatar, top two stats | 512×512; text label when missing |
-| `bg_throne.png` | Heavy item `bg_throne` (weekly boss reward) | 768×768; not yet wired to a screen |
-| `shadow_igris_stage2.png`, `shadow_beru_stage2.png` | Soldier card at stage 2 | 512×512; other soldiers still use stage 1 |
+| `bg_throne.png` | Heavy item `bg_throne` (weekly boss reward) | 768×768; shown at 35% behind the hunter card when equipped |
+| `shadow_<key>_stage2.png` for all 12 soldiers | Soldier card at stage 2 | 512×512; made from each stage-1 image for consistency |
 
-Still missing: soldier stages 2–5 for the other ten soldiers, stages 3–5 for all, wisdom overlays (`wisdom_<key>_<tier>`), monsters, category icons, other backgrounds.
+Still missing: soldier stages 3–5 for all 12, wisdom overlays (`wisdom_<key>_<tier>`), monsters, category icons, other backgrounds.

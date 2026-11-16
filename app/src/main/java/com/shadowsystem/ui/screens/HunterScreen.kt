@@ -6,6 +6,9 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.matchParentSize
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
@@ -84,6 +87,17 @@ fun HunterScreen(vm: GameViewModel, soldiers: SoldierViewModel, profile: Profile
             }
         }
         ShadowCard {
+            val ctx = androidx.compose.ui.platform.LocalContext.current
+            val bgName = extras.equipped.firstOrNull { it.startsWith("bg_") }
+            Box(modifier = Modifier.fillMaxWidth()) {
+                if (bgName != null && com.shadowsystem.core.AssetRegistry.hasAsset(ctx, bgName)) {
+                    androidx.compose.foundation.Image(
+                        painter = androidx.compose.ui.res.painterResource(com.shadowsystem.core.AssetRegistry.drawableId(ctx, bgName)),
+                        contentDescription = null,
+                        modifier = Modifier.matchParentSize().graphicsLayer { alpha = 0.35f },
+                        contentScale = androidx.compose.ui.layout.ContentScale.Crop
+                    )
+                }
             Row(verticalAlignment = Alignment.CenterVertically) {
                 AvatarStack(rank = rank, topStats = topStats, aura = aura)
                 Column(modifier = Modifier.padding(start = 12.dp)) {
@@ -95,6 +109,7 @@ fun HunterScreen(vm: GameViewModel, soldiers: SoldierViewModel, profile: Profile
                         style = MaterialTheme.typography.bodyMedium
                     )
                 }
+            }
             }
             Text(stringResource(R.string.gold_label, PersianText.toFa(state.profile.gold)), color = ShadowColors.Gold)
             Text(

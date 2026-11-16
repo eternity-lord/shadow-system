@@ -70,6 +70,8 @@ Latest green CI on the branch: `5e` batch — run 43887565776 (weekly boss, budg
 
 ## Not built yet (spec items still open)
 
+The full list, section by section, is in `docs/SPEC_AUDIT.md`.
+
 These keep PR #1 open.
 
 - **Monsters:** one image per gate rank (E to S) is shown in the active dungeon run. Background `bg_gate` shows behind the dungeon screen when equipped. Category icons show in the avatar shop.

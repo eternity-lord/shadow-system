@@ -51,6 +51,7 @@ Latest green CI on the branch: `5e` batch — run 43887565776 (weekly boss, budg
 - Budget rollover on the plan screen: unspent amount from last month carries forward, capped at one base limit; overspending does not carry a debt. Known approximation: last month's limit is taken as the current limit (budgets keep no history).
 - Installments: a debt can be split into N installments. Each payment adds one installment (the last absorbs rounding) and the progress is shown.
 - Reduce motion setting: shortens the rank-up overlay animation (`rememberReduceMotion`).
+- Morning and night report cards and a five-screen onboarding (one question, soldier suggestion). Rule tests in `DailyReportTest`.
 - Body doubling: the most recently summoned soldier bobs beside the user while the dungeon timer runs (stops when paused or with reduce-motion). Uses stage-1 art until higher stages exist.
 - Savings estimate rule (`FinanceRules.savingsEstimateDays`), tested. Not yet shown on goal cards.
 - Rank-up overlay has an explicit skip button (in addition to tap-to-dismiss).
@@ -75,7 +76,7 @@ These keep PR #1 open.
 - **Dungeon:** linking a dungeon to a quest or soldier, body-doubling soldier animation, and gate minutes that the user can change.
 - **Soldiers:** user re-linking of quests to soldiers (only template links exist), the morph animation for evolution, and a wisdom overlay image.
 - **Avatar:** layered body, hair, face, outfit, weapon and aura art (only rank avatars exist), stat overlays, and the old-avatar break-apart in the rank-up cutscene. Titles are not yet shown on the profile header.
-- **Screens:** onboarding asks no questions and does not suggest soldiers. Night report and morning briefing use phrase banks but are not yet a full screen with delta and loot summary. Reduce-motion setting is not built.
+- **Screens:** reduce-motion is built. Morning briefing and night report are cards at the top of the Now tab (morning before 04:00–20:00, night from 20:00 to 04:00), with yesterday comparison and dungeon time. Onboarding has 5 screens and asks one focus question. Still open: a separate report screen with loot and quest totals.
 - **Art:** soldier stages 2–5, egg image, wisdom overlays, monsters, backgrounds, icons. These are placeholders (see ASSETS_MANIFEST.md).
 - **Quality:** TalkBack audit on a device, emulator or device tests, and a full process-death walkthrough. Accessibility has not been checked beyond the code.
 - **Docs:** README and PROGRESS are updated to this state. Check them after the next batch.

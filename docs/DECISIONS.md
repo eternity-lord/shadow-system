@@ -107,3 +107,4 @@ one pass, the simplest reasonable option was chosen and recorded here.
 | 39 | Onboarding length | The user asked for question screens, so onboarding is 8 screens (4 intro, 4 questions). This overrides the spec's "max 5 screens". | User request takes priority. |
 | 40 | Image format | Art is PNG at 512 px (soldiers, wisdom, monsters, icons) and 768 px (backgrounds). The spec asks for WebP at 1024 px. | PNG is generated and checked here; WebP conversion is planned (see docs/SPEC_AUDIT.md). |
 | 41 | Spec audit | `docs/SPEC_AUDIT.md` lists the spec items still partial or missing; it is the work list before merge. | Keeps the remaining work visible. |
+| 42 | Quiet hours | Default window 22:00–07:00, set in Settings with two stepper rows (1-hour steps, wraps at midnight). The reminder receiver skips notifications inside the window. | Spec section 11. Stored in shared preferences. |

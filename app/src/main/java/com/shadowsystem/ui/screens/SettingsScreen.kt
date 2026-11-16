@@ -46,6 +46,8 @@ import com.shadowsystem.ui.theme.ShadowColors
 import com.shadowsystem.ui.util.ShareUtil
 import com.shadowsystem.ui.vm.SettingsNotice
 import com.shadowsystem.ui.vm.SettingsViewModel
+import androidx.compose.material3.OutlinedButton
+import com.shadowsystem.core.PersianText
 
 /** Privacy, PIN lock, encrypted backup, restore and CSV export. */
 @Composable
@@ -101,6 +103,15 @@ fun SettingsScreen(vm: SettingsViewModel, onBack: () -> Unit) {
                 Text(stringResource(R.string.hide_balances_setting), modifier = Modifier.weight(1f))
                 Switch(checked = hidden, onCheckedChange = { vm.toggleHidden() })
             }
+        }
+
+        val quietStart by vm.quietStart.collectAsStateWithLifecycle()
+        val quietEnd by vm.quietEnd.collectAsStateWithLifecycle()
+        ShadowCard {
+            SectionTitle(stringResource(R.string.quiet_title))
+            Text(stringResource(R.string.quiet_help), color = ShadowColors.TextMuted)
+            QuietRow(stringResource(R.string.quiet_start), quietStart, { vm.shiftQuietStart(-1) }, { vm.shiftQuietStart(1) })
+            QuietRow(stringResource(R.string.quiet_end), quietEnd, { vm.shiftQuietEnd(-1) }, { vm.shiftQuietEnd(1) })
         }
 
         ShadowCard {
@@ -196,3 +207,21 @@ private fun noticeText(n: SettingsNotice): String = stringResource(
         SettingsNotice.DEBUG_SEEDED -> R.string.notice_debug_seeded
     }
 )
+
+/** One quiet-hours bound: label, the hour, and two large buttons to move it. */
+@Composable
+private fun QuietRow(label: String, hour: Int, onLess: () -> Unit, onMore: () -> Unit) {
+    Row(verticalAlignment = Alignment.CenterVertically) {
+        Text(label, modifier = Modifier.weight(1f))
+        OutlinedButton(onClick = onLess, modifier = Modifier.heightIn(min = 48.dp)) {
+            Text(stringResource(R.string.quiet_less))
+        }
+        Text(
+            stringResource(R.string.quiet_time, PersianText.toFa(hour)),
+            modifier = Modifier.padding(horizontal = 12.dp)
+        )
+        OutlinedButton(onClick = onMore, modifier = Modifier.heightIn(min = 48.dp)) {
+            Text(stringResource(R.string.quiet_more))
+        }
+    }
+}

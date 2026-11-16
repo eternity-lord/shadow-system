@@ -106,7 +106,7 @@ This audit was run on 2026-11-16 against the code on the branch. It is the list 
 ## Section 11 — ADHD features
 | Item | Status | Notes |
 |---|---|---|
-| Short varied notifications, quiet hours | Partial | fixed times 08:00 and 21:00; **quiet hours missing**; varied text partly |
+| Short varied notifications, quiet hours | Partial | fixed times 08:00 and 21:00; quiet hours built (default 22:00–07:00, set in Settings, `QuietHoursTest`); varied text partly |
 | 'I'm stuck', hard day, comeback, body doubling | Done | |
 | Low motion setting | Done | affects overlays |
 | Haptics, large buttons, undo | Done | |
@@ -152,10 +152,9 @@ This audit was run on 2026-11-16 against the code on the branch. It is the list 
 Phases 0–3 are built in code. The Phase 3 acceptance ("every feature in this document works") is not met until the Missing and Partial rows above are closed.
 
 ## Next steps, in order
-1. Quiet hours: settings with a start and end, enforced in the reminder receiver. (Section 11)
-2. Categories: a table with add, edit, archive, and the default set. (Section 8)
-3. Search filters: category, wallet, amount range, date range, tags. (Section 8)
-4. Onboarding: name, avatar base, usual wake time question. Wake time sets the morning reminder. (Section 10)
-5. Previews for the main cards and screens. (Section 15)
-6. Verify the Partial rows that need a check in code, and fix any gaps found.
-7. Art: WebP conversion and the stat overlay files named per tier.
+1. Categories: a table with add, edit, archive, and the default set. (Section 8)
+2. Search filters: category, wallet, amount range, date range, tags. (Section 8)
+3. Onboarding: name, avatar base, usual wake time question. Wake time sets the morning reminder. (Section 10)
+4. Previews for the main cards and screens. (Section 15)
+5. Verify the Partial rows that need a check in code, and fix any gaps found.
+6. Art: WebP conversion and the stat overlay files named per tier.

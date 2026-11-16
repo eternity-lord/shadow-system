@@ -15,6 +15,7 @@ import com.shadowsystem.MainActivity
 import com.shadowsystem.R
 import com.shadowsystem.ShadowApp
 import com.shadowsystem.core.PersianText
+import com.shadowsystem.core.QuietHours
 import com.shadowsystem.data.repo.DayReport
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -27,6 +28,9 @@ import kotlinx.coroutines.launch
  */
 class ReminderReceiver : BroadcastReceiver() {
     override fun onReceive(context: Context, intent: Intent) {
+        val prefs = (context.applicationContext as ShadowApp).container.prefs
+        val hour = java.util.Calendar.getInstance().get(java.util.Calendar.HOUR_OF_DAY)
+        if (QuietHours.isQuiet(hour, prefs.quietStart.value, prefs.quietEnd.value)) return
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU &&
             ActivityCompat.checkSelfPermission(context, Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED
         ) return

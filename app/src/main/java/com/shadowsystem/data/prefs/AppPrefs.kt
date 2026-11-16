@@ -2,6 +2,7 @@ package com.shadowsystem.data.prefs
 
 import android.content.Context
 import com.shadowsystem.core.Crypto
+import com.shadowsystem.core.QuietHours
 import kotlinx.coroutines.flow.MutableStateFlow
 
 /** Small device-local settings: balance privacy and the PIN lock. */
@@ -22,6 +23,22 @@ class AppPrefs(context: Context) {
     fun setReminders(value: Boolean) {
         sp.edit().putBoolean(KEY_REMINDERS, value).apply()
         reminders.value = value
+    }
+
+    /** Quiet hours window (0–23). Reminders are skipped inside it. */
+    val quietStart = MutableStateFlow(sp.getInt(KEY_QUIET_START, QuietHours.DEFAULT_START))
+    val quietEnd = MutableStateFlow(sp.getInt(KEY_QUIET_END, QuietHours.DEFAULT_END))
+
+    fun shiftQuietStart(delta: Int) {
+        val v = QuietHours.shift(quietStart.value, delta)
+        sp.edit().putInt(KEY_QUIET_START, v).apply()
+        quietStart.value = v
+    }
+
+    fun shiftQuietEnd(delta: Int) {
+        val v = QuietHours.shift(quietEnd.value, delta)
+        sp.edit().putInt(KEY_QUIET_END, v).apply()
+        quietEnd.value = v
     }
 
     /** Calmer UI: short or no transitions for overlays and the soldier animation. */
@@ -57,6 +74,8 @@ class AppPrefs(context: Context) {
         const val KEY_HIDE = "hide_balances"
         const val KEY_REDUCE_MOTION = "reduce_motion"
         const val KEY_REMINDERS = "reminders_on"
+        const val KEY_QUIET_START = "quiet_start"
+        const val KEY_QUIET_END = "quiet_end"
         const val KEY_PIN_HASH = "pin_hash"
         const val KEY_PIN_SALT = "pin_salt"
     }

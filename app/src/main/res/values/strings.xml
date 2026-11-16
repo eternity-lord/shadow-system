@@ -405,4 +405,11 @@
     <string name="reminder_morning_stats">امروز %1$s از %2$s مأموریت مانده. با اولین قدم شروع کن.</string>
     <string name="reminder_night_score">امتیاز امروزت %1$s است و %2$s مأموریت انجام شده.</string>
     <string name="monster_desc">هیولای دروازه رتبه %1$s</string>
+    <string name="quiet_title">ساعت‌های آرام</string>
+    <string name="quiet_help">در این بازه هیچ یادآوری‌ای نشان داده نمی‌شود.</string>
+    <string name="quiet_start">شروع</string>
+    <string name="quiet_end">پایان</string>
+    <string name="quiet_less">کم</string>
+    <string name="quiet_more">زیاد</string>
+    <string name="quiet_time">%1$s:۰۰</string>
 </resources>

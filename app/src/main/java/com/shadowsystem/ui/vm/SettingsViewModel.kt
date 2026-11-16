@@ -42,6 +42,13 @@ class SettingsViewModel(
         onRemindersChanged(on)
     }
 
+    val quietStart: StateFlow<Int> = prefs.quietStart
+    val quietEnd: StateFlow<Int> = prefs.quietEnd
+
+    fun shiftQuietStart(delta: Int) = prefs.shiftQuietStart(delta)
+
+    fun shiftQuietEnd(delta: Int) = prefs.shiftQuietEnd(delta)
+
     private val _pinSet = MutableStateFlow(prefs.isPinSet)
     val pinSet: StateFlow<Boolean> = _pinSet.asStateFlow()
     val hidden: StateFlow<Boolean> = prefs.hidden

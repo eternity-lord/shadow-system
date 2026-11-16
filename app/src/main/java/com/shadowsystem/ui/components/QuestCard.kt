@@ -40,7 +40,9 @@ fun QuestCard(
     quest: QuestEntity,
     steps: List<QuestStepEntity>,
     onStep: (QuestStepEntity) -> Unit,
-    onSmaller: () -> Unit
+    onSmaller: () -> Unit,
+    soldierKeys: List<String> = emptyList(),
+    onSoldier: (String?) -> Unit = {}
 ) {
     val done = quest.status == QuestEntity.STATUS_DONE
     var stuckOpen by remember(quest.id) { mutableStateOf(false) }
@@ -56,6 +58,22 @@ fun QuestCard(
             style = MaterialTheme.typography.bodyMedium,
             color = ShadowColors.TextMuted
         )
+        if (soldierKeys.isNotEmpty() && !done) {
+            val current = quest.soldierKey
+            TextButton(
+                onClick = {
+                    val options: List<String?> = listOf<String?>(null) + soldierKeys
+                    val i = options.indexOf(current)
+                    onSoldier(options[(i + 1) % options.size])
+                },
+                modifier = Modifier.heightIn(min = 48.dp)
+            ) {
+                Text(
+                    if (current == null) stringResource(R.string.quest_soldier_none)
+                    else stringResource(R.string.quest_soldier_link, soldierDisplayName(current))
+                )
+            }
+        }
         if (quest.comebackApplied && !done) {
             Text(stringResource(R.string.comeback_active), color = ShadowColors.Gold, style = MaterialTheme.typography.bodyMedium)
         }

@@ -33,7 +33,9 @@ import com.shadowsystem.ui.screens.DungeonScreen
 import com.shadowsystem.ui.screens.HunterScreen
 import com.shadowsystem.ui.screens.LockScreen
 import com.shadowsystem.ui.screens.MoneyPlanScreen
+import com.shadowsystem.ui.screens.DailyReportScreen
 import com.shadowsystem.ui.screens.MoneyScreen
+import com.shadowsystem.ui.vm.DailyReportViewModel
 import com.shadowsystem.ui.screens.WalletsScreen
 import com.shadowsystem.ui.vm.WalletViewModel
 import com.shadowsystem.ui.screens.NowScreen
@@ -63,6 +65,7 @@ object Routes {
     const val PLAN = "plan"
     const val REPORTS = "reports"
     const val WALLETS = "wallets"
+    const val DAILY_REPORT = "daily_report"
     const val SETTINGS = "settings"
 }
 
@@ -118,7 +121,7 @@ private fun MainNavigation(app: ShadowApp, game: GameViewModel) {
             startDestination = Tab.NOW.route,
             modifier = Modifier.padding(inner)
         ) {
-            composable(Tab.NOW.route) { NowScreen(game, inboxVm, bossVm) }
+            composable(Tab.NOW.route) { NowScreen(game, inboxVm, bossVm) { nav.navigate(Routes.DAILY_REPORT) } }
             composable(Tab.QUESTS.route) { QuestsScreen(game) }
             composable(Tab.DUNGEON.route) { DungeonScreen(game) }
             composable(Tab.MONEY.route) {
@@ -132,6 +135,9 @@ private fun MainNavigation(app: ShadowApp, game: GameViewModel) {
             composable(Tab.HUNTER.route) { HunterScreen(game, soldierVm, profileVm) { nav.navigate(Routes.SETTINGS) } }
             composable(Routes.WALLETS) {
                 WalletsScreen(viewModel(factory = WalletViewModel.factory(app))) { nav.popBackStack() }
+            }
+            composable(Routes.DAILY_REPORT) {
+                DailyReportScreen(viewModel(factory = DailyReportViewModel.factory(app))) { nav.popBackStack() }
             }
             composable(Routes.PLAN) {
                 MoneyPlanScreen(viewModel(factory = PlanViewModel.factory(app))) { nav.popBackStack() }

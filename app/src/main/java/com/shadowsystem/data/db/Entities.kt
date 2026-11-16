@@ -91,7 +91,10 @@ data class DungeonSessionEntity(
     val completed: Boolean,
     val xpGained: Int,
     val createdAt: Long,
-    val note: String? = null
+    val note: String? = null,
+    val soldierKey: String? = null,
+    val questId: Long? = null,
+    @ColumnInfo(defaultValue = "0") val rareLoot: Boolean = false
 )
 
 @Entity(

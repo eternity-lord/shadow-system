@@ -150,6 +150,7 @@ private fun GoalRow(g: GoalEntity, onDeposit: (GoalEntity, String) -> Unit, onDe
                 PersianText.formatMoney(g.savedRial) + " / " + PersianText.formatMoney(g.targetRial)
         )
         if (done) Text(stringResource(R.string.goal_done), color = ShadowColors.Secondary, style = MaterialTheme.typography.bodyMedium)
+        goalEstimate(g)?.let { Text(it, style = MaterialTheme.typography.bodyMedium, color = ShadowColors.TextMuted) }
         Row(verticalAlignment = Alignment.CenterVertically) {
             AmountField(deposit, { deposit = PersianText.parseDigits(it).filter { c -> c.isDigit() } }, stringResource(R.string.goal_deposit_hint), modifier = Modifier.weight(1f))
             Button(onClick = { onDeposit(g, deposit); deposit = "" }, modifier = Modifier.heightIn(min = 48.dp)) { Text(stringResource(R.string.goal_deposit)) }
@@ -216,5 +217,18 @@ private fun DebtRow(d: DebtEntity, onPay: (DebtEntity, String) -> Unit, onDelete
             }
         }
         TextButton(onClick = { onDelete(d.id) }, modifier = Modifier.heightIn(min = 48.dp)) { Text(stringResource(R.string.delete), color = ShadowColors.Danger) }
+    }
+}
+
+/** Estimate from the average daily saving since the goal was created. Null when the goal is already met. */
+@Composable
+private fun goalEstimate(g: GoalEntity): String? {
+    val today = com.shadowsystem.core.DayRules.gameDay(System.currentTimeMillis())
+    val days = (today - g.createdDay + 1).coerceAtLeast(1L)
+    val estimate = FinanceRules.savingsEstimateDays(g.targetRial - g.savedRial, g.savedRial.toDouble() / days)
+    return when {
+        estimate == null -> stringResource(R.string.goal_estimate_none)
+        estimate == 0L -> null
+        else -> stringResource(R.string.goal_estimate, PersianText.toFa(estimate))
     }
 }

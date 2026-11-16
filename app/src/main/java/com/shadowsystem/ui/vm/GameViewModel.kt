@@ -1,5 +1,6 @@
 package com.shadowsystem.ui.vm
 
+import kotlinx.coroutines.flow.asStateFlow
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
@@ -38,7 +39,9 @@ data class DungeonRun(
     val startedAtMillis: Long,
     val elapsedSeconds: Int = 0,
     val paused: Boolean = false,
-    val pausedSeconds: Int = 0
+    val pausedSeconds: Int = 0,
+    val soldierKey: String? = null,
+    val questId: Long? = null
 ) {
     val plannedSeconds: Int get() = plannedMinutes * 60
     val finished: Boolean get() = elapsedSeconds >= plannedSeconds
@@ -238,7 +241,9 @@ class GameViewModel(private val game: GameRepository, private val timer: Dungeon
         startedAtMillis = snap.startedAt,
         elapsedSeconds = DungeonTimerStore.elapsedSeconds(snap, now),
         paused = snap.pausedAt != null,
-        pausedSeconds = DungeonTimerMath.pausedSeconds(snap.pausedTotal, snap.pausedAt, now)
+        pausedSeconds = DungeonTimerMath.pausedSeconds(snap.pausedTotal, snap.pausedAt, now),
+        soldierKey = snap.soldierKey,
+        questId = snap.questId
     )
 
     private fun startTicker() {
@@ -256,10 +261,30 @@ class GameViewModel(private val game: GameRepository, private val timer: Dungeon
         }
     }
 
-    fun startDungeon(rank: Rank) {
+    private val gateMinutesState = MutableStateFlow<Map<String, Int>>(emptyMap())
+
+    /** User-chosen gate lengths by rank name. Missing ranks use the default length. */
+    val gateMinutes: StateFlow<Map<String, Int>> = gateMinutesState.asStateFlow()
+
+    init {
+        viewModelScope.launch { gateMinutesState.value = game.gateMinutes() }
+    }
+
+    fun setGateMinutes(rank: Rank, minutes: Int) {
+        val clean = com.shadowsystem.core.GateRules.clamp(minutes)
+        gateMinutesState.value = gateMinutesState.value + (rank.name to clean)
+        viewModelScope.launch { game.setGateMinutes(rank.name, clean) }
+    }
+
+    /** Starts a run. [soldierKey] and [questId] are optional links shown on the run. */
+    fun startDungeon(rank: Rank, minutes: Int = GameMath.dungeonMinutes(rank), soldierKey: String? = null, questId: Long? = null) {
         if (timer.snapshot.value != null) return
-        timer.start(rank.name, GameMath.dungeonMinutes(rank), System.currentTimeMillis())
+        timer.start(rank.name, minutes, System.currentTimeMillis(), soldierKey, questId)
         startTicker()
+    }
+
+    fun setQuestSoldier(questId: Long, key: String?) {
+        viewModelScope.launch { game.setQuestSoldier(questId, key) }
     }
 
     /** Pause or resume. While paused, the work clock stops and the monster regenerates slightly (cosmetic). */
@@ -279,7 +304,7 @@ class GameViewModel(private val game: GameRepository, private val timer: Dungeon
         run.value = null
         viewModelScope.launch {
             val done = current.elapsedSeconds.coerceAtMost(current.plannedSeconds)
-            val result = game.recordDungeon(current.rank.name, current.plannedMinutes, done, completed)
+            val result = game.recordDungeon(current.rank.name, current.plannedMinutes, done, completed, current.soldierKey, current.questId)
             loot.value = LootInfo(result.sessionId, result.xp, result.gold, result.rare)
             game.refreshScore()
             bump()

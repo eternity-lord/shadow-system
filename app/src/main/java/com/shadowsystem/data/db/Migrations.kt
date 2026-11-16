@@ -79,4 +79,13 @@ object Migrations {
             db.execSQL("ALTER TABLE `debts` ADD COLUMN `installmentsPaid` INTEGER NOT NULL DEFAULT 0")
         }
     }
+
+    /** v7: dungeon sessions remember the linked soldier and quest, and whether rare loot dropped. */
+    val MIGRATION_6_7: Migration = object : Migration(6, 7) {
+        override fun migrate(db: SupportSQLiteDatabase) {
+            db.execSQL("ALTER TABLE `dungeon_sessions` ADD COLUMN `soldierKey` TEXT")
+            db.execSQL("ALTER TABLE `dungeon_sessions` ADD COLUMN `questId` INTEGER")
+            db.execSQL("ALTER TABLE `dungeon_sessions` ADD COLUMN `rareLoot` INTEGER NOT NULL DEFAULT 0")
+        }
+    }
 }

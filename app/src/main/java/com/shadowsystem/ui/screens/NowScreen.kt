@@ -45,7 +45,7 @@ import com.shadowsystem.ui.vm.GameViewModel
 
 /** Today: score, level, the System's briefing, mandatory and optional quests. */
 @Composable
-fun NowScreen(vm: GameViewModel, inbox: InboxViewModel, boss: BossViewModel) {
+fun NowScreen(vm: GameViewModel, inbox: InboxViewModel, boss: BossViewModel, onFullReport: () -> Unit = {}) {
     val state by vm.state.collectAsStateWithLifecycle()
     val bossState by boss.state.collectAsStateWithLifecycle()
     LaunchedEffect(state.dungeonSeconds, state.profile.totalXp, state.score?.score) { boss.refresh() }
@@ -78,7 +78,8 @@ fun NowScreen(vm: GameViewModel, inbox: InboxViewModel, boss: BossViewModel) {
                 morning = !DailyReport.isNightHour(java.time.LocalTime.now().hour),
                 score = state.score?.score,
                 yesterday = yesterday,
-                dungeonMinutes = state.dungeonSeconds / 60
+                dungeonMinutes = state.dungeonSeconds / 60,
+                onMore = onFullReport
             )
         }
 
@@ -142,12 +143,17 @@ fun NowScreen(vm: GameViewModel, inbox: InboxViewModel, boss: BossViewModel) {
 
 @Composable
 internal fun QuestList(quests: List<QuestEntity>, steps: List<com.shadowsystem.data.db.QuestStepEntity>, vm: GameViewModel) {
+    val app = androidx.compose.ui.platform.LocalContext.current.applicationContext as com.shadowsystem.ShadowApp
+    val summoned by app.container.soldiers.observeSaved().collectAsStateWithLifecycle(initialValue = emptyList())
+    val keys = summoned.filter { it.summonedAt != null }.map { it.key }
     quests.forEach { quest ->
         QuestCard(
             quest = quest,
             steps = steps.filter { it.questId == quest.id },
             onStep = { vm.tickStep(it) },
-            onSmaller = { vm.makeSmaller(quest) }
+            onSmaller = { vm.makeSmaller(quest) },
+            soldierKeys = keys,
+            onSoldier = { vm.setQuestSoldier(quest.id, it) }
         )
     }
 }

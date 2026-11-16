@@ -1,5 +1,6 @@
 package com.shadowsystem.ui.screens
 
+import com.shadowsystem.ui.components.AvatarStack
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -68,6 +69,8 @@ fun HunterScreen(vm: GameViewModel, soldiers: SoldierViewModel, profile: Profile
     val statLevels = Stat.values().associateWith { GameMath.statLevelForXp(stats[it] ?: 0L) }
     val top = statLevels.entries.sortedByDescending { it.value }.take(2).map { it.key }.toSet()
     val weekly = extras.weeklyTop.takeIf { it.size == 2 } ?: top
+    val topBadges = statLevels.entries.sortedByDescending { it.value }.take(2).map { "${statLabel(it.key)} ${PersianText.toFa(it.value)}" }
+    val aura = extras.equipped.any { it.contains("aura") }
     LaunchedEffect(top) { profile.refresh(top) }
 
     Column(
@@ -82,13 +85,7 @@ fun HunterScreen(vm: GameViewModel, soldiers: SoldierViewModel, profile: Profile
         }
         ShadowCard {
             Row(verticalAlignment = Alignment.CenterVertically) {
-                AssetImage(
-                    name = AvatarData.rankAssetName(rank),
-                    size = 96.dp,
-                    placeholderColor = ShadowColors.Primary,
-                    stage = (GameMath.Rank.values().indexOf(rank) + 1).coerceAtMost(5),
-                    contentDescription = stringResource(R.string.content_desc_avatar)
-                )
+                AvatarStack(rank = rank, topBadges = topBadges, aura = aura)
                 Column(modifier = Modifier.padding(start = 12.dp)) {
                     Text(stringResource(R.string.level_label, PersianText.toFa(level)), style = MaterialTheme.typography.titleLarge)
                     Text(stringResource(R.string.rank_label, rank.name), color = ShadowColors.Gold)

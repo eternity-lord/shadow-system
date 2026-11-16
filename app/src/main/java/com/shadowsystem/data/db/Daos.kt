@@ -48,6 +48,12 @@ data class LinkedQuestRow(
 
 @Dao
 interface QuestDao {
+    @Query("SELECT * FROM quests WHERE gameDay = :day")
+    suspend fun forDay(day: Long): List<QuestEntity>
+
+    @Query("UPDATE quests SET soldierKey = :key WHERE id = :id")
+    suspend fun setSoldier(id: Long, key: String?)
+
     @Query("SELECT soldierKey, gameDay, title, stepsDone FROM quests WHERE status = 'DONE' AND soldierKey IS NOT NULL")
     fun observeLinkedDone(): Flow<List<LinkedQuestRow>>
 
@@ -126,6 +132,9 @@ interface DailyScoreDao {
 
 @Dao
 interface DungeonDao {
+    @Query("SELECT * FROM dungeon_sessions WHERE gameDay = :day")
+    suspend fun sessionsForDay(day: Long): List<DungeonSessionEntity>
+
     @Insert
     suspend fun insert(session: DungeonSessionEntity): Long
 

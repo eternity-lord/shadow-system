@@ -20,15 +20,17 @@ class DungeonTimerStore(private val context: Context) {
         val plannedMinutes: Int,
         val startedAt: Long,
         val pausedTotal: Long,
-        val pausedAt: Long?
+        val pausedAt: Long?,
+        val soldierKey: String? = null,
+        val questId: Long? = null
     )
 
     private val prefs = context.getSharedPreferences(PREFS, Context.MODE_PRIVATE)
     private val current = MutableStateFlow(load())
     val snapshot: StateFlow<Snapshot?> = current.asStateFlow()
 
-    fun start(rank: String, plannedMinutes: Int, now: Long) {
-        write(Snapshot(rank, plannedMinutes, now, 0L, null))
+    fun start(rank: String, plannedMinutes: Int, now: Long, soldierKey: String? = null, questId: Long? = null) {
+        write(Snapshot(rank, plannedMinutes, now, 0L, null, soldierKey, questId))
         startService()
     }
 
@@ -70,6 +72,8 @@ class DungeonTimerStore(private val context: Context) {
                 .putLong(K_STARTED, s.startedAt)
                 .putLong(K_PAUSED_TOTAL, s.pausedTotal)
                 .putLong(K_PAUSED_AT, s.pausedAt ?: NONE)
+                .putString(K_SOLDIER, s.soldierKey)
+                .putLong(K_QUEST, s.questId ?: NONE)
                 .apply()
         }
         current.value = s
@@ -83,7 +87,9 @@ class DungeonTimerStore(private val context: Context) {
             plannedMinutes = prefs.getInt(K_MINUTES, 15),
             startedAt = prefs.getLong(K_STARTED, 0L),
             pausedTotal = prefs.getLong(K_PAUSED_TOTAL, 0L),
-            pausedAt = pausedAt.takeIf { it != NONE }
+            pausedAt = pausedAt.takeIf { it != NONE },
+            soldierKey = prefs.getString(K_SOLDIER, null),
+            questId = prefs.getLong(K_QUEST, NONE).takeIf { it != NONE }
         )
     }
 
@@ -94,6 +100,8 @@ class DungeonTimerStore(private val context: Context) {
         private const val K_STARTED = "started"
         private const val K_PAUSED_TOTAL = "paused_total"
         private const val K_PAUSED_AT = "paused_at"
+        private const val K_SOLDIER = "soldier"
+        private const val K_QUEST = "quest"
         private const val NONE = -1L
 
         /** Elapsed work seconds for a snapshot at [now]. */

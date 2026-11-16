@@ -1,5 +1,8 @@
 package com.shadowsystem.ui.components
 
+import kotlinx.coroutines.launch
+import androidx.compose.foundation.layout.size
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -153,7 +156,40 @@ fun EvolutionDialog(row: SoldierRow, onFinish: () -> Unit) {
     }
     FullscreenScene {
         Text(stringResource(R.string.evolution_title), style = MaterialTheme.typography.titleLarge)
-        SoldierImage(row, stage = row.displayStage, size = 160.dp)
+        val reduce = rememberReduceMotion()
+        val oldAlpha = remember { androidx.compose.animation.core.Animatable(1f) }
+        val newAlpha = remember { androidx.compose.animation.core.Animatable(0f) }
+        val newScale = remember { androidx.compose.animation.core.Animatable(0.7f) }
+        LaunchedEffect(row.def.key, row.progress.stage) {
+            if (reduce) {
+                oldAlpha.snapTo(0f)
+                newAlpha.snapTo(1f)
+                newScale.snapTo(1f)
+            } else {
+                delay(500)
+                launch { oldAlpha.animateTo(0f, androidx.compose.animation.core.tween(1000)) }
+                launch { newAlpha.animateTo(1f, androidx.compose.animation.core.tween(1000)) }
+                newScale.animateTo(1f, androidx.compose.animation.core.tween(1000))
+            }
+        }
+        androidx.compose.foundation.layout.Box(
+            modifier = Modifier.size(160.dp),
+            contentAlignment = androidx.compose.ui.Alignment.Center
+        ) {
+            val prev = (row.displayStage - 1).coerceAtLeast(1)
+            if (prev != row.displayStage) {
+                androidx.compose.foundation.layout.Box(
+                    modifier = Modifier.graphicsLayer { alpha = oldAlpha.value }
+                ) { SoldierImage(row, stage = prev, size = 160.dp) }
+            }
+            androidx.compose.foundation.layout.Box(
+                modifier = Modifier.graphicsLayer {
+                    alpha = newAlpha.value
+                    scaleX = newScale.value
+                    scaleY = newScale.value
+                }
+            ) { SoldierImage(row, stage = row.displayStage, size = 160.dp) }
+        }
         Text(stringResource(R.string.soldier_stage, PersianText.toFa(row.displayStage)), color = ShadowColors.Gold)
         Text(voiceLineFor(row), style = MaterialTheme.typography.bodyLarge)
         TextButton(onClick = onFinish, modifier = Modifier.heightIn(min = 48.dp)) {

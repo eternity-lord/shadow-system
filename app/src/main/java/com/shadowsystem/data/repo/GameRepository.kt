@@ -1,5 +1,6 @@
 package com.shadowsystem.data.repo
 
+import com.shadowsystem.core.GateRules
 import com.shadowsystem.core.AvatarData
 import com.shadowsystem.core.ShopItem
 import com.shadowsystem.core.DayRules
@@ -311,7 +312,14 @@ class GameRepository(
      * cancelled runs pay only the share of time spent.
      */
     /** Saves a dungeon run and pays XP and gold. Returns what was earned, for the loot screen. */
-    suspend fun recordDungeon(rankName: String, plannedMinutes: Int, doneSeconds: Int, completed: Boolean): DungeonResult {
+    suspend fun recordDungeon(
+        rankName: String,
+        plannedMinutes: Int,
+        doneSeconds: Int,
+        completed: Boolean,
+        soldierKey: String? = null,
+        questId: Long? = null
+    ): DungeonResult {
         val rank = GameMath.Rank.valueOf(rankName)
         val full = GameMath.questReward(rank).xp * 2
         val xp = if (completed) full else GameMath.partialDungeonXp(plannedMinutes, doneSeconds / 60, full)
@@ -328,7 +336,10 @@ class GameRepository(
                 doneSeconds = doneSeconds,
                 completed = completed,
                 xpGained = paidXp,
-                createdAt = clock()
+                createdAt = clock(),
+                soldierKey = soldierKey,
+                questId = questId,
+                rareLoot = rare
             )
         )
         if (rare) setKey(RARE_LOOT_KEY, (kvDao.get(RARE_LOOT_KEY)?.value ?: 0L) + 1)
@@ -339,6 +350,31 @@ class GameRepository(
     }
 
     /** Stores the optional journal note ("what did I build?") for a finished run. */
+    /** Gate length chosen by the user, per rank (kv `gate_minutes_<RANK>`). */
+    suspend fun gateMinutes(): Map<String, Int> = GameMath.Rank.values().mapNotNull { r ->
+        kvDao.get(gateKey(r.name))?.value?.let { r.name to it.toInt() }
+    }.toMap()
+
+    suspend fun setGateMinutes(rankName: String, minutes: Int) = setKey(gateKey(rankName), GateRules.clamp(minutes).toLong())
+
+    suspend fun setQuestSoldier(questId: Long, key: String?) = questDao.setSoldier(questId, key)
+
+    /** Everything the full daily report shows for one game day. */
+    suspend fun dailyReport(day: Long): DayReport {
+        val quests = questDao.forDay(day)
+        val sessions = dungeonDao.sessionsForDay(day)
+        return DayReport(
+            score = scoreDao.get(day)?.score,
+            yesterdayScore = scoreDao.get(day - 1)?.score,
+            dungeonMinutes = sessions.sumOf { it.doneSeconds } / 60,
+            dungeonsCompleted = sessions.count { it.completed },
+            rareLoot = sessions.count { it.rareLoot },
+            questsDone = quests.count { it.status == QuestEntity.STATUS_DONE },
+            questsTotal = quests.size,
+            xpToday = quests.sumOf { it.xpAwarded } + sessions.sumOf { it.xpGained }
+        )
+    }
+
     suspend fun saveDungeonNote(sessionId: Long, note: String) {
         dungeonDao.setNote(sessionId, note.trim().take(NOTE_MAX_LENGTH).ifBlank { null })
     }
@@ -403,6 +439,7 @@ class GameRepository(
 
     companion object {
         const val ONBOARDING_FOCUS_KEY = "onboarding_focus"
+        private fun gateKey(rank: String) = "gate_minutes_$rank"
         const val DUNGEON_GOAL_MINUTES = 25
         const val RARE_LOOT_KEY = "rare_loot_count"
         const val NOTE_MAX_LENGTH = 140

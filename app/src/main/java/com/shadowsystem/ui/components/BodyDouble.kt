@@ -22,18 +22,24 @@ import com.shadowsystem.R
 import com.shadowsystem.ShadowApp
 import com.shadowsystem.core.AssetImage
 import com.shadowsystem.core.AssetRegistry
+import com.shadowsystem.core.SoldierData
 import com.shadowsystem.ui.theme.ShadowColors
 
+/** Display name for a soldier key: the template name, or the key itself when unknown. */
+fun soldierDisplayName(key: String): String = SoldierData.ALL.firstOrNull { it.key == key }?.name ?: key
+
 /**
- * Body doubling: the most recently summoned soldier keeps pace beside the user during a run.
+ * Body doubling: a summoned soldier keeps pace beside the user during a run.
+ * The linked soldier is shown when the run has one; otherwise the first summoned soldier.
  * The figure bobs gently while the timer runs; it stops when paused, and with reduce-motion on.
  */
 @Composable
-fun SoldierBodyDouble(active: Boolean) {
+fun SoldierBodyDouble(active: Boolean, soldierKey: String? = null) {
     val context = LocalContext.current
     val app = context.applicationContext as ShadowApp
     val soldiers by app.container.soldiers.observeSaved().collectAsStateWithLifecycle(initialValue = emptyList())
-    val soldier = soldiers.filter { it.summonedAt != null }.minByOrNull { it.summonedAt ?: Long.MAX_VALUE }
+    val pool = soldiers.filter { it.summonedAt != null }
+    val soldier = pool.firstOrNull { it.key == soldierKey } ?: pool.minByOrNull { it.summonedAt ?: Long.MAX_VALUE }
     val reduce = rememberReduceMotion()
     val bob by rememberInfiniteTransition(label = "bodyDouble").animateFloat(
         initialValue = 0f,
@@ -43,6 +49,7 @@ fun SoldierBodyDouble(active: Boolean) {
     )
     if (soldier != null) {
         val offsetY = if (active && !reduce) bob else 0f
+        val name = soldier.customName ?: soldierDisplayName(soldier.key)
         Row(
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.spacedBy(12.dp)
@@ -51,11 +58,11 @@ fun SoldierBodyDouble(active: Boolean) {
                 name = AssetRegistry.soldierBestAsset(context, soldier.key, 1),
                 size = 72.dp,
                 placeholderColor = ShadowColors.Secondary,
-                contentDescription = soldier.customName ?: stringResource(R.string.body_double_fallback),
+                contentDescription = name,
                 modifier = Modifier.graphicsLayer { translationY = offsetY }
             )
             Text(
-                stringResource(R.string.body_double_text, soldier.customName ?: stringResource(R.string.body_double_fallback)),
+                stringResource(R.string.body_double_text, name),
                 color = ShadowColors.TextMuted,
                 modifier = Modifier.padding(end = 4.dp)
             )

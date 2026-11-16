@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
@@ -34,7 +35,7 @@ import com.shadowsystem.ui.vm.GameViewModel
 
 /** Hunter profile: level, rank, the five stats, class and the shadow soldiers. */
 @Composable
-fun HunterScreen(vm: GameViewModel) {
+fun HunterScreen(vm: GameViewModel, onSettings: () -> Unit) {
     val state by vm.state.collectAsStateWithLifecycle()
     val stats by vm.stats.collectAsStateWithLifecycle()
     val level = GameMath.levelForXp(state.profile.totalXp)
@@ -46,7 +47,12 @@ fun HunterScreen(vm: GameViewModel) {
         modifier = Modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(16.dp),
         verticalArrangement = Arrangement.spacedBy(12.dp)
     ) {
-        Text(stringResource(R.string.hunter_title), style = MaterialTheme.typography.headlineMedium)
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            Text(stringResource(R.string.hunter_title), style = MaterialTheme.typography.headlineMedium, modifier = Modifier.weight(1f))
+            androidx.compose.material3.TextButton(onClick = onSettings, modifier = Modifier.heightIn(min = 48.dp)) {
+                Text(stringResource(R.string.settings_title))
+            }
+        }
         ShadowCard {
             Row(verticalAlignment = Alignment.CenterVertically) {
                 AssetImage(

@@ -1,6 +1,5 @@
 package com.shadowsystem.data.repo
 
-import com.shadowsystem.core.DayRules
 import com.shadowsystem.core.GameMath
 import com.shadowsystem.core.MoneyRules
 import com.shadowsystem.data.db.AppDatabase
@@ -20,8 +19,8 @@ class MoneyRepository(
     suspend fun range(fromDay: Long, toDay: Long): List<TransactionEntity> = dao.range(fromDay, toDay)
 
     /**
-     * Stores a transaction. Logging gives INT XP (capped per day) and marks the day as
-     * "money logged" for the daily score. Returns the XP awarded.
+     * Stores a transaction. Logging gives a little INT XP (capped per day).
+     * Returns the XP awarded.
      */
     suspend fun add(toman: Long, category: String, note: String, isIncome: Boolean): Int {
         val day = game.today()
@@ -38,14 +37,12 @@ class MoneyRepository(
         )
         val xp = MoneyRules.logXpFor(loggedBefore)
         if (xp > 0) game.addXp(xp, GameMath.Stat.INT.name, gold = 0)
-        game.refreshScore(loggedMoney = true)
+        game.refreshScore()
         return xp
     }
 
     suspend fun delete(tx: TransactionEntity) {
         dao.delete(tx)
-        game.refreshScore(loggedMoney = dao.countForDay(tx.epochDay) > 0)
+        game.refreshScore()
     }
-
-    fun dayOf(millis: Long): Long = DayRules.gameDay(millis)
 }

@@ -23,6 +23,12 @@ interface ProfileDao {
 @Dao
 interface StatDao {
     @Query("SELECT * FROM stat_progress")
+    suspend fun all(): List<StatProgressEntity>
+
+    @Insert
+    suspend fun insertAll(list: List<StatProgressEntity>)
+
+    @Query("SELECT * FROM stat_progress")
     fun observeAll(): Flow<List<StatProgressEntity>>
 
     @Query("SELECT * FROM stat_progress WHERE stat = :stat")
@@ -34,6 +40,9 @@ interface StatDao {
 
 @Dao
 interface QuestDao {
+    @Query("DELETE FROM quest_steps WHERE questId = :questId AND position > :position AND done = 0")
+    suspend fun deleteUndoneStepsAfter(questId: Long, position: Int)
+
     @Query("SELECT * FROM quests WHERE gameDay = :day ORDER BY mandatory DESC, id ASC")
     fun observeDay(day: Long): Flow<List<QuestEntity>>
 
@@ -115,6 +124,15 @@ interface DungeonDao {
 
 @Dao
 interface TransactionDao {
+    @Query("SELECT * FROM transactions ORDER BY epochDay, id")
+    suspend fun all(): List<TransactionEntity>
+
+    @Insert
+    suspend fun insertAll(list: List<TransactionEntity>)
+
+    @Query("SELECT COUNT(*) FROM transactions WHERE epochDay = :day")
+    suspend fun dayCount(day: Long): Int
+
     @Query("SELECT * FROM transactions WHERE epochDay BETWEEN :from AND :to ORDER BY createdAt DESC")
     fun observeRange(from: Long, to: Long): Flow<List<TransactionEntity>>
 

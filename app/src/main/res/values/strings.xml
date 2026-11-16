@@ -9,11 +9,10 @@
     <string name="tab_money">پول</string>
     <string name="tab_hunter">شکارچی</string>
 
-    <!-- Now -->
+    <!-- Now / quests -->
     <string name="now_title">امروز</string>
     <string name="score_label">امتیاز امروز</string>
     <string name="shadow_yesterday">امتیاز دیروز: %1$s</string>
-    <string name="shadow_beaten">سایه دیروز را شکست دادی! +۱۰ طلا</string>
     <string name="mandatory_title">مأموریت‌های اصلی</string>
     <string name="optional_title">مأموریت‌های اختیاری</string>
     <string name="mood_question">امروز چه حالی داری؟</string>
@@ -21,24 +20,38 @@
     <string name="mood_normal">معمولی</string>
     <string name="mood_hard">روز سخت</string>
     <string name="comeback_active">پاداش بازگشت فعال است: ۳ مأموریت اول ×۱٫۵</string>
-    <string name="no_quests_yet">هنوز مأموریتی برای امروز نیست.</string>
-    <string name="generate_quests">ساخت مأموریت‌های امروز</string>
     <string name="level_label">سطح %1$s</string>
     <string name="rank_label">رتبه %1$s</string>
     <string name="xp_progress">%1$s از %2$s تجربه</string>
-
-    <!-- Quests -->
     <string name="quests_title">مأموریت‌ها</string>
-    <string name="quest_done">انجام شد</string>
-    <string name="quest_steps">مرحله %1$s از %2$s</string>
-    <string name="step_done">انجام شد</string>
+    <string name="unit_minutes">دقیقه</string>
+    <string name="quest_reward">+%1$s تجربه · +%2$s طلا</string>
+    <string name="reward_claimed">پاداش دریافت شد</string>
     <string name="im_stuck">گیر کرده‌ام</string>
     <string name="make_smaller">کوچک‌ترش کن</string>
     <string name="later">بعداً</string>
-    <string name="quest_reward">+%1$s تجربه · +%2$s طلا</string>
+    <string name="step_recorded">ثبت شد: %1$s</string>
     <string name="quest_undo">برگشت</string>
-    <string name="reward_claimed">پاداش دریافت شد</string>
     <string name="empty_quests_list">امروز هنوز مأموریتی ساخته نشده است.</string>
+
+    <!-- Onboarding -->
+    <string name="onb_progress">%1$s از %2$s</string>
+    <string name="onb_title_1">به سیستم سایه خوش آمدی</string>
+    <string name="onb_body_1">هر روز چند مأموریت کوچک دریافت می‌کنی. فقط یکی‌یکی جلو برو.</string>
+    <string name="onb_title_2">امتیاز و رتبه</string>
+    <string name="onb_body_2">هر قدم تجربه می‌دهد. با تجربه، سطح و رتبه بالا می‌رود و صفات قوی‌تر می‌شوند.</string>
+    <string name="onb_title_3">پول، جدا از بازی</string>
+    <string name="onb_body_3">هزینه‌ها را سریع ثبت کن. پول واقعی با طلای بازی هیچ ارتباطی ندارد و هیچ‌وقت خرج هزینه‌ها تجربه نمی‌دهد.</string>
+    <string name="onb_title_4">همه‌چیز روی گوشی خودت</string>
+    <string name="onb_body_4">این برنامه بدون اینترنت کار می‌کند و هیچ داده‌ای به جایی فرستاده نمی‌شود.</string>
+    <string name="onb_next">بعدی</string>
+    <string name="onb_start">شروع</string>
+
+    <!-- Lock -->
+    <string name="lock_title">قفل سیستم</string>
+    <string name="lock_hint">رمز چهار رقمی را وارد کن</string>
+    <string name="lock_wrong">رمز اشتباه است</string>
+    <string name="erase">پاک</string>
 
     <!-- Dungeon -->
     <string name="dungeon_title">سیاه‌چال</string>
@@ -51,26 +64,72 @@
     <string name="dungeon_inside">داخل سیاه‌چال هستی. تمرکز کن.</string>
     <string name="dungeon_today">امروز: %1$s</string>
     <string name="dungeon_idle">آماده ورود، شکارچی؟</string>
-    <string name="dungeon_loot">غنیمت: %1$s تجربه ذهنی</string>
 
     <!-- Money -->
     <string name="money_title">پول</string>
+    <string name="money_plan">برنامه مالی</string>
+    <string name="money_reports">گزارش‌ها</string>
     <string name="money_amount_hint">مبلغ به تومان</string>
     <string name="money_note_hint">یادداشت (اختیاری)</string>
     <string name="money_save">ثبت</string>
-    <string name="money_month_spent">خرج این ماه</string>
-    <string name="money_today">امروز</string>
-    <string name="money_empty">هنوز هزینه‌ای ثبت نشده است.</string>
-    <string name="money_delete_confirm">این تراکنش حذف شود؟</string>
-    <string name="money_yes_delete">بله، حذف کن</string>
-    <string name="cancel">انصراف</string>
-    <string name="delete">حذف</string>
-    <string name="money_logged_bonus">ثبت شد. +۲ تجربه هوش</string>
-    <string name="money_amount_invalid">مبلغ معتبر وارد کن.</string>
     <string name="money_expense">هزینه</string>
     <string name="money_income">درآمد</string>
+    <string name="money_month_spent">خرج این ماه</string>
     <string name="money_month_income">درآمد این ماه</string>
+    <string name="money_today">امروز</string>
+    <string name="money_empty">هنوز تراکنشی برای این ماه ثبت نشده است.</string>
+    <string name="money_delete_confirm">این تراکنش حذف شود؟</string>
+    <string name="money_yes_delete">بله، حذف کن</string>
+    <string name="money_amount_invalid">مبلغ معتبر وارد کن.</string>
     <string name="money_privacy">مبالغ فقط روی این گوشی ذخیره می‌شوند.</string>
+    <string name="hide_balances">پنهان کردن مبالغ</string>
+    <string name="show_balances">نمایش مبالغ</string>
+    <string name="search_hint">جستجو در یادداشت یا دسته</string>
+    <string name="filter_all">همه</string>
+    <string name="month_prev">ماه قبل</string>
+    <string name="month_next">ماه بعد</string>
+
+    <!-- Plan -->
+    <string name="plan_title">برنامه مالی</string>
+    <string name="plan_title_hint">عنوان</string>
+    <string name="plan_title_required">عنوان را وارد کن.</string>
+    <string name="plan_payment_too_high">مبلغ بیشتر از باقی‌مانده بدهی است.</string>
+    <string name="plan_saved">ذخیره شد.</string>
+    <string name="plan_delete_confirm">این مورد حذف شود؟</string>
+    <string name="plan_note">هشدار بودجه فقط اطلاع‌رسانی است و چیزی را قفل نمی‌کند.</string>
+    <string name="budget_section">بودجه ماهانه</string>
+    <string name="budget_empty">هنوز بودجه‌ای تعریف نشده است.</string>
+    <string name="budget_save">ذخیره بودجه</string>
+    <string name="budget_ok">در محدوده</string>
+    <string name="budget_warn">نزدیک سقف (بیش از ۸۰٪)</string>
+    <string name="budget_over">از سقف گذشته</string>
+    <string name="recurring_section">تراکنش‌های تکرارشونده</string>
+    <string name="recurring_empty">مثل اجاره یا قسط، هرماه یا هرهفته خودکار ثبت شود.</string>
+    <string name="recurring_save">افزودن تکرارشونده</string>
+    <string name="every_month">ماهانه</string>
+    <string name="every_week">هفتگی</string>
+    <string name="goal_section">اهداف پس‌انداز</string>
+    <string name="goal_empty">هدفی تعریف نشده است. هر هدف مثل یک غول است.</string>
+    <string name="goal_target_hint">مبلغ هدف به تومان</string>
+    <string name="goal_save">افزودن هدف</string>
+    <string name="goal_deposit_hint">مبلغ واریز</string>
+    <string name="goal_deposit">واریز</string>
+    <string name="goal_done">غول هدف شکست خورد!</string>
+    <string name="debt_section">بدهی و طلب</string>
+    <string name="debt_empty">بدهی یا طلبی ثبت نشده است.</string>
+    <string name="debt_i_owe">بدهکارم</string>
+    <string name="debt_owed_to_me">طلبکارم</string>
+    <string name="debt_remaining">باقی‌مانده: %1$s</string>
+    <string name="debt_pay_hint">مبلغ پرداخت</string>
+    <string name="debt_pay">پرداخت</string>
+    <string name="debt_save">افزودن</string>
+
+    <!-- Reports -->
+    <string name="reports_title">گزارش‌ها</string>
+    <string name="reports_by_category">هزینه‌ها به تفکیک دسته، %1$s</string>
+    <string name="reports_empty">هنوز هزینه‌ای برای این ماه نیست.</string>
+    <string name="reports_six_months">شش ماه اخیر</string>
+    <string name="reports_thirty_days">۳۰ روز اخیر</string>
 
     <!-- Hunter -->
     <string name="hunter_title">شکارچی</string>
@@ -82,15 +141,42 @@
     <string name="class_label">کلاس: %1$s</string>
     <string name="soldiers_title">سربازان سایه</string>
     <string name="soldier_locked">قفل</string>
-    <string name="soldier_unlock_hint">با رسیدن این صفت به سطح ۵ باز می‌شود</string>
     <string name="soldier_unlocked">آماده</string>
     <string name="gold_label">طلا: %1$s</string>
     <string name="active_days">روزهای فعال: %1$s</string>
 
+    <!-- Settings -->
+    <string name="settings_title">تنظیمات</string>
+    <string name="back">بازگشت</string>
+    <string name="privacy_section">حریم خصوصی</string>
+    <string name="hide_balances_setting">پنهان کردن مبالغ پول</string>
+    <string name="lock_section">قفل برنامه</string>
+    <string name="lock_enabled">قفل فعال است. هنگام بازگشت به برنامه رمز خواسته می‌شود.</string>
+    <string name="lock_disabled">قفل غیرفعال است.</string>
+    <string name="pin_hint">رمز چهار رقمی</string>
+    <string name="pin_set">فعال‌سازی قفل</string>
+    <string name="pin_remove">غیرفعال‌سازی قفل (با رمز فعلی)</string>
+    <string name="backup_section">پشتیبان رمزدار</string>
+    <string name="backup_help">پشتیبان با رمز رمزنگاری می‌شود. رمز را جای امنی نگه دار؛ بدون آن بازیابی ممکن نیست.</string>
+    <string name="backup_password_hint">رمز پشتیبان (حداقل ۶ نویسه)</string>
+    <string name="backup_export">ساخت و اشتراک پشتیبان</string>
+    <string name="backup_restore">بازیابی از فایل پشتیبان</string>
+    <string name="restore_confirm">داده‌های فعلی برنامه با محتوای پشتیبان جایگزین می‌شوند. ادامه می‌دهی؟</string>
+    <string name="restore_yes">بله، جایگزین کن</string>
+    <string name="csv_section">خروجی تراکنش‌ها</string>
+    <string name="csv_export">ساخت فایل CSV</string>
+    <string name="notice_pin_saved">قفل فعال شد.</string>
+    <string name="notice_pin_invalid">رمز باید دقیقاً چهار رقم باشد.</string>
+    <string name="notice_pin_wrong">رمز فعلی اشتباه است.</string>
+    <string name="notice_pin_removed">قفل غیرفعال شد.</string>
+    <string name="notice_password_short">رمز پشتیبان باید حداقل ۶ نویسه باشد.</string>
+    <string name="notice_backup_ready">پشتیبان ساخته شد.</string>
+    <string name="notice_restore_done">بازیابی انجام شد.</string>
+    <string name="notice_restore_failed">بازیابی ناموفق بود. رمز یا فایل را بررسی کن.</string>
+
     <!-- Generic -->
-    <string name="unit_toman">تومان</string>
-    <string name="unit_minutes">دقیقه</string>
-    <string name="unit_xp">تجربه</string>
+    <string name="delete">حذف</string>
+    <string name="cancel">انصراف</string>
     <string name="coming_soon">به‌زودی</string>
     <string name="content_desc_avatar">تصویر شکارچی</string>
 </resources>

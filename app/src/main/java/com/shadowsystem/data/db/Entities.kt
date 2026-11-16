@@ -104,3 +104,46 @@ data class TransactionEntity(
     val epochDay: Long,
     val createdAt: Long
 )
+
+@Entity(tableName = "budgets")
+data class BudgetEntity(
+    @PrimaryKey val category: String,
+    val limitRial: Long
+)
+
+@Entity(tableName = "recurring_rules")
+data class RecurringEntity(
+    @PrimaryKey(autoGenerate = true) val id: Long = 0,
+    val title: String,
+    val amountRial: Long,
+    val category: String,
+    val isIncome: Boolean,
+    val monthly: Boolean,
+    val anchorEpochDay: Long,
+    val posted: Int,
+    val active: Boolean
+)
+
+@Entity(tableName = "savings_goals")
+data class GoalEntity(
+    @PrimaryKey(autoGenerate = true) val id: Long = 0,
+    val title: String,
+    val targetRial: Long,
+    val savedRial: Long,
+    val createdDay: Long
+)
+
+@Entity(tableName = "debts")
+data class DebtEntity(
+    @PrimaryKey(autoGenerate = true) val id: Long = 0,
+    val title: String,
+    val totalRial: Long,
+    val paidRial: Long,
+    val iOwe: Boolean
+)
+
+@Entity(tableName = "kv")
+data class KeyValueEntity(
+    @PrimaryKey val key: String,
+    val value: Long
+)

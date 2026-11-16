@@ -1,6 +1,7 @@
 package com.shadowsystem.data.repo
 
 import com.shadowsystem.core.DayRules
+import com.shadowsystem.core.FinanceRules
 import com.shadowsystem.core.GameMath
 import com.shadowsystem.core.GameMath.Stat
 import com.shadowsystem.core.Mood
@@ -8,6 +9,7 @@ import com.shadowsystem.core.QuestPlanner
 import com.shadowsystem.data.db.AppDatabase
 import com.shadowsystem.data.db.DailyScoreEntity
 import com.shadowsystem.data.db.DungeonSessionEntity
+import com.shadowsystem.data.db.KeyValueEntity
 import com.shadowsystem.data.db.ProfileEntity
 import com.shadowsystem.data.db.QuestEntity
 import com.shadowsystem.data.db.QuestStepEntity
@@ -32,6 +34,7 @@ class GameRepository(
     private val questDao = db.questDao()
     private val scoreDao = db.dailyScoreDao()
     private val dungeonDao = db.dungeonDao()
+    private val kvDao = db.keyValueDao()
 
     fun today(): Long = DayRules.gameDay(clock())
 
@@ -52,6 +55,11 @@ class GameRepository(
     suspend fun profile(): ProfileEntity = profileDao.get() ?: ProfileEntity()
 
     suspend fun scoreOf(day: Long): Int? = scoreDao.get(day)?.score
+
+    suspend fun finishOnboarding() {
+        val p = profile()
+        profileDao.upsert(p.copy(onboarded = true))
+    }
 
     /** Generates the day's quests once. Returns false if they already exist. */
     suspend fun generateDay(mood: Mood): Boolean {
@@ -101,9 +109,9 @@ class GameRepository(
         val total = GameMath.applyMultiplier(quest.xpReward, multiplier)
         val k = quest.stepsDone + 1
         val n = quest.stepsTotal
-        val cumulative = if (k >= n) total else (total * 0.2 * k / n).roundToInt()
-        val gained = (cumulative - quest.xpAwarded).coerceAtLeast(0)
         val finished = k >= n
+        val cumulative = if (finished) total else (total * 0.2 * k / n).roundToInt()
+        val gained = (cumulative - quest.xpAwarded).coerceAtLeast(0)
 
         questDao.updateQuest(
             quest.copy(
@@ -118,13 +126,40 @@ class GameRepository(
         return ProgressResult(gained, finished, levelBefore, GameMath.levelForXp(profile().totalXp))
     }
 
-    /** Adds XP to total + stat, and gold. Single-user app, so no cross-table transaction needed. */
+    /** Reverts a step tick (the 5-second undo). Mirrors [tickStep] exactly. */
+    suspend fun undoStep(step: QuestStepEntity, gained: Int, finished: Boolean, stat: String, gold: Int) {
+        val quest = questDao.get(step.questId) ?: return
+        questDao.updateStep(step.copy(done = false))
+        questDao.updateQuest(
+            quest.copy(
+                stepsDone = (quest.stepsDone - 1).coerceAtLeast(0),
+                xpAwarded = (quest.xpAwarded - gained).coerceAtLeast(0),
+                status = if (finished) QuestEntity.STATUS_OPEN else quest.status,
+                completedAt = if (finished) 0L else quest.completedAt
+            )
+        )
+        addXp(-gained, stat, gold = if (finished) -gold else 0)
+    }
+
+    /** "Make it smaller": drops the undone steps after the next one, so only one step remains. */
+    suspend fun makeSmaller(quest: QuestEntity) {
+        val next = questDao.steps(quest.id).firstOrNull { !it.done } ?: return
+        questDao.deleteUndoneStepsAfter(quest.id, next.position)
+        questDao.updateQuest(quest.copy(stepsTotal = quest.stepsDone + 1))
+    }
+
+    /** Adds XP to total + stat, and gold. Negative values are used by undo. */
     suspend fun addXp(xp: Int, statName: String, gold: Int) {
         val p = profile()
-        profileDao.upsert(p.copy(totalXp = p.totalXp + xp, gold = p.gold + gold))
-        if (xp > 0) {
+        profileDao.upsert(
+            p.copy(
+                totalXp = (p.totalXp + xp).coerceAtLeast(0L),
+                gold = (p.gold + gold).coerceAtLeast(0)
+            )
+        )
+        if (xp != 0 && statName.isNotEmpty()) {
             val s = statDao.get(statName) ?: StatProgressEntity(statName)
-            statDao.upsert(s.copy(xp = s.xp + xp))
+            statDao.upsert(s.copy(xp = (s.xp + xp).coerceAtLeast(0L)))
         }
     }
 
@@ -135,14 +170,14 @@ class GameRepository(
         profileDao.upsert(p.copy(lastActiveDay = day, activeDays = p.activeDays + 1))
     }
 
-    /** Recomputes the day's score from stored data, saves it and returns it. */
-    suspend fun refreshScore(loggedMoney: Boolean, withinBudget: Boolean = true): Int {
+    /** Recomputes today's score from stored data, saves it and returns it. */
+    suspend fun refreshScore(): Int {
         val day = today()
         val quests = questDao.forDay(day)
-        val existing = scoreDao.get(day)
-        val mood = existing?.mood ?: Mood.NORMAL.name
+        val mood = scoreDao.get(day)?.mood ?: Mood.NORMAL.name
         val dungeonSeconds = dungeonDao.secondsForDay(day)
         val vitQuests = quests.filter { it.stat == Stat.VIT.name }
+        val loggedMoney = db.transactionDao().dayCount(day) > 0
         val score = GameMath.dailyScore(
             GameMath.DailyScoreInput(
                 completedXp = quests.filter { it.status == QuestEntity.STATUS_DONE }.sumOf { it.xpReward },
@@ -150,14 +185,35 @@ class GameRepository(
                 dungeonMinutes = dungeonSeconds / 60,
                 dungeonGoalMinutes = DUNGEON_GOAL_MINUTES,
                 loggedTransactionToday = loggedMoney,
-                withinBudgetPace = withinBudget,
+                withinBudgetPace = !anyBudgetOver(),
                 vitQuestsDone = vitQuests.count { it.status == QuestEntity.STATUS_DONE },
                 vitQuestsPlanned = vitQuests.size,
                 hardDay = mood == Mood.HARD.name
             )
         )
         scoreDao.upsert(DailyScoreEntity(day, score, mood, dungeonSeconds / 60, loggedMoney))
+        awardShadowBonus(day, score)
         return score
+    }
+
+    /** Shadow of Yesterday: beating yesterday's score pays +10 Gold, once per day. */
+    private suspend fun awardShadowBonus(day: Long, score: Int) {
+        val yesterday = scoreDao.get(day - 1)?.score ?: return
+        if (score <= yesterday) return
+        if (kvDao.get(SHADOW_BONUS_KEY)?.value == day) return
+        addXp(0, "", gold = GameMath.shadowBonus(score, yesterday))
+        kvDao.upsert(KeyValueEntity(SHADOW_BONUS_KEY, day))
+    }
+
+    private suspend fun anyBudgetOver(): Boolean {
+        val budgets = db.budgetDao().all().filter { it.limitRial > 0 }
+        if (budgets.isEmpty()) return false
+        val (from, to) = FinanceRules.monthRange(0, clock())
+        val spent = db.transactionDao().range(from, to)
+            .filter { !it.isIncome }
+            .groupBy { it.category }
+            .mapValues { e -> e.value.sumOf { it.amountRial } }
+        return budgets.any { FinanceRules.budgetState(spent[it.category] ?: 0L, it.limitRial) == FinanceRules.BudgetState.OVER }
     }
 
     /**
@@ -186,5 +242,6 @@ class GameRepository(
 
     companion object {
         const val DUNGEON_GOAL_MINUTES = 25
+        const val SHADOW_BONUS_KEY = "shadow_bonus_day"
     }
 }

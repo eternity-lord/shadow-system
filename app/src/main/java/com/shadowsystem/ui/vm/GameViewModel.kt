@@ -35,16 +35,26 @@ data class DungeonRun(
     val finished: Boolean get() = elapsedSeconds >= plannedSeconds
 }
 
+/** The last ticked step, kept for [UNDO_WINDOW_MS] so the user can take it back. */
+data class UndoInfo(
+    val step: QuestStepEntity,
+    val gained: Int,
+    val finished: Boolean,
+    val stat: String,
+    val gold: Int
+)
+
 data class NowState(
+    val loaded: Boolean = false,
     val profile: ProfileEntity = ProfileEntity(),
     val quests: List<QuestEntity> = emptyList(),
     val steps: List<QuestStepEntity> = emptyList(),
     val score: DailyScoreEntity? = null,
-    val yesterdayScore: Int? = null,
     val dungeonSeconds: Int = 0,
     val message: String? = null,
     val run: DungeonRun? = null,
-    val maxRank: Rank = Rank.E
+    val maxRank: Rank = Rank.E,
+    val undo: UndoInfo? = null
 )
 
 class GameViewModel(private val game: GameRepository) : ViewModel() {
@@ -52,7 +62,9 @@ class GameViewModel(private val game: GameRepository) : ViewModel() {
     private val day = game.today()
     private val message = MutableStateFlow<String?>(null)
     private val run = MutableStateFlow<DungeonRun?>(null)
+    private val undo = MutableStateFlow<UndoInfo?>(null)
     private var ticker: Job? = null
+    private var undoTimer: Job? = null
 
     val state: StateFlow<NowState> = combine(
         game.observeProfile(),
@@ -61,7 +73,8 @@ class GameViewModel(private val game: GameRepository) : ViewModel() {
         game.observeScore(day),
         game.observeDungeonSeconds(day),
         message,
-        run
+        run,
+        undo
     ) { values ->
         @Suppress("UNCHECKED_CAST")
         val profile = values[0] as ProfileEntity
@@ -73,7 +86,9 @@ class GameViewModel(private val game: GameRepository) : ViewModel() {
         val dungeonSeconds = values[4] as Int
         val msg = values[5] as String?
         val activeRun = values[6] as DungeonRun?
+        val undoInfo = values[7] as UndoInfo?
         NowState(
+            loaded = true,
             profile = profile,
             quests = quests,
             steps = steps,
@@ -81,7 +96,8 @@ class GameViewModel(private val game: GameRepository) : ViewModel() {
             dungeonSeconds = dungeonSeconds,
             message = msg,
             run = activeRun,
-            maxRank = GameMath.rankForLevel(GameMath.levelForXp(profile.totalXp))
+            maxRank = GameMath.rankForLevel(GameMath.levelForXp(profile.totalXp)),
+            undo = undoInfo
         )
     }.stateIn(viewModelScope, SharingStarted.Eagerly, NowState())
 
@@ -106,17 +122,46 @@ class GameViewModel(private val game: GameRepository) : ViewModel() {
         message.value = null
     }
 
+    fun finishOnboarding() {
+        viewModelScope.launch { game.finishOnboarding() }
+    }
+
     fun tickStep(step: QuestStepEntity) {
         viewModelScope.launch {
+            val quest = state.value.quests.firstOrNull { it.id == step.questId } ?: return@launch
             val result = game.tickStep(step) ?: return@launch
-            val loggedMoney = state.value.score?.loggedMoney ?: false
-            game.refreshScore(loggedMoney)
+            game.refreshScore()
             message.value = when {
                 result.levelAfter > result.levelBefore -> PhraseBank.levelUp()
                 result.questFinished -> PhraseBank.questDone()
                 else -> null
             }
+            showUndo(UndoInfo(step, result.xpGained, result.questFinished, quest.stat, quest.goldReward))
         }
+    }
+
+    fun undoLast() {
+        val info = undo.value ?: return
+        undoTimer?.cancel()
+        undo.value = null
+        viewModelScope.launch {
+            game.undoStep(info.step, info.gained, info.finished, info.stat, info.gold)
+            game.refreshScore()
+            message.value = null
+        }
+    }
+
+    private fun showUndo(info: UndoInfo) {
+        undo.value = info
+        undoTimer?.cancel()
+        undoTimer = viewModelScope.launch {
+            delay(UNDO_WINDOW_MS)
+            undo.value = null
+        }
+    }
+
+    fun makeSmaller(quest: QuestEntity) {
+        viewModelScope.launch { game.makeSmaller(quest) }
     }
 
     fun startDungeon(rank: Rank) {
@@ -145,12 +190,14 @@ class GameViewModel(private val game: GameRepository) : ViewModel() {
         viewModelScope.launch {
             val done = current.elapsedSeconds.coerceAtMost(current.plannedSeconds)
             game.recordDungeon(current.rank.name, current.plannedMinutes, done, completed)
-            game.refreshScore(state.value.score?.loggedMoney ?: false)
+            game.refreshScore()
             if (completed) message.value = PhraseBank.questDone()
         }
     }
 
     companion object {
+        const val UNDO_WINDOW_MS = 5_000L
+
         fun factory(app: ShadowApp): ViewModelProvider.Factory = object : ViewModelProvider.Factory {
             @Suppress("UNCHECKED_CAST")
             override fun <T : ViewModel> create(modelClass: Class<T>, extras: CreationExtras): T =

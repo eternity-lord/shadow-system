@@ -5,19 +5,23 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.CreationExtras
 import com.shadowsystem.ShadowApp
-import com.shadowsystem.core.Jalali
+import com.shadowsystem.core.FinanceRules
 import com.shadowsystem.core.MoneyRules
 import com.shadowsystem.core.PersianText
 import com.shadowsystem.data.db.TransactionEntity
+import com.shadowsystem.data.prefs.AppPrefs
 import com.shadowsystem.data.repo.GameRepository
 import com.shadowsystem.data.repo.MoneyRepository
+import com.shadowsystem.data.repo.PlanRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
+
+enum class TypeFilter { ALL, EXPENSE, INCOME }
 
 data class MoneyForm(
     val amountText: String = "",
@@ -30,47 +34,71 @@ data class MoneyForm(
 data class MoneyState(
     val form: MoneyForm = MoneyForm(),
     val entries: List<TransactionEntity> = emptyList(),
+    val monthLabel: String = "",
     val monthSpentRial: Long = 0,
     val monthIncomeRial: Long = 0,
     val todaySpentRial: Long = 0,
     val pendingDelete: TransactionEntity? = null,
-    val message: String? = null
+    val hidden: Boolean = false,
+    val query: String = "",
+    val filter: TypeFilter = TypeFilter.ALL,
+    val canGoForward: Boolean = false
 )
 
-class MoneyViewModel(private val money: MoneyRepository, private val game: GameRepository) : ViewModel() {
+private data class Controls(val offset: Int, val query: String, val filter: TypeFilter, val hidden: Boolean)
+
+/** Money tab: quick entry, month navigation, search and filters. Recurring rules are posted on start. */
+class MoneyViewModel(
+    private val money: MoneyRepository,
+    private val game: GameRepository,
+    private val plan: PlanRepository,
+    private val prefs: AppPrefs
+) : ViewModel() {
 
     private val form = MutableStateFlow(MoneyForm())
     private val pendingDelete = MutableStateFlow<TransactionEntity?>(null)
-    private val message = MutableStateFlow<String?>(null)
+    private val offset = MutableStateFlow(0)
+    private val query = MutableStateFlow("")
+    private val filter = MutableStateFlow(TypeFilter.ALL)
+    private val today = game.today()
 
-    private val monthFrom: Long
-    private val monthTo: Long
-    private val today: Long = game.today()
+    private val controls = combine(offset, query, filter, prefs.hidden) { o, q, f, h -> Controls(o, q, f, h) }
 
-    init {
-        val now = Jalali.fromMillis(System.currentTimeMillis())
-        val start = Jalali.toGregorian(now.year, now.month, 1)
-        val end = Jalali.toGregorian(now.year, now.month, Jalali.monthLength(now.year, now.month))
-        monthFrom = start.toEpochDay()
-        monthTo = end.toEpochDay()
+    private val monthEntries = offset.flatMapLatest { o ->
+        val (from, to) = FinanceRules.monthRange(o, System.currentTimeMillis())
+        money.observeRange(from, to)
     }
 
-    private val entries = money.observeRange(monthFrom, monthTo)
-
-    val state: StateFlow<MoneyState> = combine(
-        form, entries, pendingDelete, message
-    ) { f, list, pending, msg ->
-        val spent = list.filter { !it.isIncome }
+    val state: StateFlow<MoneyState> = combine(form, pendingDelete, controls, monthEntries) { f, pending, c, all ->
+        val now = System.currentTimeMillis()
+        val q = c.query.trim()
+        val shown = all.filter { t ->
+            (q.isEmpty() || t.note.contains(q, ignoreCase = true) || t.category.contains(q, ignoreCase = true)) &&
+                when (c.filter) {
+                    TypeFilter.ALL -> true
+                    TypeFilter.EXPENSE -> !t.isIncome
+                    TypeFilter.INCOME -> t.isIncome
+                }
+        }
+        val spent = all.filter { !it.isIncome }
         MoneyState(
             form = f,
-            entries = list,
+            entries = shown,
+            monthLabel = FinanceRules.monthLabel(c.offset, now),
             monthSpentRial = spent.sumOf { it.amountRial },
-            monthIncomeRial = list.filter { it.isIncome }.sumOf { it.amountRial },
+            monthIncomeRial = all.filter { it.isIncome }.sumOf { it.amountRial },
             todaySpentRial = spent.filter { it.epochDay == today }.sumOf { it.amountRial },
             pendingDelete = pending,
-            message = msg
+            hidden = c.hidden,
+            query = c.query,
+            filter = c.filter,
+            canGoForward = c.offset < 0
         )
     }.stateIn(viewModelScope, SharingStarted.Eagerly, MoneyState())
+
+    init {
+        viewModelScope.launch { plan.processRecurring() }
+    }
 
     fun onAmountChange(text: String) {
         form.value = form.value.copy(amountText = PersianText.parseDigits(text).filter { it.isDigit() }, error = false)
@@ -88,6 +116,26 @@ class MoneyViewModel(private val money: MoneyRepository, private val game: GameR
         form.value = form.value.copy(isIncome = income)
     }
 
+    fun onQuery(text: String) {
+        query.value = text.take(40)
+    }
+
+    fun onFilter(value: TypeFilter) {
+        filter.value = value
+    }
+
+    fun previousMonth() {
+        offset.value = offset.value - 1
+    }
+
+    fun nextMonth() {
+        if (offset.value < 0) offset.value = offset.value + 1
+    }
+
+    fun toggleHidden() {
+        prefs.setHideBalances(!prefs.hidden.value)
+    }
+
     fun save() {
         val f = form.value
         val toman = PersianText.parseLong(f.amountText)
@@ -98,7 +146,6 @@ class MoneyViewModel(private val money: MoneyRepository, private val game: GameR
         viewModelScope.launch {
             money.add(toman!!, f.category, f.note, f.isIncome)
             form.value = f.copy(amountText = "", note = "", error = false)
-            message.value = null
         }
     }
 
@@ -120,7 +167,7 @@ class MoneyViewModel(private val money: MoneyRepository, private val game: GameR
         fun factory(app: ShadowApp): ViewModelProvider.Factory = object : ViewModelProvider.Factory {
             @Suppress("UNCHECKED_CAST")
             override fun <T : ViewModel> create(modelClass: Class<T>, extras: CreationExtras): T =
-                MoneyViewModel(app.container.money, app.container.game) as T
+                MoneyViewModel(app.container.money, app.container.game, app.container.plan, app.container.prefs) as T
         }
     }
 }

@@ -1,13 +1,21 @@
 package com.shadowsystem.di
 
 import android.content.Context
+import com.shadowsystem.data.backup.BackupService
 import com.shadowsystem.data.db.AppDatabase
+import com.shadowsystem.data.prefs.AppPrefs
+import com.shadowsystem.data.prefs.LockState
 import com.shadowsystem.data.repo.GameRepository
 import com.shadowsystem.data.repo.MoneyRepository
+import com.shadowsystem.data.repo.PlanRepository
 
 /** Manual dependency container (no DI framework; keeps the build dependency-light). */
 class AppContainer(context: Context) {
     val database: AppDatabase = AppDatabase.create(context.applicationContext)
-    val game: GameRepository = GameRepository(database)
-    val money: MoneyRepository = MoneyRepository(database, game)
+    val game = GameRepository(database)
+    val money = MoneyRepository(database, game)
+    val plan = PlanRepository(database, game)
+    val backup = BackupService(database)
+    val prefs = AppPrefs(context.applicationContext)
+    val lock = LockState(initiallyLocked = prefs.isPinSet)
 }

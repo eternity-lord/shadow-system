@@ -1,5 +1,6 @@
 package com.shadowsystem.ui.screens
 
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -23,11 +24,12 @@ import com.shadowsystem.ui.components.MessageBanner
 import com.shadowsystem.ui.components.MoodPicker
 import com.shadowsystem.ui.components.QuestCard
 import com.shadowsystem.ui.components.ShadowCard
+import com.shadowsystem.ui.components.UndoBanner
 import com.shadowsystem.ui.components.XpBar
 import com.shadowsystem.ui.theme.ShadowColors
 import com.shadowsystem.ui.vm.GameViewModel
 
-/** Today: score, level, the System's briefing and the three mandatory quests. */
+/** Today: score, level, the System's briefing, mandatory and optional quests. */
 @Composable
 fun NowScreen(vm: GameViewModel) {
     val state by vm.state.collectAsStateWithLifecycle()
@@ -40,12 +42,15 @@ fun NowScreen(vm: GameViewModel) {
 
     Column(
         modifier = Modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(16.dp),
-        verticalArrangement = androidx.compose.foundation.layout.Arrangement.spacedBy(12.dp)
+        verticalArrangement = Arrangement.spacedBy(12.dp)
     ) {
         Text(Jalali.format(Jalali.fromMillis(System.currentTimeMillis())), style = MaterialTheme.typography.bodyMedium, color = ShadowColors.TextMuted)
         Text(stringResource(R.string.now_title), style = MaterialTheme.typography.headlineMedium)
 
         state.message?.let { MessageBanner(it) { vm.dismissMessage() } }
+        state.undo?.let { info ->
+            UndoBanner(stringResource(R.string.step_recorded, info.step.text)) { vm.undoLast() }
+        }
 
         ShadowCard {
             Text(stringResource(R.string.score_label), style = MaterialTheme.typography.titleMedium, color = ShadowColors.TextMuted)
@@ -74,23 +79,25 @@ fun NowScreen(vm: GameViewModel) {
         if (state.quests.isEmpty()) {
             MoodPicker { vm.generate(it) }
         } else {
-            SectionHeader(stringResource(R.string.mandatory_title))
-            state.quests.filter { it.mandatory }.forEach { quest ->
-                QuestCard(quest, state.steps.filter { it.questId == quest.id }) { vm.tickStep(it) }
-            }
-            val optionalLeft = state.quests.count { !it.mandatory && it.status == QuestEntity.STATUS_OPEN }
-            if (optionalLeft > 0) {
-                Text(
-                    stringResource(R.string.optional_title) + ": " + PersianText.toFa(optionalLeft),
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = ShadowColors.TextMuted
-                )
+            Text(stringResource(R.string.mandatory_title), style = MaterialTheme.typography.titleMedium, color = ShadowColors.TextMuted)
+            QuestList(state.quests.filter { it.mandatory }, state.steps, vm)
+            val optional = state.quests.filter { !it.mandatory }
+            if (optional.isNotEmpty()) {
+                Text(stringResource(R.string.optional_title), style = MaterialTheme.typography.titleMedium, color = ShadowColors.TextMuted, modifier = Modifier.fillMaxWidth())
+                QuestList(optional, state.steps, vm)
             }
         }
     }
 }
 
 @Composable
-private fun SectionHeader(text: String) {
-    Text(text, style = MaterialTheme.typography.titleMedium, color = ShadowColors.TextMuted, modifier = Modifier.fillMaxWidth())
+internal fun QuestList(quests: List<QuestEntity>, steps: List<com.shadowsystem.data.db.QuestStepEntity>, vm: GameViewModel) {
+    quests.forEach { quest ->
+        QuestCard(
+            quest = quest,
+            steps = steps.filter { it.questId == quest.id },
+            onStep = { vm.tickStep(it) },
+            onSmaller = { vm.makeSmaller(quest) }
+        )
+    }
 }

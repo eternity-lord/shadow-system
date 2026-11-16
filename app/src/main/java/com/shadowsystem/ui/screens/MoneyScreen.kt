@@ -1,14 +1,12 @@
 package com.shadowsystem.ui.screens
 
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.MaterialTheme
@@ -20,27 +18,23 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.input.KeyboardType
-import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.shadowsystem.R
-import com.shadowsystem.core.Jalali
-import com.shadowsystem.core.MoneyRules
-import com.shadowsystem.core.PersianText
-import com.shadowsystem.data.db.TransactionEntity
 import com.shadowsystem.ui.components.ConfirmDialog
-import com.shadowsystem.ui.components.PrimaryButton
+import com.shadowsystem.ui.components.EntryCard
 import com.shadowsystem.ui.components.ShadowCard
+import com.shadowsystem.ui.components.SummaryCard
+import com.shadowsystem.ui.components.TransactionRow
 import com.shadowsystem.ui.theme.ShadowColors
-import com.shadowsystem.ui.vm.MoneyForm
 import com.shadowsystem.ui.vm.MoneyViewModel
+import com.shadowsystem.ui.vm.TypeFilter
 
-/** Money: quick expense/income logging, monthly summary and history. */
+/** Money tab: quick entry, month navigation, search and filters. */
 @Composable
-fun MoneyScreen(vm: MoneyViewModel) {
+fun MoneyScreen(vm: MoneyViewModel, onPlan: () -> Unit, onReports: () -> Unit) {
     val state by vm.state.collectAsStateWithLifecycle()
-    state.pendingDelete?.let { tx ->
+    state.pendingDelete?.let {
         ConfirmDialog(
             text = stringResource(R.string.money_delete_confirm),
             confirmText = stringResource(R.string.money_yes_delete),
@@ -52,96 +46,75 @@ fun MoneyScreen(vm: MoneyViewModel) {
         modifier = Modifier.fillMaxSize().padding(16.dp),
         verticalArrangement = Arrangement.spacedBy(12.dp)
     ) {
-        item { Text(stringResource(R.string.money_title), style = MaterialTheme.typography.headlineMedium) }
-        item { Entry(state.form, vm) }
-        item { Summary(state.monthSpentRial, state.monthIncomeRial, state.todaySpentRial) }
-        item { Text(stringResource(R.string.money_privacy), style = MaterialTheme.typography.bodyMedium, color = ShadowColors.TextMuted) }
-        if (state.entries.isEmpty()) {
-            item { Text(stringResource(R.string.money_empty), color = ShadowColors.TextMuted) }
+        item {
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Text(stringResource(R.string.money_title), style = MaterialTheme.typography.headlineMedium, modifier = Modifier.weight(1f))
+                TextButton(onClick = onPlan, modifier = Modifier.heightIn(min = 48.dp)) { Text(stringResource(R.string.money_plan)) }
+                TextButton(onClick = onReports, modifier = Modifier.heightIn(min = 48.dp)) { Text(stringResource(R.string.money_reports)) }
+            }
         }
-        items(state.entries, key = { it.id }) { tx -> TransactionRow(tx) { vm.askDelete(tx) } }
-    }
-}
-
-@Composable
-private fun Entry(form: MoneyForm, vm: MoneyViewModel) {
-    ShadowCard {
-        Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-            FilterChip(
-                selected = !form.isIncome,
-                onClick = { vm.onIncomeToggle(false) },
-                label = { Text(stringResource(R.string.money_expense)) },
-                modifier = Modifier.heightIn(min = 48.dp)
-            )
-            FilterChip(
-                selected = form.isIncome,
-                onClick = { vm.onIncomeToggle(true) },
-                label = { Text(stringResource(R.string.money_income)) },
-                modifier = Modifier.heightIn(min = 48.dp)
+        item { MonthBar(state.monthLabel, state.canGoForward, onPrev = { vm.previousMonth() }, onNext = { vm.nextMonth() }) }
+        item {
+            EntryCard(
+                form = state.form,
+                onIncome = vm::onIncomeToggle,
+                onAmount = vm::onAmountChange,
+                onCategory = vm::onCategory,
+                onNote = vm::onNoteChange,
+                onSave = vm::save
             )
         }
-        OutlinedTextField(
-            value = form.amountText,
-            onValueChange = vm::onAmountChange,
-            label = { Text(stringResource(R.string.money_amount_hint)) },
-            isError = form.error,
-            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-            singleLine = true,
-            modifier = Modifier.fillMaxWidth()
-        )
-        if (form.error) {
-            Text(stringResource(R.string.money_amount_invalid), color = ShadowColors.Danger, style = MaterialTheme.typography.bodyMedium)
+        item {
+            SummaryCard(state.monthSpentRial, state.monthIncomeRial, state.todaySpentRial, state.hidden) { vm.toggleHidden() }
         }
-        LazyRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-            items(MoneyRules.CATEGORIES) { cat ->
+        item {
+            OutlinedTextField(
+                value = state.query,
+                onValueChange = vm::onQuery,
+                label = { Text(stringResource(R.string.search_hint)) },
+                singleLine = true,
+                modifier = Modifier.fillMaxWidth()
+            )
+        }
+        item {
+            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                 FilterChip(
-                    selected = form.category == cat,
-                    onClick = { vm.onCategory(cat) },
-                    label = { Text(cat) },
+                    selected = state.filter == TypeFilter.ALL,
+                    onClick = { vm.onFilter(TypeFilter.ALL) },
+                    label = { Text(stringResource(R.string.filter_all)) },
+                    modifier = Modifier.heightIn(min = 48.dp)
+                )
+                FilterChip(
+                    selected = state.filter == TypeFilter.EXPENSE,
+                    onClick = { vm.onFilter(TypeFilter.EXPENSE) },
+                    label = { Text(stringResource(R.string.money_expense)) },
+                    modifier = Modifier.heightIn(min = 48.dp)
+                )
+                FilterChip(
+                    selected = state.filter == TypeFilter.INCOME,
+                    onClick = { vm.onFilter(TypeFilter.INCOME) },
+                    label = { Text(stringResource(R.string.money_income)) },
                     modifier = Modifier.heightIn(min = 48.dp)
                 )
             }
         }
-        OutlinedTextField(
-            value = form.note,
-            onValueChange = vm::onNoteChange,
-            label = { Text(stringResource(R.string.money_note_hint)) },
-            singleLine = true,
-            modifier = Modifier.fillMaxWidth()
-        )
-        PrimaryButton(stringResource(R.string.money_save), onClick = { vm.save() })
+        if (state.entries.isEmpty()) {
+            item { Text(stringResource(R.string.money_empty), color = ShadowColors.TextMuted) }
+        }
+        items(state.entries, key = { it.id }) { tx ->
+            TransactionRow(tx, state.hidden) { vm.askDelete(tx) }
+        }
+        item { Text(stringResource(R.string.money_privacy), style = MaterialTheme.typography.bodyMedium, color = ShadowColors.TextMuted) }
     }
 }
 
 @Composable
-private fun Summary(spent: Long, income: Long, today: Long) {
+private fun MonthBar(label: String, canGoForward: Boolean, onPrev: () -> Unit, onNext: () -> Unit) {
     ShadowCard {
-        Text(stringResource(R.string.money_month_spent) + ": " + PersianText.formatMoney(spent), style = MaterialTheme.typography.titleMedium)
-        Text(stringResource(R.string.money_month_income) + ": " + PersianText.formatMoney(income), style = MaterialTheme.typography.bodyMedium, color = ShadowColors.TextMuted)
-        Text(stringResource(R.string.money_today) + ": " + PersianText.formatMoney(today), style = MaterialTheme.typography.bodyMedium, color = ShadowColors.TextMuted)
-    }
-}
-
-@Composable
-private fun TransactionRow(tx: TransactionEntity, onDelete: () -> Unit) {
-    ShadowCard {
-        Row(verticalAlignment = Alignment.CenterVertically) {
-            Column(modifier = Modifier.weight(1f)) {
-                Text(
-                    (if (tx.isIncome) "+ " else "− ") + PersianText.formatMoney(tx.amountRial),
-                    style = MaterialTheme.typography.titleMedium,
-                    color = if (tx.isIncome) ShadowColors.Secondary else ShadowColors.TextPrimary
-                )
-                Text(
-                    listOf(tx.category, tx.note).filter { it.isNotBlank() }.joinToString(" · ") +
-                        "  ·  " + Jalali.format(Jalali.fromGregorian(java.time.LocalDate.ofEpochDay(tx.epochDay))),
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = ShadowColors.TextMuted
-                )
-            }
-            TextButton(onClick = onDelete, modifier = Modifier.heightIn(min = 48.dp)) {
-                Text(stringResource(R.string.delete), color = ShadowColors.Danger)
-            }
+        Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.SpaceBetween, modifier = Modifier.fillMaxWidth()) {
+            TextButton(onClick = onPrev, modifier = Modifier.heightIn(min = 48.dp)) { Text(stringResource(R.string.month_prev)) }
+            Text(label, style = MaterialTheme.typography.titleMedium)
+            TextButton(onClick = onNext, enabled = canGoForward, modifier = Modifier.heightIn(min = 48.dp)) { Text(stringResource(R.string.month_next)) }
         }
     }
 }

@@ -57,7 +57,10 @@ one pass, the simplest reasonable option was chosen and recorded here.
 - A horizontal swipe of 120px or more on a step completes it, like a tap. The 5-second undo banner still applies.
 
 ## Release build (phase 3)
-- `assembleRelease` runs in CI with R8 (`isMinifyEnabled`, resource shrinking). It is signed with the debug key as a placeholder. A real release key must be supplied by the owner and is not stored in the repository.
+- `assembleRelease` runs in CI with R8 (`isMinifyEnabled`, resource shrinking).
+- Release key: generated in the sandbox (RSA 2048, PKCS#12, alias `shadow`, 25-year self-signed certificate). The keystore and its random password are stored in `release-keystore/`, which is git-ignored, and are not in the repository (the repo is public).
+- Gradle reads `release-keystore/keystore.properties` locally, or `SHADOW_*` environment variables. If neither exists, it falls back to the debug key so CI still builds.
+- CI does not have the key. The sandbox token cannot write repository secrets (HTTP 403), so the CI release APK is debug-signed. To sign CI builds with the real key, add the secrets `SHADOW_KEYSTORE_FILE` (decoded keystore path), `SHADOW_STORE_PASSWORD`, `SHADOW_KEY_ALIAS` and `SHADOW_KEY_PASSWORD` in GitHub, then add a workflow step that decodes the keystore. Losing the keystore means future updates cannot be installed over existing installs, so keep a backup of the `release-keystore/` folder.
 
 ## Accessibility (phase 3)
 - Touch targets are 48dp or taller. Text uses the Material type scale and the app supports large fonts through the system. A full TalkBack audit has not been run, because there is no device in the sandbox.

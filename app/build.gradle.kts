@@ -19,6 +19,23 @@ android {
         vectorDrawables { useSupportLibrary = true }
     }
 
+    signingConfigs {
+        create("release") {
+            // Reads release-keystore/keystore.properties (git-ignored), or SHADOW_* environment variables in CI.
+            val props = java.util.Properties()
+            val propsFile = rootProject.file("release-keystore/keystore.properties")
+            if (propsFile.exists()) propsFile.inputStream().use { props.load(it) }
+            val store = props.getProperty("storeFile") ?: System.getenv("SHADOW_KEYSTORE_FILE")
+            if (store != null) {
+                storeFile = rootProject.file(store)
+                storeType = "pkcs12"
+                storePassword = props.getProperty("storePassword") ?: System.getenv("SHADOW_STORE_PASSWORD")
+                keyAlias = props.getProperty("keyAlias") ?: System.getenv("SHADOW_KEY_ALIAS")
+                keyPassword = props.getProperty("keyPassword") ?: System.getenv("SHADOW_KEY_PASSWORD")
+            }
+        }
+    }
+
     buildTypes {
         release {
             isMinifyEnabled = true
@@ -27,7 +44,9 @@ android {
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
             )
-            signingConfig = signingConfigs.getByName("debug")
+            // Use the real release key when present; otherwise fall back to the debug key so builds still run.
+            signingConfig = signingConfigs.getByName("release").takeIf { it.storeFile != null }
+                ?: signingConfigs.getByName("debug")
         }
         debug {
             applicationIdSuffix = ".debug"

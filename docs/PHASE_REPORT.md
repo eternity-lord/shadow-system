@@ -62,7 +62,7 @@ Delivered: AES-256-GCM encrypted backup (UI in Settings), PIN lock (PBKDF2), bio
 - Rank-up: a dialog appears when the rank increases. There is no full cutscene.
 - Artwork: 6 gate images, 12 soldier portraits (stage 1) and 6 rank avatars are real. Higher soldier stages, wisdom art and monster art still use procedural placeholders (see ASSETS_MANIFEST.md).
 - Accessibility: touch targets are 48dp and text scales, but no TalkBack audit has been run (no device in the sandbox).
-- Release signing: debug key placeholder. The owner must supply a real key.
+- Release signing: a real key was generated and is used for local release builds from `release-keystore/` (git-ignored). CI release builds are still debug-signed because the sandbox cannot write repository secrets. See DECISIONS.md.
 - Not run: emulator or device tests; no screenshots verified visually.
 
 ## Verification

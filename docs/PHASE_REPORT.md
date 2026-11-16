@@ -72,7 +72,7 @@ Latest green CI on the branch: `5e` batch — run 43887565776 (weekly boss, budg
 
 These keep PR #1 open.
 
-- **Art (needs image generation, not code; done: egg, five stat emblems, throne background, stage 2 for all 12 soldiers, stage 3 for ten. Still missing: stage 3 for two more, stages 4–5, wisdom overlays, monsters, icons, other backgrounds):** soldier stages 2–5 (only stage 1 exists; the app falls back to it), wisdom overlays, egg image, monsters, backgrounds and category icons. Placeholders are in `ASSETS_MANIFEST.md`.
+- **Art (needs image generation, not code; done: egg, five stat emblems, throne background, stage 2 for all 12 soldiers, stage 3 for all 12, stage 4 for eight. Still missing: stage 4 for four, stage 5 for all 12, wisdom overlays, monsters, icons, other backgrounds):** soldier stages 2–5 (only stage 1 exists; the app falls back to it), wisdom overlays, egg image, monsters, backgrounds and category icons. Placeholders are in `ASSETS_MANIFEST.md`.
 - **Avatar layers:** the layer system exists in code (base image, aura ring when an aura item is equipped, stage badge, two stat overlays). Body, hair, face, outfit and weapon layers wait for art.
 - **Evolution cutscene:** the old stage fades out while the new stage fades in and grows. A true silhouette morph needs the stage art.
 - **Accessibility and security on a device:** TalkBack, PIN and biometric unlock are not checked on a real device from this sandbox. The code uses labels and 48 dp targets.

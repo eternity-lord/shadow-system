@@ -51,6 +51,8 @@ Latest green CI on the branch: `5e` batch — run 43887565776 (weekly boss, budg
 - Budget rollover on the plan screen: unspent amount from last month carries forward, capped at one base limit; overspending does not carry a debt. Known approximation: last month's limit is taken as the current limit (budgets keep no history).
 - Installments: a debt can be split into N installments. Each payment adds one installment (the last absorbs rounding) and the progress is shown.
 - Reduce motion setting: shortens the rank-up overlay animation (`rememberReduceMotion`).
+- Body doubling: the most recently summoned soldier bobs beside the user while the dungeon timer runs (stops when paused or with reduce-motion). Uses stage-1 art until higher stages exist.
+- Savings estimate rule (`FinanceRules.savingsEstimateDays`), tested. Not yet shown on goal cards.
 - Rank-up overlay has an explicit skip button (in addition to tap-to-dismiss).
 - Unit tests: recurrence catch-up and cap, month-end anchors, installment split, rollover, wallet balances and transfers, cheque status, Jalali leap years, month lengths, clamping and round trip.
 

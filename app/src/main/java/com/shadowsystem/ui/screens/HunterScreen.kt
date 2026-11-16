@@ -69,7 +69,7 @@ fun HunterScreen(vm: GameViewModel, soldiers: SoldierViewModel, profile: Profile
     val statLevels = Stat.values().associateWith { GameMath.statLevelForXp(stats[it] ?: 0L) }
     val top = statLevels.entries.sortedByDescending { it.value }.take(2).map { it.key }.toSet()
     val weekly = extras.weeklyTop.takeIf { it.size == 2 } ?: top
-    val topBadges = statLevels.entries.sortedByDescending { it.value }.take(2).map { "${statLabel(it.key)} ${PersianText.toFa(it.value)}" }
+    val topStats = statLevels.entries.sortedByDescending { it.value }.take(2).map { it.key.name to "${statLabel(it.key)} ${PersianText.toFa(it.value)}" }
     val aura = extras.equipped.any { it.contains("aura") }
     LaunchedEffect(top) { profile.refresh(top) }
 
@@ -85,7 +85,7 @@ fun HunterScreen(vm: GameViewModel, soldiers: SoldierViewModel, profile: Profile
         }
         ShadowCard {
             Row(verticalAlignment = Alignment.CenterVertically) {
-                AvatarStack(rank = rank, topBadges = topBadges, aura = aura)
+                AvatarStack(rank = rank, topStats = topStats, aura = aura)
                 Column(modifier = Modifier.padding(start = 12.dp)) {
                     Text(stringResource(R.string.level_label, PersianText.toFa(level)), style = MaterialTheme.typography.titleLarge)
                     Text(stringResource(R.string.rank_label, rank.name), color = ShadowColors.Gold)

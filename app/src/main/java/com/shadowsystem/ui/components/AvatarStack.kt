@@ -16,6 +16,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.shadowsystem.R
 import com.shadowsystem.core.AssetImage
+import com.shadowsystem.core.AssetRegistry
 import com.shadowsystem.core.AvatarData
 import com.shadowsystem.core.GameMath
 import com.shadowsystem.core.PersianText
@@ -26,7 +27,7 @@ import com.shadowsystem.ui.theme.ShadowColors
  * the stage badge, and the two strongest stats as small overlays. Art for the layers is a placeholder until it exists.
  */
 @Composable
-fun AvatarStack(rank: GameMath.Rank, topBadges: List<String>, aura: Boolean) {
+fun AvatarStack(rank: GameMath.Rank, topStats: List<Pair<String, String>>, aura: Boolean) {
     val stage = (GameMath.Rank.values().indexOf(rank) + 1).coerceAtMost(5)
     Box(modifier = Modifier.size(112.dp), contentAlignment = Alignment.Center) {
         if (aura) {
@@ -45,11 +46,23 @@ fun AvatarStack(rank: GameMath.Rank, topBadges: List<String>, aura: Boolean) {
             color = ShadowColors.Gold,
             modifier = Modifier.align(Alignment.BottomCenter).background(Color.Black.copy(alpha = 0.6f)).padding(horizontal = 6.dp)
         )
-        topBadges.getOrNull(0)?.let {
-            Text(it, style = MaterialTheme.typography.labelSmall, modifier = Modifier.align(Alignment.TopEnd).background(Color.Black.copy(alpha = 0.6f)).padding(2.dp))
+        topStats.getOrNull(0)?.let { (stat, label) ->
+            StatBadge(stat, label, Modifier.align(Alignment.TopEnd))
         }
-        topBadges.getOrNull(1)?.let {
-            Text(it, style = MaterialTheme.typography.labelSmall, modifier = Modifier.align(Alignment.TopStart).background(Color.Black.copy(alpha = 0.6f)).padding(2.dp))
+        topStats.getOrNull(1)?.let { (stat, label) ->
+            StatBadge(stat, label, Modifier.align(Alignment.TopStart))
         }
+    }
+}
+
+/** Stat emblem when its art exists, otherwise the stat label as text. */
+@Composable
+private fun StatBadge(stat: String, label: String, modifier: Modifier) {
+    val context = androidx.compose.ui.platform.LocalContext.current
+    val name = AssetRegistry.statAssetName(stat)
+    if (AssetRegistry.hasAsset(context, name)) {
+        AssetImage(name = name, size = 28.dp, contentDescription = label, modifier = modifier)
+    } else {
+        Text(label, style = MaterialTheme.typography.labelSmall, modifier = modifier.background(Color.Black.copy(alpha = 0.6f)).padding(2.dp))
     }
 }

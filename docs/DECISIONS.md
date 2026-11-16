@@ -98,3 +98,6 @@ one pass, the simplest reasonable option was chosen and recorded here.
 | 30 | Budget rollover | Unspent carries to the next month, capped at one base limit; overspend does not carry | Spec asks for rollover; the cap stops a saved-up month making the next unlimited. |
 | 31 | Receipts | Photo picked with `OpenDocument` (no storage permission), URI stored on the transaction. Thumbnail decoded at 1/4 size off the main thread. | Keeps the app offline with no media permission. |
 | 32 | Installments | Debt holds `installmentCount` and `installmentsPaid`. Each payment adds `installmentPart` (rounding goes to the last one). Manual payments still work. | Simple schedule without a separate table. |
+| 33 | Gate length | Stored per rank in kv (`gate_minutes_<RANK>`), 5–120 min in steps of 5 | Lets the user pick a session length without changing the rank scale. |
+| 34 | Dungeon links | Soldier and quest are stored on the run and on the session. They do not change XP. | Keeps XP rules unchanged; the link is for focus and history. |
+| 35 | Daily report | Full report reads the day's data only. Spending is shown but never adds XP or gold. | Spec: money never gives XP or gold. |

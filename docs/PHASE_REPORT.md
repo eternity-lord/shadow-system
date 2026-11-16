@@ -72,14 +72,18 @@ Latest green CI on the branch: `5e` batch — run 43887565776 (weekly boss, budg
 
 These keep PR #1 open.
 
-- **Money:** no open items in code. Receipts (photo picked with the system document picker, stored as a persistable URI; the image stays on the device), installments on debts (count, progress, pay next), budget rollover on the plan screen, wallets, transfers and cheques are built. Known limit: receipt URIs in a backup only work on the device that made them.
-- **Dungeon:** linking a dungeon to a quest or soldier, body-doubling soldier animation, and gate minutes that the user can change.
-- **Soldiers:** user re-linking of quests to soldiers (only template links exist), the morph animation for evolution, and a wisdom overlay image.
-- **Avatar:** layered body, hair, face, outfit, weapon and aura art (only rank avatars exist), stat overlays, and the old-avatar break-apart in the rank-up cutscene. Titles are not yet shown on the profile header.
-- **Screens:** reduce-motion is built. Morning briefing and night report are cards at the top of the Now tab (morning before 04:00–20:00, night from 20:00 to 04:00), with yesterday comparison and dungeon time. Onboarding has 5 screens and asks one focus question. Still open: a separate report screen with loot and quest totals.
-- **Art:** soldier stages 2–5, egg image, wisdom overlays, monsters, backgrounds, icons. These are placeholders (see ASSETS_MANIFEST.md).
-- **Quality:** TalkBack audit on a device, emulator or device tests, and a full process-death walkthrough. Accessibility has not been checked beyond the code.
-- **Docs:** README and PROGRESS are updated to this state. Check them after the next batch.
+- **Art (needs image generation, not code):** soldier stages 2–5 (only stage 1 exists; the app falls back to it), wisdom overlays, egg image, monsters, backgrounds and category icons. Placeholders are in `ASSETS_MANIFEST.md`.
+- **Avatar layers:** the layer system exists in code (base image, aura ring when an aura item is equipped, stage badge, two stat overlays). Body, hair, face, outfit and weapon layers wait for art.
+- **Evolution cutscene:** the old stage fades out while the new stage fades in and grows. A true silhouette morph needs the stage art.
+- **Accessibility and security on a device:** TalkBack, PIN and biometric unlock are not checked on a real device from this sandbox. The code uses labels and 48 dp targets.
+
+## Built in the last batches (summary)
+
+- Dungeon: body-doubling soldier (the linked one, or the first summoned), gate length per rank (5–120 min, steps of 5), optional soldier and quest link saved on the session, rare loot flag per session.
+- Quests: a quest can be relinked to another summoned soldier from its card (cycles through "no soldier" and each summoned soldier).
+- Reports: morning and night card on the Now tab, and a full daily report screen (score and trend, quests, XP, dungeon time, rare loot, spending). Spending never gives XP or gold.
+- Onboarding: five screens, one focus question, soldier suggestion.
+- Goals: savings estimate on each goal card (average daily saving since the goal was made).
 
 ## Verification
 - The sandbox has no JDK or Android SDK. Compilation and unit tests run on GitHub Actions only.

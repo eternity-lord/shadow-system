@@ -152,9 +152,8 @@ This audit was run on 2026-11-16 against the code on the branch. It is the list 
 Phases 0–3 are built in code. The Phase 3 acceptance ("every feature in this document works") is not met until the Missing and Partial rows above are closed.
 
 ## Next steps, in order
-1. Categories: a table with add, edit, archive, and the default set. (Section 8)
-2. Search filters: category, wallet, amount range, date range, tags. (Section 8)
-3. Onboarding: name, avatar base, usual wake time question. Wake time sets the morning reminder. (Section 10)
-4. Previews for the main cards and screens. (Section 15)
-5. Verify the Partial rows that need a check in code, and fix any gaps found.
-6. Art: WebP conversion and the stat overlay files named per tier.
+1. Search filters: category, wallet, amount range, date range, tags. (Section 8)
+2. Onboarding: name, avatar base, usual wake time question. Wake time sets the morning reminder. (Section 10)
+3. Previews for the main cards and screens. (Section 15)
+4. Verify the Partial rows that need a check in code, and fix any gaps found.
+5. Art: WebP conversion and the stat overlay files named per tier.

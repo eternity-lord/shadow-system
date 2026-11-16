@@ -29,12 +29,23 @@ import com.shadowsystem.ui.components.SummaryCard
 import com.shadowsystem.ui.components.TransactionRow
 import com.shadowsystem.ui.theme.ShadowColors
 import com.shadowsystem.ui.vm.MoneyViewModel
+import com.shadowsystem.ui.components.CategoryEditorDialog
+import com.shadowsystem.ui.components.rememberCategoryNames
 import com.shadowsystem.ui.vm.TypeFilter
 
 /** Money tab: quick entry, month navigation, search and filters. */
 @Composable
 fun MoneyScreen(vm: MoneyViewModel, onPlan: () -> Unit, onReports: () -> Unit, onWallets: () -> Unit) {
     val state by vm.state.collectAsStateWithLifecycle()
+    val categories = rememberCategoryNames(state.form.isIncome)
+    val appContext = androidx.compose.ui.platform.LocalContext.current.applicationContext as com.shadowsystem.ShadowApp
+    val categoryVm: com.shadowsystem.ui.vm.CategoryViewModel = androidx.lifecycle.viewmodel.compose.viewModel(
+        factory = com.shadowsystem.ui.vm.CategoryViewModel.factory(appContext)
+    )
+    var showCategories by androidx.compose.runtime.remember { androidx.compose.runtime.mutableStateOf(false) }
+    if (showCategories) {
+        CategoryEditorDialog(vm = categoryVm) { showCategories = false }
+    }
     val context = androidx.compose.ui.platform.LocalContext.current
     var receiptTarget by androidx.compose.runtime.remember { androidx.compose.runtime.mutableStateOf<Long?>(null) }
     val receiptPicker = androidx.activity.compose.rememberLauncherForActivityResult(
@@ -68,6 +79,7 @@ fun MoneyScreen(vm: MoneyViewModel, onPlan: () -> Unit, onReports: () -> Unit, o
                 TextButton(onClick = onPlan, modifier = Modifier.heightIn(min = 48.dp)) { Text(stringResource(R.string.money_plan)) }
                 TextButton(onClick = onReports, modifier = Modifier.heightIn(min = 48.dp)) { Text(stringResource(R.string.money_reports)) }
                 TextButton(onClick = onWallets, modifier = Modifier.heightIn(min = 48.dp)) { Text(stringResource(R.string.money_wallets)) }
+                TextButton(onClick = { showCategories = true }, modifier = Modifier.heightIn(min = 48.dp)) { Text(stringResource(R.string.category_manage)) }
             }
         }
         item { MonthBar(state.monthLabel, state.canGoForward, onPrev = { vm.previousMonth() }, onNext = { vm.nextMonth() }) }
@@ -89,6 +101,7 @@ fun MoneyScreen(vm: MoneyViewModel, onPlan: () -> Unit, onReports: () -> Unit, o
         item {
             EntryCard(
                 form = state.form,
+                categories = categories,
                 onIncome = vm::onIncomeToggle,
                 onAmount = vm::onAmountChange,
                 onCategory = vm::onCategory,

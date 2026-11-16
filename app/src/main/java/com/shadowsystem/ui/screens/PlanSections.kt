@@ -30,6 +30,7 @@ import com.shadowsystem.data.db.GoalEntity
 import com.shadowsystem.data.db.RecurringEntity
 import com.shadowsystem.ui.components.AmountField
 import com.shadowsystem.ui.components.CategoryChips
+import com.shadowsystem.ui.components.rememberCategoryNames
 import com.shadowsystem.ui.components.PrimaryButton
 import com.shadowsystem.ui.components.SectionTitle
 import com.shadowsystem.ui.components.ShadowCard
@@ -41,6 +42,7 @@ import com.shadowsystem.ui.vm.BudgetRow
 fun BudgetSection(rows: List<BudgetRow>, onSave: (String, String) -> Unit, onRemove: (String) -> Unit) {
     var category by remember { mutableStateOf(MoneyRules.CATEGORIES.first()) }
     var amount by remember { mutableStateOf("") }
+    val categories = rememberCategoryNames(false)
     val alert = remember(rows) { rows.any { it.level != FinanceRules.BudgetState.OK } }
     val phrase = remember(alert) { PhraseBank.budget() }
     ShadowCard {
@@ -83,7 +85,7 @@ fun BudgetSection(rows: List<BudgetRow>, onSave: (String, String) -> Unit, onRem
                 }
             }
         }
-        CategoryChips(category) { category = it }
+        CategoryChips(category, categories) { category = it }
         AmountField(amount, { amount = PersianText.parseDigits(it).filter { c -> c.isDigit() } }, stringResource(R.string.money_amount_hint))
         PrimaryButton(stringResource(R.string.budget_save), onClick = { onSave(category, amount) })
     }
@@ -96,6 +98,7 @@ fun RecurringSection(rules: List<RecurringEntity>, onAdd: (String, String, Strin
     var category by remember { mutableStateOf(MoneyRules.CATEGORIES.first()) }
     var income by remember { mutableStateOf(false) }
     var monthly by remember { mutableStateOf(true) }
+    val categories = rememberCategoryNames(income)
     ShadowCard {
         SectionTitle(stringResource(R.string.recurring_section))
         if (rules.isEmpty()) Text(stringResource(R.string.recurring_empty), color = ShadowColors.TextMuted)
@@ -120,7 +123,7 @@ fun RecurringSection(rules: List<RecurringEntity>, onAdd: (String, String, Strin
             FilterChip(selected = monthly, onClick = { monthly = true }, label = { Text(stringResource(R.string.every_month)) }, modifier = Modifier.heightIn(min = 48.dp))
             FilterChip(selected = !monthly, onClick = { monthly = false }, label = { Text(stringResource(R.string.every_week)) }, modifier = Modifier.heightIn(min = 48.dp))
         }
-        CategoryChips(category) { category = it }
+        CategoryChips(category, categories) { category = it }
         PrimaryButton(stringResource(R.string.recurring_save), onClick = { onAdd(title, amount, category, income, monthly) })
     }
 }

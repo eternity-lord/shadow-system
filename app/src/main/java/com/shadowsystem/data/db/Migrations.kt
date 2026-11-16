@@ -88,4 +88,26 @@ object Migrations {
             db.execSQL("ALTER TABLE `dungeon_sessions` ADD COLUMN `rareLoot` INTEGER NOT NULL DEFAULT 0")
         }
     }
+
+    /** v8: money categories table, seeded with the default set. */
+    val MIGRATION_7_8: Migration = object : Migration(7, 8) {
+        override fun migrate(db: SupportSQLiteDatabase) {
+            db.execSQL(
+                "CREATE TABLE IF NOT EXISTS `categories` (`name` TEXT NOT NULL, `isIncome` INTEGER NOT NULL, " +
+                    "`archived` INTEGER NOT NULL, `colorArgb` INTEGER NOT NULL, `sortOrder` INTEGER NOT NULL, " +
+                    "PRIMARY KEY(`name`))"
+            )
+            seedCategories(db)
+        }
+    }
+
+    /** Inserts the default categories. Existing names are kept. Also used on a fresh install. */
+    fun seedCategories(db: SupportSQLiteDatabase) {
+        com.shadowsystem.core.CategoryRules.DEFAULTS.forEachIndexed { i, d ->
+            db.execSQL(
+                "INSERT OR IGNORE INTO `categories` (`name`,`isIncome`,`archived`,`colorArgb`,`sortOrder`) VALUES (?,?,0,?,?)",
+                arrayOf<Any?>(d.name, if (d.isIncome) 1 else 0, d.colorArgb, i)
+            )
+        }
+    }
 }

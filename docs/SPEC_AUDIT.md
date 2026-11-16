@@ -75,7 +75,7 @@ This audit was run on 2026-11-16 against the code on the branch. It is the list 
 | Wallets, opening balance, transfers | Done | |
 | Transactions: type, wallet, category + subcategory, Jalali date, note, tags, receipt, location | Partial | tags and location text not in the model; subcategory not in the model |
 | Quick add: 3 taps, numpad, frequent categories | Done | |
-| Categories: default set with icons; add, edit, archive | Missing | categories are plain strings; no editor, no archive |
+| Categories: default set with icons; add, edit, archive | Partial | table `categories` (v8) with the default set; add, rename (updates transactions, budgets, recurring rules) and archive in the Money tab. Missing: category icons and colours in the UI, and categories are not in the encrypted backup yet |
 | Recurring rules daily/weekly/monthly/yearly, catch-up on open, pause | Done | `RecurrenceAndInstallmentTest` |
 | Budgets per category and overall, 80%/100%, rollover | Done | |
 | Savings goals with estimated finish | Done | `SavingsEstimateTest` |

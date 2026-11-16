@@ -200,3 +200,13 @@ data class ChequeEntity(
     val issuedByMe: Boolean,
     val cleared: Boolean = false
 )
+
+/** Money category. Transactions, budgets and recurring rules refer to it by name. Archived ones are hidden from new entries. */
+@androidx.room.Entity(tableName = "categories")
+data class CategoryEntity(
+    @androidx.room.PrimaryKey val name: String,
+    val isIncome: Boolean,
+    val archived: Boolean,
+    val colorArgb: Long,
+    val sortOrder: Int
+)

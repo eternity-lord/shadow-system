@@ -23,9 +23,10 @@ import androidx.room.RoomDatabase
         SoldierEntity::class,
         WalletEntity::class,
         TransferEntity::class,
-        ChequeEntity::class
+        ChequeEntity::class,
+        CategoryEntity::class
     ],
-    version = 7,
+    version = 8,
     exportSchema = true
 )
 abstract class AppDatabase : RoomDatabase() {
@@ -45,11 +46,20 @@ abstract class AppDatabase : RoomDatabase() {
     abstract fun goalDao(): GoalDao
     abstract fun debtDao(): DebtDao
     abstract fun keyValueDao(): KeyValueDao
+    abstract fun categoryDao(): CategoryDao
 
     companion object {
         fun create(context: Context): AppDatabase =
             Room.databaseBuilder(context, AppDatabase::class.java, "shadow_system.db")
-                .addMigrations(Migrations.MIGRATION_1_2, Migrations.MIGRATION_2_3, Migrations.MIGRATION_3_4, Migrations.MIGRATION_4_5, Migrations.MIGRATION_5_6, Migrations.MIGRATION_6_7)
+                .addMigrations(
+                    Migrations.MIGRATION_1_2, Migrations.MIGRATION_2_3, Migrations.MIGRATION_3_4, Migrations.MIGRATION_4_5,
+                    Migrations.MIGRATION_5_6, Migrations.MIGRATION_6_7, Migrations.MIGRATION_7_8
+                )
+                .addCallback(object : RoomDatabase.Callback() {
+                    override fun onCreate(db: androidx.sqlite.db.SupportSQLiteDatabase) {
+                        Migrations.seedCategories(db)
+                    }
+                })
                 .build()
     }
 }

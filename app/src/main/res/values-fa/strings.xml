@@ -412,4 +412,22 @@
     <string name="quiet_less">کم</string>
     <string name="quiet_more">زیاد</string>
     <string name="quiet_time">%1$s:۰۰</string>
+    <string name="category_manage">دسته‌ها</string>
+    <string name="category_title">مدیریت دسته‌ها</string>
+    <string name="category_add_label">دسته‌ی تازه</string>
+    <string name="category_add_button">افزودن</string>
+    <string name="category_rename">تغییر نام</string>
+    <string name="category_rename_title">نام تازه‌ی دسته</string>
+    <string name="category_archive">بایگانی</string>
+    <string name="category_restore">بازگردانی</string>
+    <string name="category_archived">بایگانی‌شده</string>
+    <string name="category_kind_expense">هزینه</string>
+    <string name="category_kind_income">درآمد</string>
+    <string name="category_save">ذخیره</string>
+    <string name="category_close">بستن</string>
+    <string name="category_err_empty">نام دسته خالی است.</string>
+    <string name="category_err_long">نام دسته حداکثر ۲۰ نویسه باشد.</string>
+    <string name="category_err_exists">این نام از قبل وجود دارد.</string>
+    <string name="category_done">ذخیره شد.</string>
+    <string name="category_archive_help">دسته‌ی بایگانی‌شده در ثبت تازه دیده نمی‌شود؛ تراکنش‌های قبلی سر جایشان می‌مانند.</string>
 </resources>

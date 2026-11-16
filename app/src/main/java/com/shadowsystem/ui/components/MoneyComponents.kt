@@ -32,9 +32,9 @@ fun moneyText(rial: Long, hidden: Boolean): String =
     if (hidden) "••••" else PersianText.formatMoney(rial)
 
 @Composable
-fun CategoryChips(selected: String, onSelect: (String) -> Unit) {
+fun CategoryChips(selected: String, categories: List<String>, onSelect: (String) -> Unit) {
     LazyRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-        items(MoneyRules.CATEGORIES) { cat ->
+        items(categories) { cat ->
             FilterChip(
                 selected = selected == cat,
                 onClick = { onSelect(cat) },
@@ -65,7 +65,7 @@ fun AmountField(
 }
 
 @Composable
-fun EntryCard(form: MoneyForm, onIncome: (Boolean) -> Unit, onAmount: (String) -> Unit, onCategory: (String) -> Unit, onNote: (String) -> Unit, onSave: () -> Unit) {
+fun EntryCard(form: MoneyForm, categories: List<String>, onIncome: (Boolean) -> Unit, onAmount: (String) -> Unit, onCategory: (String) -> Unit, onNote: (String) -> Unit, onSave: () -> Unit) {
     ShadowCard {
         Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
             FilterChip(
@@ -89,7 +89,7 @@ fun EntryCard(form: MoneyForm, onIncome: (Boolean) -> Unit, onAmount: (String) -
         if (form.error) {
             Text(stringResource(R.string.money_amount_invalid), color = ShadowColors.Danger, style = MaterialTheme.typography.bodyMedium)
         }
-        CategoryChips(form.category, onCategory)
+        CategoryChips(form.category, categories, onCategory)
         OutlinedTextField(
             value = form.note,
             onValueChange = onNote,

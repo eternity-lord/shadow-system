@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">سیستم سایه</string>
+
+    <!-- Tabs -->
+    <string name="tab_now">امروز</string>
+    <string name="tab_quests">مأموریت</string>
+    <string name="tab_dungeon">سیاه‌چال</string>
+    <string name="tab_money">پول</string>
+    <string name="tab_hunter">شکارچی</string>
+
+    <!-- Now -->
+    <string name="now_title">امروز</string>
+    <string name="score_label">امتیاز امروز</string>
+    <string name="shadow_yesterday">امتیاز دیروز: %1$s</string>
+    <string name="shadow_beaten">سایه دیروز را شکست دادی! +۱۰ طلا</string>
+    <string name="mandatory_title">مأموریت‌های اصلی</string>
+    <string name="optional_title">مأموریت‌های اختیاری</string>
+    <string name="mood_question">امروز چه حالی داری؟</string>
+    <string name="mood_great">عالی</string>
+    <string name="mood_normal">معمولی</string>
+    <string name="mood_hard">روز سخت</string>
+    <string name="comeback_active">پاداش بازگشت فعال است: ۳ مأموریت اول ×۱٫۵</string>
+    <string name="no_quests_yet">هنوز مأموریتی برای امروز نیست.</string>
+    <string name="generate_quests">ساخت مأموریت‌های امروز</string>
+    <string name="level_label">سطح %1$s</string>
+    <string name="rank_label">رتبه %1$s</string>
+    <string name="xp_progress">%1$s از %2$s تجربه</string>
+
+    <!-- Quests -->
+    <string name="quests_title">مأموریت‌ها</string>
+    <string name="quest_done">انجام شد</string>
+    <string name="quest_steps">مرحله %1$s از %2$s</string>
+    <string name="step_done">انجام شد</string>
+    <string name="im_stuck">گیر کرده‌ام</string>
+    <string name="make_smaller">کوچک‌ترش کن</string>
+    <string name="later">بعداً</string>
+    <string name="quest_reward">+%1$s تجربه · +%2$s طلا</string>
+    <string name="quest_undo">برگشت</string>
+    <string name="reward_claimed">پاداش دریافت شد</string>
+    <string name="empty_quests_list">امروز هنوز مأموریتی ساخته نشده است.</string>
+
+    <!-- Dungeon -->
+    <string name="dungeon_title">سیاه‌چال</string>
+    <string name="gate_rank">دروازه %1$s</string>
+    <string name="gate_minutes">%1$s دقیقه</string>
+    <string name="dungeon_start">ورود به سیاه‌چال</string>
+    <string name="dungeon_cancel">خروج زودهنگام</string>
+    <string name="dungeon_cancel_confirm">خروج زودهنگام؟ فقط تجربه متناسب با زمان ثبت می‌شود.</string>
+    <string name="dungeon_finish">پیروزی در سیاه‌چال</string>
+    <string name="dungeon_inside">داخل سیاه‌چال هستی. تمرکز کن.</string>
+    <string name="dungeon_today">امروز: %1$s</string>
+    <string name="dungeon_idle">آماده ورود، شکارچی؟</string>
+    <string name="dungeon_loot">غنیمت: %1$s تجربه ذهنی</string>
+
+    <!-- Money -->
+    <string name="money_title">پول</string>
+    <string name="money_amount_hint">مبلغ به تومان</string>
+    <string name="money_note_hint">یادداشت (اختیاری)</string>
+    <string name="money_save">ثبت</string>
+    <string name="money_month_spent">خرج این ماه</string>
+    <string name="money_today">امروز</string>
+    <string name="money_empty">هنوز هزینه‌ای ثبت نشده است.</string>
+    <string name="money_delete_confirm">این تراکنش حذف شود؟</string>
+    <string name="money_yes_delete">بله، حذف کن</string>
+    <string name="cancel">انصراف</string>
+    <string name="delete">حذف</string>
+    <string name="money_logged_bonus">ثبت شد. +۲ تجربه هوش</string>
+    <string name="money_amount_invalid">مبلغ معتبر وارد کن.</string>
+    <string name="money_expense">هزینه</string>
+    <string name="money_income">درآمد</string>
+    <string name="money_month_income">درآمد این ماه</string>
+    <string name="money_privacy">مبالغ فقط روی این گوشی ذخیره می‌شوند.</string>
+
+    <!-- Hunter -->
+    <string name="hunter_title">شکارچی</string>
+    <string name="stat_str">قدرت</string>
+    <string name="stat_int">هوش</string>
+    <string name="stat_agi">چابکی</string>
+    <string name="stat_vit">استقامت</string>
+    <string name="stat_sense">حس</string>
+    <string name="class_label">کلاس: %1$s</string>
+    <string name="soldiers_title">سربازان سایه</string>
+    <string name="soldier_locked">قفل</string>
+    <string name="soldier_unlock_hint">با رسیدن این صفت به سطح ۵ باز می‌شود</string>
+    <string name="soldier_unlocked">آماده</string>
+    <string name="gold_label">طلا: %1$s</string>
+    <string name="active_days">روزهای فعال: %1$s</string>
+
+    <!-- Generic -->
+    <string name="unit_toman">تومان</string>
+    <string name="unit_minutes">دقیقه</string>
+    <string name="unit_xp">تجربه</string>
+    <string name="coming_soon">به‌زودی</string>
+    <string name="content_desc_avatar">تصویر شکارچی</string>
+</resources>

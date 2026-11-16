@@ -1,3 +1,5 @@
+import java.util.Properties
+
 plugins {
     id("com.android.application")
     id("org.jetbrains.kotlin.android")
@@ -22,7 +24,7 @@ android {
     signingConfigs {
         create("release") {
             // Reads release-keystore/keystore.properties (git-ignored), or SHADOW_* environment variables in CI.
-            val props = java.util.Properties()
+            val props = Properties()
             val propsFile = rootProject.file("release-keystore/keystore.properties")
             if (propsFile.exists()) propsFile.inputStream().use { props.load(it) }
             val store = props.getProperty("storeFile") ?: System.getenv("SHADOW_KEYSTORE_FILE")

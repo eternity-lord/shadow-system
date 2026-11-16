@@ -9,8 +9,16 @@ Spec reference: `docs/original-prompt.pdf` section 16 (phase order).
 - Manifest without INTERNET permission, RTL support, Persian `strings.xml` and `values-fa`.
 - Documentation skeleton: README, DECISIONS, ASSETS_MANIFEST, PROGRESS, this report.
 
-## Phase 1 — MVP — PARTIALLY DONE (commits `f4fd82e` … latest on branch)
-Build status: `./gradlew assembleDebug testDebugUnitTest` **passes on GitHub Actions** (run 43830642358).
+## Phase 1 — MVP — MOSTLY DONE (latest green commit `44cd81f`)
+Build status: `./gradlew assembleDebug testDebugUnitTest` **passes on GitHub Actions** (run 43833013809, commit `44cd81f`).
+
+Added since the earlier report:
+- Room schema v2 (`MIGRATION_1_2`) with budgets, recurring rules, goals, debts and key-value settings.
+- Onboarding (4 screens), PIN lock gate, FLAG_SECURE on the whole window.
+- Reports screen (donut, six-month bars, 30-day line) drawn with Compose Canvas.
+- Settings screen: hide-balances toggle, PIN set/remove, encrypted backup export/restore (AES-256-GCM, PBKDF2), CSV export.
+- Money plan screen: budgets, recurring rules, savings goals (bosses), debts and installments.
+- Reports and settings are wired into the navigation; the Hunter tab links to Settings.
 
 Delivered:
 - Jalali calendar (own implementation, validated against jalaali-js constants) with leap-year, month-boundary, round-trip and weekday tests.
@@ -23,19 +31,21 @@ Delivered:
 - CI workflow that builds the APK, runs tests, and posts errors as a commit comment on failure.
 
 Not yet delivered from Phase 1 in the spec:
-- Onboarding (≤5 screens), morning briefing / night report as notifications, notification scheduler.
-- "I'm stuck" (make smaller / later), swipe-complete with 5s undo.
-- Numpad quick-add, receipt photo, tags.
+- Morning briefing / night report notifications (not yet scheduled).
+- Swipe-complete with 5s undo (undo banner exists; swipe gesture not wired).
+- Numpad quick-add, receipt photo, tags, Gold shop.
 - Foreground-service dungeon timer, monster HP, loot journal, weekly boss.
 - Full soldier system (summon ritual, XP, evolution, voice lines in UI, wisdom overlay).
 - Avatar layering, stat-based class visuals, rank trial boss, rank-up cutscene.
 - Generated or downloaded artwork (only placeholders; see ASSETS_MANIFEST.md).
 
-## Phase 2 — Depth — NOT STARTED
-Planned: budgets with 80/100% warnings, recurring rules with Jalali catch-up, savings goals as bosses, debts and installments, reports (donut/bars/lines), search and filters, CSV export, notifications, onboarding, comeback polish, rank trial, Gold shop.
+## Phase 2 — Depth — PARTIALLY DONE
+Done (compiled, CI green): budgets with 80/100% warnings, recurring rules with Jalali catch-up (`MAX_CATCH_UP` 60), savings goals as bosses, debts and installments, reports (donut/bars/lines), CSV export.
+Not done: search and filters UI (search logic may exist in the repository but is not fully surfaced), notifications, rank trial boss, Gold shop.
 
-## Phase 3 — Completion — NOT STARTED
-Planned: AES-256-GCM backup with PBKDF2, app lock (PIN + biometric), FLAG_SECURE on money screens, hide-balances toggle, artwork integration, accessibility pass, release build with R8 and signing placeholder.
+## Phase 3 — Completion — PARTIALLY DONE
+Done: AES-256-GCM backup with PBKDF2 (UI in Settings), PIN lock (PBKDF2 hash), FLAG_SECURE, hide-balances toggle.
+Not done: biometric unlock, artwork integration beyond procedural placeholders, accessibility pass, R8 release build with signing placeholder.
 
 ## Verification
 - Local sandbox has no JDK/Android SDK and Google Maven is unreachable, so all compilation and tests ran on GitHub Actions.
@@ -43,4 +53,4 @@ Planned: AES-256-GCM backup with PBKDF2, app lock (PIN + biometric), FLAG_SECURE
 - Room schema JSON is generated into `app/schemas` on build; it is not committed yet.
 
 ## Honest status
-The app is an **MVP of Phase 1**, not the full specification. Phases 2 and 3 are not implemented.
+The app covers most of Phase 1, a large part of Phase 2 and part of Phase 3. It is **not yet the full specification**. Remaining work is listed above. PR #1 stays open until those items are finished.

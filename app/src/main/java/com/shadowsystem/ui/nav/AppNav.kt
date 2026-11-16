@@ -34,6 +34,8 @@ import com.shadowsystem.ui.screens.HunterScreen
 import com.shadowsystem.ui.screens.LockScreen
 import com.shadowsystem.ui.screens.MoneyPlanScreen
 import com.shadowsystem.ui.screens.MoneyScreen
+import com.shadowsystem.ui.screens.WalletsScreen
+import com.shadowsystem.ui.vm.WalletViewModel
 import com.shadowsystem.ui.screens.NowScreen
 import com.shadowsystem.ui.screens.OnboardingScreen
 import com.shadowsystem.ui.screens.QuestsScreen
@@ -60,6 +62,7 @@ enum class Tab(val route: String, val labelRes: Int, val icon: ImageVector) {
 object Routes {
     const val PLAN = "plan"
     const val REPORTS = "reports"
+    const val WALLETS = "wallets"
     const val SETTINGS = "settings"
 }
 
@@ -122,10 +125,14 @@ private fun MainNavigation(app: ShadowApp, game: GameViewModel) {
                 MoneyScreen(
                     vm = money,
                     onPlan = { nav.navigate(Routes.PLAN) },
-                    onReports = { nav.navigate(Routes.REPORTS) }
+                    onReports = { nav.navigate(Routes.REPORTS) },
+                    onWallets = { nav.navigate(Routes.WALLETS) }
                 )
             }
             composable(Tab.HUNTER.route) { HunterScreen(game, soldierVm, profileVm) { nav.navigate(Routes.SETTINGS) } }
+            composable(Routes.WALLETS) {
+                WalletsScreen(viewModel(factory = WalletViewModel.factory(app))) { nav.popBackStack() }
+            }
             composable(Routes.PLAN) {
                 MoneyPlanScreen(viewModel(factory = PlanViewModel.factory(app))) { nav.popBackStack() }
             }

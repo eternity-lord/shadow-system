@@ -20,6 +20,7 @@ class AppContainer(context: Context) {
     val soldiers = com.shadowsystem.data.repo.SoldierRepository(database)
     val achievements = com.shadowsystem.data.repo.AchievementRepository(database, game)
     val boss = com.shadowsystem.data.repo.BossRepository(database, game)
+    val wallets = com.shadowsystem.data.repo.WalletRepository(database, game)
     val timer = com.shadowsystem.util.DungeonTimerStore(context.applicationContext)
     val backup = BackupService(database)
     val prefs = AppPrefs(context.applicationContext)

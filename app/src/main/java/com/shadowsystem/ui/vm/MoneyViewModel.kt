@@ -9,10 +9,12 @@ import com.shadowsystem.core.FinanceRules
 import com.shadowsystem.core.MoneyRules
 import com.shadowsystem.core.PersianText
 import com.shadowsystem.data.db.TransactionEntity
+import com.shadowsystem.data.db.WalletEntity
 import com.shadowsystem.data.prefs.AppPrefs
 import com.shadowsystem.data.repo.GameRepository
 import com.shadowsystem.data.repo.MoneyRepository
 import com.shadowsystem.data.repo.PlanRepository
+import com.shadowsystem.data.repo.WalletRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -28,7 +30,8 @@ data class MoneyForm(
     val category: String = MoneyRules.CATEGORIES.first(),
     val note: String = "",
     val isIncome: Boolean = false,
-    val error: Boolean = false
+    val error: Boolean = false,
+    val walletId: Long? = null
 )
 
 data class MoneyState(
@@ -42,7 +45,9 @@ data class MoneyState(
     val hidden: Boolean = false,
     val query: String = "",
     val filter: TypeFilter = TypeFilter.ALL,
-    val canGoForward: Boolean = false
+    val canGoForward: Boolean = false,
+    val wallets: List<WalletEntity> = emptyList(),
+    val balances: Map<Long, Long> = emptyMap()
 )
 
 private data class Controls(val offset: Int, val query: String, val filter: TypeFilter, val hidden: Boolean)
@@ -52,7 +57,8 @@ class MoneyViewModel(
     private val money: MoneyRepository,
     private val game: GameRepository,
     private val plan: PlanRepository,
-    private val prefs: AppPrefs
+    private val prefs: AppPrefs,
+    private val wallets: WalletRepository
 ) : ViewModel() {
 
     private val form = MutableStateFlow(MoneyForm())
@@ -69,7 +75,7 @@ class MoneyViewModel(
         money.observeRange(from, to)
     }
 
-    val state: StateFlow<MoneyState> = combine(form, pendingDelete, controls, monthEntries) { f, pending, c, all ->
+    private val baseState: StateFlow<MoneyState> = combine(form, pendingDelete, controls, monthEntries) { f, pending, c, all ->
         val now = System.currentTimeMillis()
         val q = c.query.trim()
         val shown = all.filter { t ->
@@ -96,8 +102,19 @@ class MoneyViewModel(
         )
     }.stateIn(viewModelScope, SharingStarted.Eagerly, MoneyState())
 
+    val state: StateFlow<MoneyState> = combine(baseState, wallets.observeWallets(), wallets.observeBalances()) { s, ws, b ->
+        s.copy(wallets = ws, balances = b)
+    }.stateIn(viewModelScope, SharingStarted.Eagerly, MoneyState())
+
+    fun onWallet(id: Long?) {
+        form.value = form.value.copy(walletId = id)
+    }
+
     init {
-        viewModelScope.launch { plan.processRecurring() }
+        viewModelScope.launch {
+            wallets.ensureDefault()
+            plan.processRecurring()
+        }
     }
 
     fun onAmountChange(text: String) {
@@ -144,7 +161,7 @@ class MoneyViewModel(
             return
         }
         viewModelScope.launch {
-            money.add(toman!!, f.category, f.note, f.isIncome)
+            money.add(toman!!, f.category, f.note, f.isIncome, f.walletId)
             form.value = f.copy(amountText = "", note = "", error = false)
         }
     }
@@ -167,7 +184,7 @@ class MoneyViewModel(
         fun factory(app: ShadowApp): ViewModelProvider.Factory = object : ViewModelProvider.Factory {
             @Suppress("UNCHECKED_CAST")
             override fun <T : ViewModel> create(modelClass: Class<T>, extras: CreationExtras): T =
-                MoneyViewModel(app.container.money, app.container.game, app.container.plan, app.container.prefs) as T
+                MoneyViewModel(app.container.money, app.container.game, app.container.plan, app.container.prefs, app.container.wallets) as T
         }
     }
 }

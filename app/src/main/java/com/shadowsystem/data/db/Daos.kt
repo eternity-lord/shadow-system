@@ -159,6 +159,9 @@ interface TransactionDao {
     @Query("SELECT * FROM transactions WHERE epochDay BETWEEN :from AND :to")
     suspend fun range(from: Long, to: Long): List<TransactionEntity>
 
+    @Query("SELECT * FROM transactions")
+    fun observeAll(): Flow<List<TransactionEntity>>
+
     @Query("SELECT COUNT(*) FROM transactions")
     suspend fun count(): Int
 

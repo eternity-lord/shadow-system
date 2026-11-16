@@ -104,7 +104,8 @@ data class TransactionEntity(
     val note: String,
     val isIncome: Boolean,
     val epochDay: Long,
-    val createdAt: Long
+    val createdAt: Long,
+    val walletId: Long? = null
 )
 
 @Entity(tableName = "budgets")
@@ -163,4 +164,32 @@ data class SoldierEntity(
     @PrimaryKey val key: String,
     val customName: String? = null,
     val summonedAt: Long? = null
+)
+
+@Entity(tableName = "wallets")
+data class WalletEntity(
+    @PrimaryKey(autoGenerate = true) val id: Long = 0,
+    val name: String,
+    val openingRial: Long = 0
+)
+
+@Entity(tableName = "transfers")
+data class TransferEntity(
+    @PrimaryKey(autoGenerate = true) val id: Long = 0,
+    val fromWalletId: Long,
+    val toWalletId: Long,
+    val amountRial: Long,
+    val epochDay: Long,
+    val createdAt: Long
+)
+
+/** A cheque we issued (issuedByMe) or received. Tracked by due date and cleared flag. */
+@Entity(tableName = "cheques")
+data class ChequeEntity(
+    @PrimaryKey(autoGenerate = true) val id: Long = 0,
+    val title: String,
+    val amountRial: Long,
+    val dueEpochDay: Long,
+    val issuedByMe: Boolean,
+    val cleared: Boolean = false
 )

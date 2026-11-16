@@ -49,4 +49,25 @@ object Migrations {
             )
         }
     }
+
+    /** v5: wallets, optional wallet on transactions (null = first wallet), transfers and cheques. */
+    val MIGRATION_4_5: Migration = object : Migration(4, 5) {
+        override fun migrate(db: SupportSQLiteDatabase) {
+            db.execSQL(
+                "CREATE TABLE IF NOT EXISTS `wallets` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, " +
+                    "`name` TEXT NOT NULL, `openingRial` INTEGER NOT NULL)"
+            )
+            db.execSQL("ALTER TABLE `transactions` ADD COLUMN `walletId` INTEGER")
+            db.execSQL(
+                "CREATE TABLE IF NOT EXISTS `transfers` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, " +
+                    "`fromWalletId` INTEGER NOT NULL, `toWalletId` INTEGER NOT NULL, `amountRial` INTEGER NOT NULL, " +
+                    "`epochDay` INTEGER NOT NULL, `createdAt` INTEGER NOT NULL)"
+            )
+            db.execSQL(
+                "CREATE TABLE IF NOT EXISTS `cheques` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, " +
+                    "`title` TEXT NOT NULL, `amountRial` INTEGER NOT NULL, `dueEpochDay` INTEGER NOT NULL, " +
+                    "`issuedByMe` INTEGER NOT NULL, `cleared` INTEGER NOT NULL)"
+            )
+        }
+    }
 }

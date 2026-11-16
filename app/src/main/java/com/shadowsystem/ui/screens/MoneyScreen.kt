@@ -32,7 +32,7 @@ import com.shadowsystem.ui.vm.TypeFilter
 
 /** Money tab: quick entry, month navigation, search and filters. */
 @Composable
-fun MoneyScreen(vm: MoneyViewModel, onPlan: () -> Unit, onReports: () -> Unit) {
+fun MoneyScreen(vm: MoneyViewModel, onPlan: () -> Unit, onReports: () -> Unit, onWallets: () -> Unit) {
     val state by vm.state.collectAsStateWithLifecycle()
     state.pendingDelete?.let {
         ConfirmDialog(
@@ -51,9 +51,25 @@ fun MoneyScreen(vm: MoneyViewModel, onPlan: () -> Unit, onReports: () -> Unit) {
                 Text(stringResource(R.string.money_title), style = MaterialTheme.typography.headlineMedium, modifier = Modifier.weight(1f))
                 TextButton(onClick = onPlan, modifier = Modifier.heightIn(min = 48.dp)) { Text(stringResource(R.string.money_plan)) }
                 TextButton(onClick = onReports, modifier = Modifier.heightIn(min = 48.dp)) { Text(stringResource(R.string.money_reports)) }
+                TextButton(onClick = onWallets, modifier = Modifier.heightIn(min = 48.dp)) { Text(stringResource(R.string.money_wallets)) }
             }
         }
         item { MonthBar(state.monthLabel, state.canGoForward, onPrev = { vm.previousMonth() }, onNext = { vm.nextMonth() }) }
+        if (state.wallets.size > 1) {
+            item {
+                Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                    Text(stringResource(R.string.wallet_pick), modifier = Modifier.padding(top = 12.dp))
+                    state.wallets.forEach { w ->
+                        FilterChip(
+                            selected = state.form.walletId == w.id,
+                            onClick = { vm.onWallet(w.id) },
+                            label = { Text(w.name) },
+                            modifier = Modifier.heightIn(min = 48.dp)
+                        )
+                    }
+                }
+            }
+        }
         item {
             EntryCard(
                 form = state.form,

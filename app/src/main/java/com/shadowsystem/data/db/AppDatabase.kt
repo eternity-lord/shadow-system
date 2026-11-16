@@ -20,9 +20,12 @@ import androidx.room.RoomDatabase
         DebtEntity::class,
         KeyValueEntity::class,
         InboxEntity::class,
-        SoldierEntity::class
+        SoldierEntity::class,
+        WalletEntity::class,
+        TransferEntity::class,
+        ChequeEntity::class
     ],
-    version = 4,
+    version = 5,
     exportSchema = true
 )
 abstract class AppDatabase : RoomDatabase() {
@@ -33,6 +36,9 @@ abstract class AppDatabase : RoomDatabase() {
     abstract fun dungeonDao(): DungeonDao
     abstract fun inboxDao(): InboxDao
     abstract fun soldierDao(): SoldierDao
+    abstract fun walletDao(): WalletDao
+    abstract fun transferDao(): TransferDao
+    abstract fun chequeDao(): ChequeDao
     abstract fun transactionDao(): TransactionDao
     abstract fun budgetDao(): BudgetDao
     abstract fun recurringDao(): RecurringDao
@@ -43,7 +49,7 @@ abstract class AppDatabase : RoomDatabase() {
     companion object {
         fun create(context: Context): AppDatabase =
             Room.databaseBuilder(context, AppDatabase::class.java, "shadow_system.db")
-                .addMigrations(Migrations.MIGRATION_1_2, Migrations.MIGRATION_2_3, Migrations.MIGRATION_3_4)
+                .addMigrations(Migrations.MIGRATION_1_2, Migrations.MIGRATION_2_3, Migrations.MIGRATION_3_4, Migrations.MIGRATION_4_5)
                 .build()
     }
 }

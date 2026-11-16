@@ -1,0 +1,190 @@
+package com.shadowsystem.data.repo
+
+import com.shadowsystem.core.DayRules
+import com.shadowsystem.core.GameMath
+import com.shadowsystem.core.GameMath.Stat
+import com.shadowsystem.core.Mood
+import com.shadowsystem.core.QuestPlanner
+import com.shadowsystem.data.db.AppDatabase
+import com.shadowsystem.data.db.DailyScoreEntity
+import com.shadowsystem.data.db.DungeonSessionEntity
+import com.shadowsystem.data.db.ProfileEntity
+import com.shadowsystem.data.db.QuestEntity
+import com.shadowsystem.data.db.QuestStepEntity
+import com.shadowsystem.data.db.StatProgressEntity
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.map
+import kotlin.math.roundToInt
+
+/** Result of ticking a step, used for UI feedback. */
+data class ProgressResult(val xpGained: Int, val questFinished: Boolean, val levelBefore: Int, val levelAfter: Int)
+
+/**
+ * Owns all game state: profile, stats, quests, dungeon sessions and daily scores.
+ * Quest XP: each step pays 20% of the reward spread across steps; the last step pays the rest.
+ */
+class GameRepository(
+    private val db: AppDatabase,
+    private val clock: () -> Long = System::currentTimeMillis
+) {
+    private val profileDao = db.profileDao()
+    private val statDao = db.statDao()
+    private val questDao = db.questDao()
+    private val scoreDao = db.dailyScoreDao()
+    private val dungeonDao = db.dungeonDao()
+
+    fun today(): Long = DayRules.gameDay(clock())
+
+    fun observeProfile(): Flow<ProfileEntity> = profileDao.observe().map { it ?: ProfileEntity() }
+
+    fun observeStats(): Flow<Map<Stat, Long>> = statDao.observeAll().map { rows ->
+        Stat.values().associateWith { s -> rows.firstOrNull { it.stat == s.name }?.xp ?: 0L }
+    }
+
+    fun observeQuests(day: Long): Flow<List<QuestEntity>> = questDao.observeDay(day)
+
+    fun observeSteps(day: Long): Flow<List<QuestStepEntity>> = questDao.observeStepsForDay(day)
+
+    fun observeScore(day: Long): Flow<DailyScoreEntity?> = scoreDao.observe(day)
+
+    fun observeDungeonSeconds(day: Long): Flow<Int> = dungeonDao.observeSecondsForDay(day)
+
+    suspend fun profile(): ProfileEntity = profileDao.get() ?: ProfileEntity()
+
+    suspend fun scoreOf(day: Long): Int? = scoreDao.get(day)?.score
+
+    /** Generates the day's quests once. Returns false if they already exist. */
+    suspend fun generateDay(mood: Mood): Boolean {
+        val day = today()
+        if (questDao.countForDay(day) > 0) return false
+        val profile = profile()
+        val comeback = DayRules.isComeback(profile.lastActiveDay, day)
+        val level = GameMath.levelForXp(profile.totalXp)
+        var comebackLeft = if (comeback) DayRules.COMEBACK_QUESTS else 0
+        for (planned in QuestPlanner.plan(level, mood)) {
+            val t = planned.template
+            val reward = GameMath.questReward(t.rank)
+            val boosted = comebackLeft > 0
+            val id = questDao.insertQuest(
+                QuestEntity(
+                    title = t.title,
+                    description = t.description,
+                    stat = t.stat.name,
+                    rank = t.rank.name,
+                    minutes = t.minutes,
+                    mandatory = planned.mandatory,
+                    lowEnergy = t.lowEnergy,
+                    gameDay = day,
+                    xpReward = reward.xp,
+                    goldReward = reward.gold,
+                    stepsTotal = t.steps.size,
+                    comebackApplied = boosted
+                )
+            )
+            questDao.insertSteps(
+                t.steps.mapIndexed { i, text -> QuestStepEntity(questId = id, position = i, text = text) }
+            )
+            if (boosted) comebackLeft--
+        }
+        scoreDao.upsert(DailyScoreEntity(day, 0, mood.name))
+        return true
+    }
+
+    /** Ticks one step and pays its XP. Returns null if the step was already done. */
+    suspend fun tickStep(step: QuestStepEntity): ProgressResult? {
+        val quest = questDao.get(step.questId) ?: return null
+        if (quest.status == QuestEntity.STATUS_DONE || step.done) return null
+        val levelBefore = GameMath.levelForXp(profile().totalXp)
+        questDao.updateStep(step.copy(done = true))
+
+        val multiplier = if (quest.comebackApplied) DayRules.COMEBACK_MULTIPLIER else 1.0
+        val total = GameMath.applyMultiplier(quest.xpReward, multiplier)
+        val k = quest.stepsDone + 1
+        val n = quest.stepsTotal
+        val cumulative = if (k >= n) total else (total * 0.2 * k / n).roundToInt()
+        val gained = (cumulative - quest.xpAwarded).coerceAtLeast(0)
+        val finished = k >= n
+
+        questDao.updateQuest(
+            quest.copy(
+                stepsDone = k,
+                xpAwarded = maxOf(cumulative, quest.xpAwarded),
+                status = if (finished) QuestEntity.STATUS_DONE else quest.status,
+                completedAt = if (finished) clock() else 0L
+            )
+        )
+        addXp(gained, quest.stat, gold = if (finished) quest.goldReward else 0)
+        if (finished) touchActiveDay()
+        return ProgressResult(gained, finished, levelBefore, GameMath.levelForXp(profile().totalXp))
+    }
+
+    /** Adds XP to total + stat, and gold. Single-user app, so no cross-table transaction needed. */
+    suspend fun addXp(xp: Int, statName: String, gold: Int) {
+        val p = profile()
+        profileDao.upsert(p.copy(totalXp = p.totalXp + xp, gold = p.gold + gold))
+        if (xp > 0) {
+            val s = statDao.get(statName) ?: StatProgressEntity(statName)
+            statDao.upsert(s.copy(xp = s.xp + xp))
+        }
+    }
+
+    private suspend fun touchActiveDay() {
+        val day = today()
+        val p = profile()
+        if (p.lastActiveDay == day) return
+        profileDao.upsert(p.copy(lastActiveDay = day, activeDays = p.activeDays + 1))
+    }
+
+    /** Recomputes the day's score from stored data, saves it and returns it. */
+    suspend fun refreshScore(loggedMoney: Boolean, withinBudget: Boolean = true): Int {
+        val day = today()
+        val quests = questDao.forDay(day)
+        val existing = scoreDao.get(day)
+        val mood = existing?.mood ?: Mood.NORMAL.name
+        val dungeonSeconds = dungeonDao.secondsForDay(day)
+        val vitQuests = quests.filter { it.stat == Stat.VIT.name }
+        val score = GameMath.dailyScore(
+            GameMath.DailyScoreInput(
+                completedXp = quests.filter { it.status == QuestEntity.STATUS_DONE }.sumOf { it.xpReward },
+                plannedXp = quests.sumOf { it.xpReward },
+                dungeonMinutes = dungeonSeconds / 60,
+                dungeonGoalMinutes = DUNGEON_GOAL_MINUTES,
+                loggedTransactionToday = loggedMoney,
+                withinBudgetPace = withinBudget,
+                vitQuestsDone = vitQuests.count { it.status == QuestEntity.STATUS_DONE },
+                vitQuestsPlanned = vitQuests.size,
+                hardDay = mood == Mood.HARD.name
+            )
+        )
+        scoreDao.upsert(DailyScoreEntity(day, score, mood, dungeonSeconds / 60, loggedMoney))
+        return score
+    }
+
+    /**
+     * Saves a dungeon run. Completed runs pay double the rank's quest XP to INT;
+     * cancelled runs pay only the share of time spent.
+     */
+    suspend fun recordDungeon(rankName: String, plannedMinutes: Int, doneSeconds: Int, completed: Boolean): Int {
+        val rank = GameMath.Rank.valueOf(rankName)
+        val full = GameMath.questReward(rank).xp * 2
+        val xp = if (completed) full else GameMath.partialDungeonXp(plannedMinutes, doneSeconds / 60, full)
+        dungeonDao.insert(
+            DungeonSessionEntity(
+                gameDay = today(),
+                rank = rankName,
+                plannedMinutes = plannedMinutes,
+                doneSeconds = doneSeconds,
+                completed = completed,
+                xpGained = xp,
+                createdAt = clock()
+            )
+        )
+        if (xp > 0) addXp(xp, Stat.INT.name, gold = if (completed) GameMath.questReward(rank).gold else 0)
+        if (doneSeconds >= 60) touchActiveDay()
+        return xp
+    }
+
+    companion object {
+        const val DUNGEON_GOAL_MINUTES = 25
+    }
+}

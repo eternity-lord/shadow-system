@@ -95,3 +95,4 @@ one pass, the simplest reasonable option was chosen and recorded here.
 | 27 | Wallet on transactions | Nullable `walletId` on `transactions`. Null means the first wallet, so v4 data needs no backfill (migration 4→5). | Spec wants wallets without losing old entries. |
 | 28 | Transfers | Separate `transfers` table. They never count as spending and give no XP or Gold. | Spec: spending must never give XP or Gold, and moving money is not spending. |
 | 29 | Cheques | One table for issued and received cheques, due date stored as epoch day from the Jalali date. "Due soon" means within 3 days. | Keeps one list with a single status rule (`ChequeRules`). |
+| 30 | Budget rollover | Unspent carries to the next month, capped at one base limit; overspend does not carry | Spec asks for rollover; the cap stops a saved-up month making the next unlimited. |

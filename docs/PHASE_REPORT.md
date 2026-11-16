@@ -47,7 +47,10 @@ Latest green CI on the branch: `5e` batch — run 43887565776 (weekly boss, budg
 - Wallets with an opening balance. Each entry can be booked to a wallet; entries without one count toward the first wallet. Balances are live.
 - Transfers between wallets. They are not spending: no XP, no Gold, and they do not count in budgets or reports.
 - Cheques, issued or received, with a Jalali due date (day/month/year steppers), status (cleared, overdue, due in 3 days, later), mark-cleared and delete with confirmation.
-- Unit tests: wallet balances and transfers, cheque status, Jalali leap years, month lengths, clamping and round trip.
+- Encrypted backup and CSV include wallets, transfers, cheques and each transaction's wallet. Old backups (without these records) still restore.
+- Budget rollover rule: unspent amount carries forward, capped at one base limit; overspending does not carry a debt.
+- Rank-up overlay has an explicit skip button (in addition to tap-to-dismiss).
+- Unit tests: rollover, wallet balances and transfers, cheque status, Jalali leap years, month lengths, clamping and round trip.
 
 **Inbox, screens and settings**
 - Inbox "park a thought" card on the Now tab, with delete confirmation.
@@ -64,7 +67,7 @@ Latest green CI on the branch: `5e` batch — run 43887565776 (weekly boss, budg
 
 These keep PR #1 open.
 
-- **Money:** receipt photos. Wallets, transfers, cheques and the Jalali date picker are built, but the new tables are not yet in the encrypted backup or CSV export.
+- **Money:** receipt photos. Budget rollover is a tested rule (`FinanceRules.rolloverLimit`) but is not yet applied to the budget screen. Wallets, transfers, cheques, the Jalali date picker, encrypted backup and CSV now include the new tables.
 - **Dungeon:** linking a dungeon to a quest or soldier, body-doubling soldier animation, and gate minutes that the user can change.
 - **Soldiers:** user re-linking of quests to soldiers (only template links exist), the morph animation for evolution, and a wisdom overlay image.
 - **Avatar:** layered body, hair, face, outfit, weapon and aura art (only rank avatars exist), stat overlays, and the old-avatar break-apart in the rank-up cutscene. Titles are not yet shown on the profile header.

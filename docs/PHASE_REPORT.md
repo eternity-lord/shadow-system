@@ -57,17 +57,25 @@ Delivered: gold shop with a dungeon boost, rank-up dialog, budgets (80%/100% war
 ## Phase 3 — Completion — PARTLY DONE
 Delivered: AES-256-GCM encrypted backup (UI in Settings), PIN lock (PBKDF2), biometric unlock, FLAG_SECURE, hide-balances toggle, R8 release build in CI, numpad.
 
+## Latest batch (`5be021a`, CI green on both runs)
+- Dungeon monster HP drains with the timer (`DungeonRules.monsterHpPercent`, unit-tested).
+- Loot dialog after a finished run: XP, gold, 10% rare-item roll (counter stored in key-value), optional journal note (140 chars, saved to `dungeon_sessions.note`).
+- Inbox "park a thought" card on the Now tab (table `inbox`, add and delete with confirmation).
+- Room v3 with `MIGRATION_2_3` (adds `note` and `inbox`).
+- Light haptic feedback on quest step completion.
+- Debug-only 60-day seed generator (`app/src/debug`, with a no-op stub in `app/src/release`). The button is shown only in debug builds.
+
 ## Open (honest list)
 Spec items not yet built (these keep PR #1 open):
-- Dungeon monster HP, loot journal, foreground-service dungeon timer.
+- Dungeon foreground-service timer (the timer still runs in the UI and stops when the app is killed), pause, body-doubling soldier animation, ambient sound.
 - Soldier summon ritual, soldier XP and evolution UI, voice lines and wisdom overlay.
 - Avatar layering and stat-based class visuals.
 - Weekly boss beyond the rank trial; monster and wisdom art.
-- Higher soldier stages (2–5) use the stage 1 portrait with a stage label. Wisdom art and monster art are not used in the UI, so no placeholders are visible.
+- Higher soldier stages (2–5) use the stage 1 portrait with a stage label.
 - A TalkBack audit on a real device has not been run.
 - The release key is committed to the public repo by the owner's decision (see DECISIONS.md).
 - Not run: emulator or device tests.
 
 ## Verification
 - The sandbox has no JDK or Android SDK, so compilation and tests run on GitHub Actions only.
-- Latest CI run: success on `dcb6107`.
+- Latest CI: success on `5be021a` (both the Android CI runs).

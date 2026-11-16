@@ -7,7 +7,7 @@ on:
   workflow_dispatch:
 
 permissions:
-  contents: read
+  contents: write
 
 jobs:
   build:
@@ -27,9 +27,26 @@ jobs:
         run: chmod +x gradlew
 
       - name: Build debug APK and run unit tests
-        run: ./gradlew assembleDebug testDebugUnitTest --stacktrace
+        id: build
+        run: |
+          set -o pipefail
+          ./gradlew assembleDebug testDebugUnitTest --stacktrace 2>&1 | tee build.log
+
+      - name: Post error excerpt on failure
+        if: failure()
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
+          SHA: ${{ github.sha }}
+        run: |
+          {
+            echo "CI failure excerpt (first 60 KB):"
+            grep -E "^e: |^w: .*Unresolved|FAILED|What went wrong|Could not|Execution failed|error:|Caused by|AssertionError|expected" -A4 build.log | head -c 60000
+          } > excerpt.txt || true
+          gh api "repos/$REPO/commits/$SHA/comments" -F body=@excerpt.txt || true
 
       - name: Upload debug APK
+        if: success()
         uses: actions/upload-artifact@v4
         with:
           name: shadow-system-debug-apk

@@ -12,7 +12,7 @@ All artwork is either generated for this project with the image generator or dra
 
 Higher soldier stages (`shadow_<key>_stage2..5`), wisdom art and monster art are not planned for this build. `AssetRegistry` falls back to a procedural placeholder for them.
 
-The app works without these files: `AssetImage` draws a procedural silhouette when no drawable with the name exists. Adding the PNG with the same name replaces it with no code change.
+The app falls back to a procedural silhouette whenever a drawable with the expected name is missing. Adding a PNG with the same name replaces the fallback with no code change.
 
 ## Fonts (`app/src/main/res/font/`)
 
@@ -26,7 +26,7 @@ The app works without these files: `AssetImage` draws a procedural silhouette wh
 
 ## Procedural placeholders (no file)
 
-`AssetRegistry` resolves names such as `shadow_<key>_stage<1-5>`, `wisdom_<key>_<1-3>`, `avatar_rank_<e..s>`, `monster_<rank>_<n>`, `rank_<rank>`, `stat_<stat>` and `icon_cat_<name>`. If a drawable with that name is missing, `AssetImage` draws a `ProceduralPlaceholder` (a Canvas silhouette). See "Still to generate" above for the exact files that remain.
+`AssetRegistry` resolves names such as `shadow_<key>_stage<1-5>`, `wisdom_<key>_<1-3>`, `avatar_rank_<e..s>`, `monster_<rank>_<n>`, `rank_<rank>`, `stat_<stat>` and `icon_cat_<name>`. If a drawable with that name is missing, `AssetImage` draws a `ProceduralPlaceholder` (a Canvas silhouette). Only higher soldier stages, wisdom art and monster art still use this fallback.
 
 ## Not used
 

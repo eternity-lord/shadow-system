@@ -128,7 +128,7 @@ fun HunterScreen(vm: GameViewModel, soldiers: SoldierViewModel, profile: Profile
                 StatRadar(values = Stat.values().map { ((statLevels[it] ?: 1) / 10f).coerceIn(0.05f, 1f) })
             }
             Text(
-                Stat.values().joinToString(" · ") { "${statLabel(it)} ${PersianText.toFa(statLevels[it] ?: 1)}" },
+                Stat.values().map { "${statLabel(it)} ${PersianText.toFa(statLevels[it] ?: 1)}" }.joinToString(" · "),
                 style = MaterialTheme.typography.bodyMedium,
                 color = ShadowColors.TextMuted
             )

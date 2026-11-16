@@ -184,6 +184,12 @@ private fun ActiveRun(run: DungeonRun, onFinish: () -> Unit, onTogglePause: () -
 
     ShadowCard {
         Text(stringResource(R.string.dungeon_inside), style = MaterialTheme.typography.titleMedium)
+        AssetImage(
+            name = AssetRegistry.monsterAssetName(run.rank.name, 1),
+            size = 120.dp,
+            placeholderColor = ShadowColors.Primary,
+            contentDescription = stringResource(R.string.monster_desc, run.rank.name)
+        )
         SoldierBodyDouble(active = !run.paused && !run.finished, soldierKey = run.soldierKey)
         questTitle?.let {
             Text(stringResource(R.string.dungeon_link_quest_format, it), color = ShadowColors.TextMuted, style = MaterialTheme.typography.bodyMedium)

@@ -72,7 +72,8 @@ Latest green CI on the branch: `5e` batch — run 43887565776 (weekly boss, budg
 
 These keep PR #1 open.
 
-- **Art (needs image generation, not code; done: egg, five stat emblems, throne background, stage 2 for all 12 soldiers, stage 3, 4 and 5 for all 12. Wisdom tier 1 for all 12 soldiers, tier 2 for all 12, tier 3 for ten; shown on the soldier art. Still missing: wisdom overlays, monsters, icons, other backgrounds):** soldier stages 2–5 (only stage 1 exists; the app falls back to it), wisdom overlays, egg image, monsters, backgrounds and category icons. Placeholders are in `ASSETS_MANIFEST.md`.
+- **Monsters:** one image per gate rank (E to S) is shown in the active dungeon run. Background `bg_gate` is made but not wired yet.
+- **Art (needs image generation, not code; done: egg, five stat emblems, throne background, stage 2 for all 12 soldiers, stage 3, 4 and 5 for all 12. Wisdom tier 1 for all 12 soldiers, tier 2 and 3 for all 12; shown on the soldier art. Still missing: wisdom overlays, monsters, icons, other backgrounds):** soldier stages 2–5 (only stage 1 exists; the app falls back to it), wisdom overlays, egg image, monsters, backgrounds and category icons. Placeholders are in `ASSETS_MANIFEST.md`.
 - **Avatar layers:** the layer system exists in code (base image, aura ring when an aura item is equipped, stage badge, two stat overlays). Body, hair, face, outfit and weapon layers wait for art.
 - **Evolution cutscene:** the old stage fades out while the new stage fades in and grows. A true silhouette morph needs the stage art.
 - **Accessibility and security on a device:** TalkBack, PIN and biometric unlock are not checked on a real device from this sandbox. The code uses labels and 48 dp targets.

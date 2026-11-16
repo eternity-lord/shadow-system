@@ -45,3 +45,13 @@ Every visual asset the app references, and what it is. Missing assets fall back 
 | `shadow_<key>_stage2.png` for all 12 soldiers | Soldier card at stage 2 | 512×512; made from each stage-1 image for consistency |
 
 Stage 3 done for all 12 soldiers. Stage 4 done for all 12 soldiers. Stage 5 done for all 12 soldiers. Wisdom tier 1 art done for all 12 soldiers (`wisdom_<key>_1.png`). Tier 2 done for all 12 soldiers (`wisdom_<key>_2.png`). The overlay is shown on soldier art (60% alpha) at the highest tier that has art; soldiers without art show no overlay. Tier 3 done for ten soldiers (igris, beru, blue, bellion, fang, iron, jima, kaisel, nova, scribe). Still missing: tier 3 for tank and tusk. wisdom overlays (`wisdom_<key>_<tier>`), monsters, category icons, other backgrounds.
+
+## Batch: wisdom tiers 3 (last two), monsters, gate background
+
+| File | Used by | Notes |
+|---|---|---|
+| `wisdom_tank_3.png`, `wisdom_tusk_3.png` | Soldier overlay at tier 3 | Wisdom tier 3 now done for all 12 soldiers |
+| `monster_e_1.png` ... `monster_s_1.png` (6 files, one per gate rank) | Active dungeon run | 512×512 |
+| `bg_gate.png` | Shop item `bg_gate` | 768×768; not yet wired to a screen |
+
+Still missing: monster variants (`_2`, `_3`) if wanted, category icons (`icon_cat_*`), other backgrounds, soldier and wisdom art beyond this batch.

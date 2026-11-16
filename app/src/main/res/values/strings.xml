@@ -264,6 +264,15 @@
     <string name="shop_equip">پوشیدن</string>
     <string name="shop_unequip">درآوردن</string>
 
+    <!-- Weekly boss -->
+    <string name="boss_title">باس هفتگی</string>
+    <string name="boss_hp">جان باس: %1$s٪</string>
+    <string name="boss_minutes">دقیقه‌ی سیاه‌چال: %1$s از %2$s</string>
+    <string name="boss_quests">مأموریت انجام‌شده: %1$s از %2$s</string>
+    <string name="boss_claim">دریافت پاداش باس</string>
+    <string name="boss_claimed">پاداش این هفته گرفته شد.</string>
+    <string name="boss_reward">پاداش شکست باس: %1$s تجربه و %2$s طلا و یک آیتم سنگین</string>
+
     <!-- Gold shop -->
     <string name="shop_quest_name">تقویت مأموریت</string>
     <string name="shop_quest_desc">تجربه‌ی مأموریت بعدی ×۱٫۵ می‌شود.</string>

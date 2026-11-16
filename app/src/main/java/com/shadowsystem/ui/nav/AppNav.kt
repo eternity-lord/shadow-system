@@ -93,6 +93,7 @@ private fun MainNavigation(app: ShadowApp, game: GameViewModel) {
     val money: MoneyViewModel = viewModel(factory = MoneyViewModel.factory(app))
     val inboxVm: InboxViewModel = viewModel(factory = InboxViewModel.factory(app))
     val profileVm: com.shadowsystem.ui.vm.ProfileViewModel = viewModel(factory = com.shadowsystem.ui.vm.ProfileViewModel.factory(app))
+    val bossVm: com.shadowsystem.ui.vm.BossViewModel = viewModel(factory = com.shadowsystem.ui.vm.BossViewModel.factory(app))
     val soldierVm: com.shadowsystem.ui.vm.SoldierViewModel = viewModel(factory = com.shadowsystem.ui.vm.SoldierViewModel.factory(app))
 
     Scaffold(
@@ -114,7 +115,7 @@ private fun MainNavigation(app: ShadowApp, game: GameViewModel) {
             startDestination = Tab.NOW.route,
             modifier = Modifier.padding(inner)
         ) {
-            composable(Tab.NOW.route) { NowScreen(game, inboxVm) }
+            composable(Tab.NOW.route) { NowScreen(game, inboxVm, bossVm) }
             composable(Tab.QUESTS.route) { QuestsScreen(game) }
             composable(Tab.DUNGEON.route) { DungeonScreen(game) }
             composable(Tab.MONEY.route) {

@@ -32,6 +32,8 @@ import com.shadowsystem.ui.components.QuestCard
 import com.shadowsystem.ui.components.ShadowCard
 import com.shadowsystem.ui.components.UndoBanner
 import com.shadowsystem.ui.components.InboxCard
+import com.shadowsystem.ui.components.BossCard
+import com.shadowsystem.ui.vm.BossViewModel
 import com.shadowsystem.ui.components.RankTrialCard
 import com.shadowsystem.ui.vm.InboxViewModel
 import com.shadowsystem.ui.components.RankUpOverlay
@@ -41,8 +43,10 @@ import com.shadowsystem.ui.vm.GameViewModel
 
 /** Today: score, level, the System's briefing, mandatory and optional quests. */
 @Composable
-fun NowScreen(vm: GameViewModel, inbox: InboxViewModel) {
+fun NowScreen(vm: GameViewModel, inbox: InboxViewModel, boss: BossViewModel) {
     val state by vm.state.collectAsStateWithLifecycle()
+    val bossState by boss.state.collectAsStateWithLifecycle()
+    LaunchedEffect(state.dungeonSeconds, state.profile.totalXp, state.score?.score) { boss.refresh() }
     val items by inbox.items.collectAsStateWithLifecycle()
     val pendingDelete by inbox.pendingDelete.collectAsStateWithLifecycle()
     var prevRank by remember { mutableStateOf<Rank?>(null) }
@@ -100,6 +104,8 @@ fun NowScreen(vm: GameViewModel, inbox: InboxViewModel) {
         if (state.trial.pending) {
             RankTrialCard(state.trial)
         }
+
+        BossCard(bossState) { boss.claim() }
 
         InboxCard(
             items = items,

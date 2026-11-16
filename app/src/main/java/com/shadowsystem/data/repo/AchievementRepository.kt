@@ -29,7 +29,7 @@ class AchievementRepository(private val db: AppDatabase, private val game: GameR
             ) > 0,
             goalDone = scalar("SELECT COUNT(*) FROM savings_goals WHERE targetRial > 0 AND savedRial >= targetRial") > 0,
             soldiersSummoned = scalar("SELECT COUNT(*) FROM soldiers WHERE summonedAt IS NOT NULL").toInt(),
-            bossDone = false
+            bossDone = scalar("SELECT COUNT(*) FROM kv WHERE `key` LIKE 'boss_claimed_%'") > 0
         )
     }
 }

@@ -34,6 +34,12 @@ import com.shadowsystem.ui.components.ConfirmDialog
 import com.shadowsystem.ui.components.MessageBanner
 import com.shadowsystem.ui.components.ShadowCard
 import com.shadowsystem.ui.components.LootDialog
+import com.shadowsystem.util.AmbientSound
+import com.shadowsystem.core.DungeonTimerMath
+import androidx.compose.ui.hapticfeedback.HapticFeedbackType
+import androidx.compose.ui.platform.LocalHapticFeedback
+import androidx.compose.material3.OutlinedButton
+import androidx.compose.runtime.LaunchedEffect
 import com.shadowsystem.ui.components.XpBar
 import com.shadowsystem.core.DungeonRules
 import com.shadowsystem.ui.theme.ShadowColors
@@ -69,6 +75,7 @@ fun DungeonScreen(vm: GameViewModel) {
             ActiveRun(
                 run = run,
                 onFinish = { vm.endDungeon(completed = true) },
+                onTogglePause = { vm.togglePause() },
                 onExitRequest = { confirmExit = true }
             )
         }

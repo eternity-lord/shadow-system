@@ -28,13 +28,17 @@ import kotlinx.coroutines.flow.merge
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
+import com.shadowsystem.core.DungeonTimerMath
+import com.shadowsystem.util.DungeonTimerStore
 
 /** Active dungeon run. Uses wall-clock start so backgrounding does not drift the timer. */
 data class DungeonRun(
     val rank: Rank,
     val plannedMinutes: Int,
     val startedAtMillis: Long,
-    val elapsedSeconds: Int = 0
+    val elapsedSeconds: Int = 0,
+    val paused: Boolean = false,
+    val pausedSeconds: Int = 0
 ) {
     val plannedSeconds: Int get() = plannedMinutes * 60
     val finished: Boolean get() = elapsedSeconds >= plannedSeconds
@@ -70,7 +74,7 @@ private data class SideState(val trial: RankTrialState, val boosts: Set<String>)
 /** Loot from the last finished dungeon run, shown until the user closes it. */
 data class LootInfo(val sessionId: Long, val xp: Int, val gold: Int, val rare: Boolean)
 
-class GameViewModel(private val game: GameRepository) : ViewModel() {
+class GameViewModel(private val game: GameRepository, private val timer: DungeonTimerStore) : ViewModel() {
 
     private val day = game.today()
     private val message = MutableStateFlow<String?>(null)
@@ -144,6 +148,11 @@ class GameViewModel(private val game: GameRepository) : ViewModel() {
 
     init {
         viewModelScope.launch { yesterday.value = game.scoreOf(day - 1) }
+        // Process was killed during a run: restore it and restart the notification service.
+        if (timer.snapshot.value != null) {
+            timer.ensureService()
+            startTicker()
+        }
     }
 
     fun generate(mood: Mood) {
@@ -223,28 +232,50 @@ class GameViewModel(private val game: GameRepository) : ViewModel() {
         }
     }
 
-    fun startDungeon(rank: Rank) {
-        if (run.value != null) return
-        run.value = DungeonRun(
-            rank = rank,
-            plannedMinutes = GameMath.dungeonMinutes(rank),
-            startedAtMillis = System.currentTimeMillis()
-        )
+    private fun runFrom(snap: DungeonTimerStore.Snapshot, now: Long): DungeonRun = DungeonRun(
+        rank = Rank.valueOf(snap.rank),
+        plannedMinutes = snap.plannedMinutes,
+        startedAtMillis = snap.startedAt,
+        elapsedSeconds = DungeonTimerStore.elapsedSeconds(snap, now),
+        paused = snap.pausedAt != null,
+        pausedSeconds = DungeonTimerMath.pausedSeconds(snap.pausedTotal, snap.pausedAt, now)
+    )
+
+    private fun startTicker() {
         ticker?.cancel()
         ticker = viewModelScope.launch {
             while (true) {
-                val current = run.value ?: break
-                val elapsed = ((System.currentTimeMillis() - current.startedAtMillis) / 1000).toInt()
-                run.value = current.copy(elapsedSeconds = elapsed)
+                val snap = timer.snapshot.value
+                if (snap == null) {
+                    run.value = null
+                    break
+                }
+                run.value = runFrom(snap, System.currentTimeMillis())
                 delay(1000)
             }
         }
     }
 
+    fun startDungeon(rank: Rank) {
+        if (timer.snapshot.value != null) return
+        timer.start(rank.name, GameMath.dungeonMinutes(rank), System.currentTimeMillis())
+        startTicker()
+    }
+
+    /** Pause or resume. While paused, the work clock stops and the monster regenerates slightly (cosmetic). */
+    fun togglePause() {
+        val snap = timer.snapshot.value ?: return
+        val now = System.currentTimeMillis()
+        if (snap.pausedAt == null) timer.pause(now) else timer.resume(now)
+        timer.snapshot.value?.let { run.value = runFrom(it, now) }
+    }
+
     /** Ends the run. [completed] is true only when the planned time was reached. */
     fun endDungeon(completed: Boolean) {
-        val current = run.value ?: return
+        val snap = timer.snapshot.value ?: return
+        val current = runFrom(snap, System.currentTimeMillis())
         ticker?.cancel()
+        timer.clear()
         run.value = null
         viewModelScope.launch {
             val done = current.elapsedSeconds.coerceAtMost(current.plannedSeconds)
@@ -262,7 +293,7 @@ class GameViewModel(private val game: GameRepository) : ViewModel() {
         fun factory(app: ShadowApp): ViewModelProvider.Factory = object : ViewModelProvider.Factory {
             @Suppress("UNCHECKED_CAST")
             override fun <T : ViewModel> create(modelClass: Class<T>, extras: CreationExtras): T =
-                GameViewModel(app.container.game) as T
+                GameViewModel(app.container.game, app.container.timer) as T
         }
     }
 }

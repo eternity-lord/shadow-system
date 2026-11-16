@@ -200,6 +200,20 @@
     <string name="debug_seed">ساخت ۶۰ روز داده آزمایشی</string>
     <string name="notice_debug_seeded">داده‌ی آزمایشی ساخته شد.</string>
 
+    <!-- Dungeon timer -->
+    <string name="dungeon_pause">توقف موقت</string>
+    <string name="dungeon_resume">ادامه</string>
+    <string name="dungeon_paused_label">متوقف شده؛ زمان کار متوقف است</string>
+    <string name="dungeon_ambient_on">صدای محیط: روشن</string>
+    <string name="dungeon_ambient_off">صدای محیط: خاموش</string>
+    <string name="dungeon_haptic_on">لرزش هر دقیقه: روشن</string>
+    <string name="dungeon_haptic_off">لرزش هر دقیقه: خاموش</string>
+    <string name="dungeon_channel">تایمر دانجن</string>
+    <string name="dungeon_notif_title">دانجن در جریان است</string>
+    <string name="dungeon_notif_running">%1$s تا پایان</string>
+    <string name="dungeon_notif_paused">متوقف شده؛ برای ادامه برگرد</string>
+    <string name="dungeon_notif_done">زمان تمام شد؛ غنیمت منتظر توست</string>
+
     <!-- Gold shop -->
     <string name="shop_quest_name">تقویت مأموریت</string>
     <string name="shop_quest_desc">تجربه‌ی مأموریت بعدی ×۱٫۵ می‌شود.</string>

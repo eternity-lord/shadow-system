@@ -17,6 +17,7 @@ class AppContainer(context: Context) {
     val money = MoneyRepository(database, game)
     val plan = PlanRepository(database, game)
     val inbox = InboxRepository(database)
+    val timer = com.shadowsystem.util.DungeonTimerStore(context.applicationContext)
     val backup = BackupService(database)
     val prefs = AppPrefs(context.applicationContext)
     val lock = LockState(initiallyLocked = prefs.isPinSet)

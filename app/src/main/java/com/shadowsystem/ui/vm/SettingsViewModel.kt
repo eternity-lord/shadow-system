@@ -49,6 +49,12 @@ class SettingsViewModel(
     private val _notice = MutableStateFlow<SettingsNotice?>(null)
     val notice: StateFlow<SettingsNotice?> = _notice.asStateFlow()
 
+    val reduceMotion: StateFlow<Boolean> = prefs.reduceMotion
+
+    fun toggleReduceMotion() {
+        prefs.setReduceMotion(!prefs.reduceMotion.value)
+    }
+
     fun toggleHidden() {
         prefs.setHideBalances(!prefs.hidden.value)
     }

@@ -53,6 +53,13 @@ fun BudgetSection(rows: List<BudgetRow>, onSave: (String, String) -> Unit, onRem
                     progress = if (row.limitRial > 0) row.spentRial.toFloat() / row.limitRial else 0f,
                     label = "${row.category}: ${PersianText.formatMoney(row.spentRial)} / ${PersianText.formatMoney(row.limitRial)}"
                 )
+                if (row.carriedRial > 0L) {
+                    Text(
+                        stringResource(R.string.budget_carried, PersianText.formatMoney(row.carriedRial)),
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = ShadowColors.TextMuted
+                    )
+                }
                 Row {
                     Text(
                         stringResource(
@@ -152,26 +159,34 @@ private fun GoalRow(g: GoalEntity, onDeposit: (GoalEntity, String) -> Unit, onDe
 }
 
 @Composable
-fun DebtSection(debts: List<DebtEntity>, onAdd: (String, String, Boolean) -> Unit, onPay: (DebtEntity, String) -> Unit, onDelete: (Long) -> Unit) {
+fun DebtSection(
+    debts: List<DebtEntity>,
+    onAdd: (String, String, Boolean, String) -> Unit,
+    onPay: (DebtEntity, String) -> Unit,
+    onDelete: (Long) -> Unit,
+    onInstall: (DebtEntity) -> Unit
+) {
     var title by remember { mutableStateOf("") }
     var amount by remember { mutableStateOf("") }
+    var installments by remember { mutableStateOf("") }
     var iOwe by remember { mutableStateOf(true) }
     ShadowCard {
         SectionTitle(stringResource(R.string.debt_section))
         if (debts.isEmpty()) Text(stringResource(R.string.debt_empty), color = ShadowColors.TextMuted)
-        debts.forEach { d -> DebtRow(d, onPay, onDelete) }
+        debts.forEach { d -> DebtRow(d, onPay, onDelete, onInstall) }
         OutlinedTextField(title, { title = it.take(40) }, label = { Text(stringResource(R.string.plan_title_hint)) }, singleLine = true, modifier = Modifier.fillMaxWidth())
         AmountField(amount, { amount = PersianText.parseDigits(it).filter { c -> c.isDigit() } }, stringResource(R.string.money_amount_hint))
+        AmountField(installments, { installments = PersianText.parseDigits(it).filter { c -> c.isDigit() }.take(3) }, stringResource(R.string.debt_installments_hint))
         Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
             FilterChip(selected = iOwe, onClick = { iOwe = true }, label = { Text(stringResource(R.string.debt_i_owe)) }, modifier = Modifier.heightIn(min = 48.dp))
             FilterChip(selected = !iOwe, onClick = { iOwe = false }, label = { Text(stringResource(R.string.debt_owed_to_me)) }, modifier = Modifier.heightIn(min = 48.dp))
         }
-        PrimaryButton(stringResource(R.string.debt_save), onClick = { onAdd(title, amount, iOwe) })
+        PrimaryButton(stringResource(R.string.debt_save), onClick = { onAdd(title, amount, iOwe, installments) })
     }
 }
 
 @Composable
-private fun DebtRow(d: DebtEntity, onPay: (DebtEntity, String) -> Unit, onDelete: (Long) -> Unit) {
+private fun DebtRow(d: DebtEntity, onPay: (DebtEntity, String) -> Unit, onDelete: (Long) -> Unit, onInstall: (DebtEntity) -> Unit) {
     var pay by remember(d.id) { mutableStateOf("") }
     val remaining = FinanceRules.debtRemaining(d.totalRial, d.paidRial)
     Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
@@ -180,6 +195,20 @@ private fun DebtRow(d: DebtEntity, onPay: (DebtEntity, String) -> Unit, onDelete
                 " · " + stringResource(R.string.debt_remaining, PersianText.formatMoney(remaining)),
             style = MaterialTheme.typography.bodyMedium
         )
+        if (d.installmentCount > 0) {
+            Text(
+                stringResource(
+                    R.string.debt_installment_progress,
+                    PersianText.toFa(d.installmentsPaid),
+                    PersianText.toFa(d.installmentCount)
+                ),
+                style = MaterialTheme.typography.bodyMedium,
+                color = ShadowColors.TextMuted
+            )
+            if (d.installmentsPaid < d.installmentCount) {
+                Button(onClick = { onInstall(d) }, modifier = Modifier.heightIn(min = 48.dp)) { Text(stringResource(R.string.debt_installment_pay)) }
+            }
+        }
         if (remaining > 0) {
             Row(verticalAlignment = Alignment.CenterVertically) {
                 AmountField(pay, { pay = PersianText.parseDigits(it).filter { c -> c.isDigit() } }, stringResource(R.string.debt_pay_hint), modifier = Modifier.weight(1f))

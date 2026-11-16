@@ -123,7 +123,7 @@ fun SummaryCard(spent: Long, income: Long, today: Long, hidden: Boolean, onToggl
 }
 
 @Composable
-fun TransactionRow(tx: TransactionEntity, hidden: Boolean, onDelete: () -> Unit) {
+fun TransactionRow(tx: TransactionEntity, hidden: Boolean, onReceipt: () -> Unit = {}, onDelete: () -> Unit) {
     ShadowCard {
         Row(verticalAlignment = Alignment.CenterVertically) {
             Column(modifier = Modifier.weight(1f)) {
@@ -138,6 +138,10 @@ fun TransactionRow(tx: TransactionEntity, hidden: Boolean, onDelete: () -> Unit)
                     style = MaterialTheme.typography.bodyMedium,
                     color = ShadowColors.TextMuted
                 )
+                tx.receiptUri?.let { ReceiptThumb(it) }
+                TextButton(onClick = onReceipt, modifier = Modifier.heightIn(min = 48.dp)) {
+                    Text(stringResource(if (tx.receiptUri == null) R.string.receipt_attach else R.string.receipt_change))
+                }
             }
             TextButton(onClick = onDelete, modifier = Modifier.heightIn(min = 48.dp)) {
                 Text(stringResource(R.string.delete), color = ShadowColors.Danger)

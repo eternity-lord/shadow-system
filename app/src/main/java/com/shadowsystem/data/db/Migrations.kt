@@ -70,4 +70,13 @@ object Migrations {
             )
         }
     }
+
+    /** v6: receipt photo URI on transactions; installment count and progress on debts. */
+    val MIGRATION_5_6: Migration = object : Migration(5, 6) {
+        override fun migrate(db: SupportSQLiteDatabase) {
+            db.execSQL("ALTER TABLE `transactions` ADD COLUMN `receiptUri` TEXT")
+            db.execSQL("ALTER TABLE `debts` ADD COLUMN `installmentCount` INTEGER NOT NULL DEFAULT 0")
+            db.execSQL("ALTER TABLE `debts` ADD COLUMN `installmentsPaid` INTEGER NOT NULL DEFAULT 0")
+        }
+    }
 }

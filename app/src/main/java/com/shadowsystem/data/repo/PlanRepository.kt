@@ -1,5 +1,6 @@
 package com.shadowsystem.data.repo
 
+import com.shadowsystem.core.FinanceRules
 import com.shadowsystem.core.MoneyRules
 import com.shadowsystem.core.RecurrenceRules
 import com.shadowsystem.data.db.AppDatabase
@@ -111,13 +112,33 @@ class PlanRepository(
         goals.deleteById(id)
     }
 
-    suspend fun addDebt(title: String, toman: Long, iOwe: Boolean) {
-        debts.insert(DebtEntity(title = title.trim(), totalRial = MoneyRules.tomanToRial(toman), paidRial = 0L, iOwe = iOwe))
+    suspend fun addDebt(title: String, toman: Long, iOwe: Boolean, installments: Int = 0) {
+        debts.insert(
+            DebtEntity(
+                title = title.trim(),
+                totalRial = MoneyRules.tomanToRial(toman),
+                paidRial = 0L,
+                iOwe = iOwe,
+                installmentCount = installments.coerceIn(0, 120)
+            )
+        )
     }
 
     suspend fun payDebt(debt: DebtEntity, toman: Long) {
         val paid = (debt.paidRial + MoneyRules.tomanToRial(toman)).coerceAtMost(debt.totalRial)
         debts.update(debt.copy(paidRial = paid))
+    }
+
+    /** Pays the next installment; the amount comes from [FinanceRules.installmentPart]. */
+    suspend fun payInstallment(debt: DebtEntity) {
+        if (debt.installmentCount <= 0 || debt.installmentsPaid >= debt.installmentCount) return
+        val part = FinanceRules.installmentPart(debt.totalRial, debt.installmentCount, debt.installmentsPaid)
+        debts.update(
+            debt.copy(
+                paidRial = (debt.paidRial + part).coerceAtMost(debt.totalRial),
+                installmentsPaid = debt.installmentsPaid + 1
+            )
+        )
     }
 
     suspend fun deleteDebt(id: Long) {

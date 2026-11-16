@@ -166,6 +166,10 @@ class MoneyViewModel(
         }
     }
 
+    fun setReceipt(id: Long, uri: String) {
+        viewModelScope.launch { money.setReceipt(id, uri) }
+    }
+
     fun askDelete(tx: TransactionEntity) {
         pendingDelete.value = tx
     }

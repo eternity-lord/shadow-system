@@ -86,6 +86,15 @@ fun SettingsScreen(vm: SettingsViewModel, onBack: () -> Unit) {
         BackHeader(stringResource(R.string.settings_title), onBack)
         notice?.let { n -> MessageBanner(noticeText(n)) { vm.clearNotice() } }
 
+        val reduceMotion by vm.reduceMotion.collectAsStateWithLifecycle()
+        ShadowCard {
+            SectionTitle(stringResource(R.string.reduce_motion_title))
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Text(stringResource(R.string.reduce_motion_setting), modifier = Modifier.weight(1f))
+                Switch(checked = reduceMotion, onCheckedChange = { vm.toggleReduceMotion() })
+            }
+        }
+
         ShadowCard {
             SectionTitle(stringResource(R.string.privacy_section))
             Row(verticalAlignment = Alignment.CenterVertically) {

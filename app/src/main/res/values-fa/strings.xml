@@ -336,4 +336,14 @@
     <string name="money_wallets">حساب‌ها و چک‌ها</string>
     <string name="wallet_pick">حساب پرداخت</string>
     <string name="rank_up_skip">رد شدن</string>
+    <string name="receipt_attach">افزودن رسید</string>
+    <string name="receipt_change">تغییر رسید</string>
+    <string name="receipt_missing">رسید دیگر در دسترس نیست</string>
+    <string name="receipt_desc">تصویر رسید</string>
+    <string name="debt_installments_hint">تعداد اقساط (اختیاری)</string>
+    <string name="debt_installment_pay">پرداخت قسط بعدی</string>
+    <string name="debt_installment_progress">قسط %1$s از %2$s پرداخت شده</string>
+    <string name="budget_carried">شامل %1$s انتقال از ماه قبل</string>
+    <string name="reduce_motion_title">حرکت و انیمیشن</string>
+    <string name="reduce_motion_setting">کاهش حرکت (انیمیشن‌های کم)</string>
 </resources>

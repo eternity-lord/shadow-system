@@ -162,6 +162,9 @@ interface TransactionDao {
     @Query("SELECT * FROM transactions")
     fun observeAll(): Flow<List<TransactionEntity>>
 
+    @Query("UPDATE transactions SET receiptUri = :uri WHERE id = :id")
+    suspend fun setReceipt(id: Long, uri: String?)
+
     @Query("SELECT COUNT(*) FROM transactions")
     suspend fun count(): Int
 

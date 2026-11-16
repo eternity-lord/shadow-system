@@ -18,6 +18,13 @@ object FinanceRules {
         return baseLimit + carried
     }
 
+    /** Amount of installment [index] (0-based). The last one absorbs the rounding remainder. */
+    fun installmentPart(totalRial: Long, count: Int, index: Int): Long {
+        if (count <= 0) return totalRial
+        val base = totalRial / count
+        return if (index >= count - 1) totalRial - base * (count - 1) else base
+    }
+
     fun budgetState(spent: Long, limit: Long): BudgetState = when {
         limit <= 0L -> BudgetState.OK
         spent >= limit -> BudgetState.OVER

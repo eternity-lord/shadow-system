@@ -24,6 +24,14 @@ class AppPrefs(context: Context) {
         reminders.value = value
     }
 
+    /** Calmer UI: short or no transitions for overlays and the soldier animation. */
+    val reduceMotion = MutableStateFlow(sp.getBoolean(KEY_REDUCE_MOTION, false))
+
+    fun setReduceMotion(value: Boolean) {
+        sp.edit().putBoolean(KEY_REDUCE_MOTION, value).apply()
+        reduceMotion.value = value
+    }
+
     val isPinSet: Boolean
         get() = sp.contains(KEY_PIN_HASH)
 
@@ -47,6 +55,7 @@ class AppPrefs(context: Context) {
 
     private companion object {
         const val KEY_HIDE = "hide_balances"
+        const val KEY_REDUCE_MOTION = "reduce_motion"
         const val KEY_REMINDERS = "reminders_on"
         const val KEY_PIN_HASH = "pin_hash"
         const val KEY_PIN_SALT = "pin_salt"

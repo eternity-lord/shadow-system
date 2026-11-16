@@ -42,6 +42,8 @@ class MoneyRepository(
         return xp
     }
 
+    suspend fun setReceipt(id: Long, uri: String?) = dao.setReceipt(id, uri)
+
     suspend fun delete(tx: TransactionEntity) {
         dao.delete(tx)
         game.refreshScore()

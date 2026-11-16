@@ -34,6 +34,21 @@ import com.shadowsystem.ui.vm.TypeFilter
 @Composable
 fun MoneyScreen(vm: MoneyViewModel, onPlan: () -> Unit, onReports: () -> Unit, onWallets: () -> Unit) {
     val state by vm.state.collectAsStateWithLifecycle()
+    val context = androidx.compose.ui.platform.LocalContext.current
+    var receiptTarget by androidx.compose.runtime.remember { androidx.compose.runtime.mutableStateOf<Long?>(null) }
+    val receiptPicker = androidx.activity.compose.rememberLauncherForActivityResult(
+        androidx.activity.result.contract.ActivityResultContracts.OpenDocument()
+    ) { uri ->
+        val id = receiptTarget
+        receiptTarget = null
+        if (uri != null && id != null) {
+            // Keep read access across restarts; some providers refuse, which is fine for this session.
+            runCatching {
+                context.contentResolver.takePersistableUriPermission(uri, android.content.Intent.FLAG_GRANT_READ_URI_PERMISSION)
+            }
+            vm.setReceipt(id, uri.toString())
+        }
+    }
     state.pendingDelete?.let {
         ConfirmDialog(
             text = stringResource(R.string.money_delete_confirm),
@@ -118,7 +133,14 @@ fun MoneyScreen(vm: MoneyViewModel, onPlan: () -> Unit, onReports: () -> Unit, o
             item { Text(stringResource(R.string.money_empty), color = ShadowColors.TextMuted) }
         }
         items(state.entries, key = { it.id }) { tx ->
-            TransactionRow(tx, state.hidden) { vm.askDelete(tx) }
+            TransactionRow(
+                tx,
+                state.hidden,
+                onReceipt = {
+                    receiptTarget = tx.id
+                    receiptPicker.launch(arrayOf("image/*"))
+                }
+            ) { vm.askDelete(tx) }
         }
         item { Text(stringResource(R.string.money_privacy), style = MaterialTheme.typography.bodyMedium, color = ShadowColors.TextMuted) }
     }

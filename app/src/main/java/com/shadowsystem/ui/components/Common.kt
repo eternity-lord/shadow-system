@@ -123,3 +123,11 @@ fun VerticalGap(dp: Int = 12) {
 /** Screen width in dp, used to size grids without lazy layouts. */
 @Composable
 fun screenWidthDp(): Int = LocalConfiguration.current.screenWidthDp
+
+/** Reads the reduce-motion setting so animations can be shortened everywhere. */
+@Composable
+fun rememberReduceMotion(): Boolean {
+    val app = LocalContext.current.applicationContext as com.shadowsystem.ShadowApp
+    val flow = app.container.prefs.reduceMotion
+    return flow.collectAsStateWithLifecycle().value
+}

@@ -22,7 +22,13 @@ import kotlinx.coroutines.launch
 /** Short user-facing notices; the screen maps them to Persian strings. */
 enum class PlanNotice { INVALID_AMOUNT, EMPTY_TITLE, PAYMENT_TOO_HIGH, SAVED }
 
-data class BudgetRow(val category: String, val limitRial: Long, val spentRial: Long, val level: FinanceRules.BudgetState)
+data class BudgetRow(
+    val category: String,
+    val limitRial: Long,
+    val spentRial: Long,
+    val level: FinanceRules.BudgetState,
+    val carriedRial: Long = 0L
+)
 
 /** Pending destructive action; [kind] is one of budget, recurring, goal, debt. */
 data class PendingDelete(val kind: String, val id: Long = 0, val category: String = "")
@@ -40,6 +46,7 @@ data class PlanState(
 private data class PlanData(
     val budgets: List<BudgetEntity>,
     val spent: Map<String, Long>,
+    val prevSpent: Map<String, Long>,
     val recurring: List<RecurringEntity>,
     val goals: List<GoalEntity>,
     val debts: List<DebtEntity>
@@ -53,22 +60,22 @@ class PlanViewModel(private val plan: PlanRepository) : ViewModel() {
 
     private val data = combine(
         plan.observeBudgets(),
-        plan.observeMonthSpent(
-            FinanceRules.monthRange(0, now).first,
-            FinanceRules.monthRange(0, now).second
-        ),
+        combine(
+            plan.observeMonthSpent(FinanceRules.monthRange(0, now).first, FinanceRules.monthRange(0, now).second),
+            plan.observeMonthSpent(FinanceRules.monthRange(-1, now).first, FinanceRules.monthRange(-1, now).second)
+        ) { cur, prev -> cur to prev },
         plan.observeRecurring(),
         plan.observeGoals(),
         plan.observeDebts()
-    ) { b, s, r, g, d -> PlanData(b, s, r, g, d) }
+    ) { b, sp, r, g, d -> PlanData(b, sp.first, sp.second, r, g, d) }
 
     val state: StateFlow<PlanState> = combine(data, pending, notice) { d, p, n ->
         PlanState(
             budgets = d.budgets.map {
-                BudgetRow(
-                    it.category, it.limitRial, d.spent[it.category] ?: 0L,
-                    FinanceRules.budgetState(d.spent[it.category] ?: 0L, it.limitRial)
-                )
+                // Rollover: last month's unspent part (capped at one base limit) is added to this month.
+                val limit = FinanceRules.rolloverLimit(it.limitRial, it.limitRial, d.prevSpent[it.category] ?: 0L)
+                val spent = d.spent[it.category] ?: 0L
+                BudgetRow(it.category, limit, spent, FinanceRules.budgetState(spent, limit), limit - it.limitRial)
             },
             recurring = d.recurring,
             goals = d.goals,
@@ -114,12 +121,16 @@ class PlanViewModel(private val plan: PlanRepository) : ViewModel() {
         viewModelScope.launch { plan.depositGoal(goal, toman) }
     }
 
-    fun addDebt(title: String, amountText: String, iOwe: Boolean) {
+    fun payInstallment(debt: DebtEntity) {
+        viewModelScope.launch { plan.payInstallment(debt) }
+    }
+
+    fun addDebt(title: String, amountText: String, iOwe: Boolean, installmentsText: String = "") {
         val toman = PersianText.parseLong(amountText)
         if (title.isBlank()) return notify(PlanNotice.EMPTY_TITLE)
         if (toman == null || toman <= 0) return notify(PlanNotice.INVALID_AMOUNT)
         viewModelScope.launch {
-            plan.addDebt(title, toman, iOwe)
+            plan.addDebt(title, toman, iOwe, PersianText.parseLong(installmentsText)?.toInt() ?: 0)
             notify(PlanNotice.SAVED)
         }
     }

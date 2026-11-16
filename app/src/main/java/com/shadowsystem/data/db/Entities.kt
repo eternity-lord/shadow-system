@@ -1,5 +1,6 @@
 package com.shadowsystem.data.db
 
+import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.ForeignKey
 import androidx.room.Index
@@ -105,7 +106,8 @@ data class TransactionEntity(
     val isIncome: Boolean,
     val epochDay: Long,
     val createdAt: Long,
-    val walletId: Long? = null
+    val walletId: Long? = null,
+    val receiptUri: String? = null
 )
 
 @Entity(tableName = "budgets")
@@ -142,7 +144,9 @@ data class DebtEntity(
     val title: String,
     val totalRial: Long,
     val paidRial: Long,
-    val iOwe: Boolean
+    val iOwe: Boolean,
+    @ColumnInfo(defaultValue = "0") val installmentCount: Int = 0,
+    @ColumnInfo(defaultValue = "0") val installmentsPaid: Int = 0
 )
 
 @Entity(tableName = "kv")

@@ -40,14 +40,14 @@ object BackupCodec {
         s.profile?.let { line("profile", it.totalXp, it.gold, it.activeDays, it.lastActiveDay, it.onboarded) }
         s.stats.forEach { line("stat", it.stat, it.xp) }
         s.transactions.forEach {
-            line("tx", it.id, it.amountRial, it.category, it.note, it.isIncome, it.epochDay, it.createdAt, it.walletId ?: "")
+            line("tx", it.id, it.amountRial, it.category, it.note, it.isIncome, it.epochDay, it.createdAt, it.walletId ?: "", it.receiptUri ?: "")
         }
         s.budgets.forEach { line("budget", it.category, it.limitRial) }
         s.recurring.forEach {
             line("rec", it.id, it.title, it.amountRial, it.category, it.isIncome, it.monthly, it.anchorEpochDay, it.posted, it.active)
         }
         s.goals.forEach { line("goal", it.id, it.title, it.targetRial, it.savedRial, it.createdDay) }
-        s.debts.forEach { line("debt", it.id, it.title, it.totalRial, it.paidRial, it.iOwe) }
+        s.debts.forEach { line("debt", it.id, it.title, it.totalRial, it.paidRial, it.iOwe, it.installmentCount, it.installmentsPaid) }
         s.wallets.forEach { line("wallet", it.id, it.name, it.openingRial) }
         s.transfers.forEach { line("transfer", it.id, it.fromWalletId, it.toWalletId, it.amountRial, it.epochDay, it.createdAt) }
         s.cheques.forEach { line("cheque", it.id, it.title, it.amountRial, it.dueEpochDay, it.issuedByMe, it.cleared) }
@@ -77,7 +77,8 @@ object BackupCodec {
                 "tx" -> txs += TransactionEntity(
                     id = f[1].toLong(), amountRial = f[2].toLong(), category = f[3], note = f[4],
                     isIncome = f[5].toBoolean(), epochDay = f[6].toLong(), createdAt = f[7].toLong(),
-                    walletId = f.getOrNull(8)?.toLongOrNull()
+                    walletId = f.getOrNull(8)?.toLongOrNull(),
+                    receiptUri = f.getOrNull(9)?.ifBlank { null }
                 )
                 "budget" -> budgets += BudgetEntity(category = f[1], limitRial = f[2].toLong())
                 "rec" -> recs += RecurringEntity(
@@ -91,7 +92,9 @@ object BackupCodec {
                 )
                 "debt" -> debts += DebtEntity(
                     id = f[1].toLong(), title = f[2], totalRial = f[3].toLong(),
-                    paidRial = f[4].toLong(), iOwe = f[5].toBoolean()
+                    paidRial = f[4].toLong(), iOwe = f[5].toBoolean(),
+                    installmentCount = f.getOrNull(6)?.toIntOrNull() ?: 0,
+                    installmentsPaid = f.getOrNull(7)?.toIntOrNull() ?: 0
                 )
                 "wallet" -> wallets += WalletEntity(id = f[1].toLong(), name = f[2], openingRial = f[3].toLong())
                 "transfer" -> transfers += TransferEntity(

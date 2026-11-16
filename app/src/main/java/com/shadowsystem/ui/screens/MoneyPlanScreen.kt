@@ -48,7 +48,7 @@ fun MoneyPlanScreen(vm: PlanViewModel, onBack: () -> Unit) {
             )
         }
         item { GoalSection(state.goals, onAdd = vm::addGoal, onDeposit = vm::depositGoal, onDelete = { vm.ask("goal", id = it) }) }
-        item { DebtSection(state.debts, onAdd = vm::addDebt, onPay = vm::payDebt, onDelete = { vm.ask("debt", id = it) }) }
+        item { DebtSection(state.debts, onAdd = vm::addDebt, onPay = vm::payDebt, onDelete = { vm.ask("debt", id = it) }, onInstall = vm::payInstallment) }
         item { Text(stringResource(R.string.plan_note), style = MaterialTheme.typography.bodyMedium) }
     }
 }

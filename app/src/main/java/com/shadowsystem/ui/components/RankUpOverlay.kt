@@ -37,6 +37,7 @@ import com.shadowsystem.ui.theme.ShadowColors
 @Composable
 fun RankUpOverlay(rank: GameMath.Rank, onDismiss: () -> Unit) {
     var shown by remember { mutableStateOf(false) }
+    val reduce = rememberReduceMotion()
     LaunchedEffect(Unit) { shown = true }
     // The rank-up moment lasts 5 seconds; tapping skips it.
     LaunchedEffect(Unit) {
@@ -45,12 +46,12 @@ fun RankUpOverlay(rank: GameMath.Rank, onDismiss: () -> Unit) {
     }
     val scale by animateFloatAsState(
         targetValue = if (shown) 1f else 0.5f,
-        animationSpec = tween(durationMillis = 700, easing = FastOutSlowInEasing),
+        animationSpec = tween(durationMillis = if (reduce) 0 else 700, easing = FastOutSlowInEasing),
         label = "rankUpScale"
     )
     val fade by animateFloatAsState(
         targetValue = if (shown) 1f else 0f,
-        animationSpec = tween(durationMillis = 500),
+        animationSpec = tween(durationMillis = if (reduce) 0 else 500),
         label = "rankUpFade"
     )
     Dialog(onDismissRequest = onDismiss, properties = DialogProperties(usePlatformDefaultWidth = false)) {

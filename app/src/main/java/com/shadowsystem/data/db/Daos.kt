@@ -49,7 +49,7 @@ data class LinkedQuestRow(
 @Dao
 interface QuestDao {
     @Query("SELECT * FROM quests WHERE gameDay = :day")
-    suspend fun forDay(day: Long): List<QuestEntity>
+    suspend fun questsOnDay(day: Long): List<QuestEntity>
 
     @Query("UPDATE quests SET soldierKey = :key WHERE id = :id")
     suspend fun setSoldier(id: Long, key: String?)

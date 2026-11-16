@@ -41,6 +41,15 @@ object AssetRegistry {
         return soldierAssetName(key, 1)
     }
     fun wisdomAssetName(key: String, tier: Int): String = "wisdom_${key}_$tier"
+
+    /** Overlay for the highest wisdom tier (1..3) that has art, at or below [tier]; null when none exists. */
+    fun wisdomBestAsset(context: Context, key: String, tier: Int): String? {
+        for (t in tier.coerceIn(0, 3) downTo 1) {
+            val name = wisdomAssetName(key, t)
+            if (hasAsset(context, name)) return name
+        }
+        return null
+    }
     fun monsterAssetName(rank: String, n: Int): String = "monster_${rank.lowercase()}_$n"
     fun gateAssetName(rank: String): String = "gate_${rank.lowercase()}"
     fun rankAssetName(rank: String): String = "rank_${rank.lowercase()}"

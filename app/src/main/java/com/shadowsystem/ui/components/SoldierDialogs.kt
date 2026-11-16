@@ -220,13 +220,27 @@ private fun FullscreenScene(content: @Composable () -> Unit) {
 fun SoldierImage(row: SoldierRow, stage: Int, size: androidx.compose.ui.unit.Dp) {
     val context = LocalContext.current
     val s = stage.coerceAtLeast(1)
-    AssetImage(
-        name = AssetRegistry.soldierBestAsset(context, row.def.key, s),
-        size = size,
-        placeholderColor = Color(row.def.colorHex),
-        stage = s,
-        contentDescription = row.name
-    )
+    val wisdom = AssetRegistry.wisdomBestAsset(context, row.def.key, row.progress.wisdomTier)
+    androidx.compose.foundation.layout.Box(
+        contentAlignment = Alignment.Center,
+        modifier = Modifier.size(size)
+    ) {
+        AssetImage(
+            name = AssetRegistry.soldierBestAsset(context, row.def.key, s),
+            size = size,
+            placeholderColor = Color(row.def.colorHex),
+            stage = s,
+            contentDescription = row.name
+        )
+        if (wisdom != null) {
+            androidx.compose.foundation.Image(
+                painter = androidx.compose.ui.res.painterResource(AssetRegistry.drawableId(context, wisdom)),
+                contentDescription = null,
+                modifier = Modifier.size(size).graphicsLayer { alpha = 0.6f },
+                contentScale = androidx.compose.ui.layout.ContentScale.Fit
+            )
+        }
+    }
 }
 
 fun stateLabelRes(state: SoldierProgress.State): Int = when (state) {

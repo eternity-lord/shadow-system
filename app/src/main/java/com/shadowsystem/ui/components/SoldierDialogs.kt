@@ -180,8 +180,16 @@ fun EvolutionDialog(row: SoldierRow, onFinish: () -> Unit) {
             if (prev != row.displayStage) {
                 androidx.compose.foundation.layout.Box(
                     modifier = Modifier.graphicsLayer { alpha = oldAlpha.value }
-                ) { SoldierImage(row, stage = prev, size = 160.dp) }
+                ) { SoldierImage(row, stage = prev, size = 160.dp, silhouette = true) }
             }
+            // The new form starts as its silhouette and gains its colours as the silhouette fades out.
+            androidx.compose.foundation.layout.Box(
+                modifier = Modifier.graphicsLayer {
+                    alpha = 1f - newAlpha.value
+                    scaleX = newScale.value
+                    scaleY = newScale.value
+                }
+            ) { SoldierImage(row, stage = row.displayStage, size = 160.dp, silhouette = true) }
             androidx.compose.foundation.layout.Box(
                 modifier = Modifier.graphicsLayer {
                     alpha = newAlpha.value
@@ -217,10 +225,11 @@ private fun FullscreenScene(content: @Composable () -> Unit) {
 }
 
 @Composable
-fun SoldierImage(row: SoldierRow, stage: Int, size: androidx.compose.ui.unit.Dp) {
+fun SoldierImage(row: SoldierRow, stage: Int, size: androidx.compose.ui.unit.Dp, silhouette: Boolean = false) {
     val context = LocalContext.current
     val s = stage.coerceAtLeast(1)
-    val wisdom = AssetRegistry.wisdomBestAsset(context, row.def.key, row.progress.wisdomTier)
+    // A silhouette is the same picture tinted solid black: the alpha shape is kept, the detail is not.
+    val wisdom = if (silhouette) null else AssetRegistry.wisdomBestAsset(context, row.def.key, row.progress.wisdomTier)
     androidx.compose.foundation.layout.Box(
         contentAlignment = Alignment.Center,
         modifier = Modifier.size(size)
@@ -228,9 +237,10 @@ fun SoldierImage(row: SoldierRow, stage: Int, size: androidx.compose.ui.unit.Dp)
         AssetImage(
             name = AssetRegistry.soldierBestAsset(context, row.def.key, s),
             size = size,
-            placeholderColor = Color(row.def.colorHex),
+            placeholderColor = if (silhouette) Color.Black else Color(row.def.colorHex),
             stage = s,
-            contentDescription = row.name
+            contentDescription = row.name,
+            tint = if (silhouette) Color.Black else null
         )
         if (wisdom != null) {
             androidx.compose.foundation.Image(

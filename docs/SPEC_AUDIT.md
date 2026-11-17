@@ -79,8 +79,8 @@ This audit was run on 2026-11-16 against the code on the branch. It is the list 
 | Recurring rules daily/weekly/monthly/yearly, catch-up on open, pause | Done | `RecurrenceAndInstallmentTest` |
 | Budgets per category and overall, 80%/100%, rollover | Done | |
 | Savings goals with estimated finish | Done | `SavingsEstimateTest` |
-| Debts (direction, partial payments, reminders) | Partial | payments done; reminders not verified |
-| Installments and cheques with status and reminders | Partial | status done; reminders not verified |
+| Debts (direction, partial payments, reminders) | Done | due date per debt (migration v9); payments; morning and night reminders count debts and cheques due within 3 days or overdue (`DueRulesTest`) |
+| Installments and cheques with status and reminders | Done | installments fall on the same day each Jalali month from the first due date; cheque status; the same due-soon reminder count (`DueRulesTest`). Installment rows show the next due date by count, not as a full schedule list |
 | Reports: monthly/yearly, donut, bars, trend, comparison, top expenses, daily average | Done | donut by category, six-month bars, 30-day line, this month vs last month (%), daily average, 12-month total, five largest expenses. The yearly view is a 12-month total, not a year-over-year chart |
 | Search and filters: text, date range, category, wallet, amount range, tags | Done | text, income/expense, category, wallet, amount range (toman), date presets (7/30/90 days, all time), #tag in note. Missing: custom date picker for the range |
 | CSV export and encrypted backup (AES-256-GCM, PBKDF2) | Done | `BudgetAndCryptoTest` |

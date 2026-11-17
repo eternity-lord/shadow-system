@@ -65,6 +65,7 @@ fun HunterScreen(vm: GameViewModel, soldiers: SoldierViewModel, profile: Profile
     val ritual by soldiers.ritual.collectAsStateWithLifecycle()
     val evolution by soldiers.evolution.collectAsStateWithLifecycle()
     var selectedKey by remember { mutableStateOf<String?>(null) }
+    var shopNote by remember { mutableStateOf<Int?>(null) }
     val stats by vm.stats.collectAsStateWithLifecycle()
     val level = GameMath.levelForXp(state.profile.totalXp)
     val rank = GameMath.rankForLevel(level)
@@ -180,9 +181,10 @@ fun HunterScreen(vm: GameViewModel, soldiers: SoldierViewModel, profile: Profile
             gold = state.profile.gold,
             owned = extras.owned,
             equipped = extras.equipped,
-            onBuy = { item -> profile.buy(item, top) { } },
+            onBuy = { item -> profile.buy(item) { ok -> shopNote = if (ok) R.string.avatar_shop_bought else R.string.avatar_shop_failed } },
             onEquip = { item -> profile.toggleEquip(item) }
         )
+        shopNote?.let { Text(stringResource(it), color = ShadowColors.Gold) }
         Text(stringResource(R.string.soldiers_title), style = MaterialTheme.typography.titleMedium, color = ShadowColors.TextMuted)
         roster.chunked(3).forEach { row ->
             Row(horizontalArrangement = Arrangement.spacedBy(8.dp), modifier = Modifier.fillMaxWidth()) {

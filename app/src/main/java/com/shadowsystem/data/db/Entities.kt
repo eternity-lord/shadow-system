@@ -149,7 +149,8 @@ data class DebtEntity(
     val paidRial: Long,
     val iOwe: Boolean,
     @ColumnInfo(defaultValue = "0") val installmentCount: Int = 0,
-    @ColumnInfo(defaultValue = "0") val installmentsPaid: Int = 0
+    @ColumnInfo(defaultValue = "0") val installmentsPaid: Int = 0,
+    val dueEpochDay: Long? = null
 )
 
 @Entity(tableName = "kv")

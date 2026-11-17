@@ -165,7 +165,7 @@ private fun GoalRow(g: GoalEntity, onDeposit: (GoalEntity, String) -> Unit, onDe
 @Composable
 fun DebtSection(
     debts: List<DebtEntity>,
-    onAdd: (String, String, Boolean, String) -> Unit,
+    onAdd: (String, String, Boolean, String, com.shadowsystem.core.Jalali.Date) -> Unit,
     onPay: (DebtEntity, String) -> Unit,
     onDelete: (Long) -> Unit,
     onInstall: (DebtEntity) -> Unit
@@ -174,6 +174,7 @@ fun DebtSection(
     var amount by remember { mutableStateOf("") }
     var installments by remember { mutableStateOf("") }
     var iOwe by remember { mutableStateOf(true) }
+    var due by remember { mutableStateOf(com.shadowsystem.core.Jalali.fromMillis(System.currentTimeMillis() + 30L * 86_400_000L)) }
     ShadowCard {
         SectionTitle(stringResource(R.string.debt_section))
         if (debts.isEmpty()) Text(stringResource(R.string.debt_empty), color = ShadowColors.TextMuted)
@@ -185,7 +186,9 @@ fun DebtSection(
             FilterChip(selected = iOwe, onClick = { iOwe = true }, label = { Text(stringResource(R.string.debt_i_owe)) }, modifier = Modifier.heightIn(min = 48.dp))
             FilterChip(selected = !iOwe, onClick = { iOwe = false }, label = { Text(stringResource(R.string.debt_owed_to_me)) }, modifier = Modifier.heightIn(min = 48.dp))
         }
-        PrimaryButton(stringResource(R.string.debt_save), onClick = { onAdd(title, amount, iOwe, installments) })
+        Text(stringResource(R.string.debt_due), color = ShadowColors.TextMuted)
+        com.shadowsystem.ui.components.JalaliDatePicker(due) { due = it }
+        PrimaryButton(stringResource(R.string.debt_save), onClick = { onAdd(title, amount, iOwe, installments, due) })
     }
 }
 

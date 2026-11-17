@@ -458,4 +458,10 @@
     <string name="reports_daily_avg">میانگین روزانه‌ی این ماه: %1$s</string>
     <string name="reports_year_total">مجموع هزینه‌ی ۱۲ ماه اخیر: %1$s</string>
     <string name="reports_top">بیشترین هزینه‌های این ماه</string>
+    <string name="avatar_shop_bought">خریداری شد.</string>
+    <string name="avatar_shop_failed">خرید انجام نشد: طلا کافی نیست، قبلاً خریده شده، یا فقط از پاداش به دست می‌آید.</string>
+    <string name="settings_hunter_title">شکارچی</string>
+    <string name="settings_wake_title">ساعت بیداری (یادآور صبح همان‌جا می‌آید)</string>
+    <string name="debt_due">سررسید (اولین قسط یا پرداخت)</string>
+    <string name="reminder_due_extra">%1$s چک یا بدهی نزدیک سررسید یا گذشته دارید.</string>
 </resources>

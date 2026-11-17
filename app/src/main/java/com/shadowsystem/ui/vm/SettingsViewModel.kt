@@ -26,6 +26,28 @@ class SettingsViewModel(
     private val seedDebug: suspend () -> Unit
 ) : ViewModel() {
 
+    /** Hunter profile from onboarding, editable here. */
+    val hunterName = MutableStateFlow(prefs.hunterName())
+    val avatarBase = MutableStateFlow(prefs.avatarBase())
+    val wakeHour = MutableStateFlow(prefs.wakeHour())
+
+    fun setHunterName(value: String) {
+        prefs.setHunterName(value)
+        hunterName.value = prefs.hunterName()
+    }
+
+    fun setAvatarBase(value: Int) {
+        prefs.setAvatarBase(value)
+        avatarBase.value = value
+    }
+
+    /** Changing the wake hour moves the morning reminder right away when reminders are on. */
+    fun setWakeHour(hour: Int) {
+        prefs.setWakeHour(hour)
+        wakeHour.value = hour
+        if (prefs.reminders.value) onRemindersChanged(true)
+    }
+
     /** Debug builds only: fills the database with 60 days of test data. */
     fun seedDebugData() {
         viewModelScope.launch {

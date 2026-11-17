@@ -89,6 +89,13 @@ object Migrations {
         }
     }
 
+    /** v9: debts get a first due day (installments fall on the same day each month). */
+    val MIGRATION_8_9: Migration = object : Migration(8, 9) {
+        override fun migrate(db: SupportSQLiteDatabase) {
+            db.execSQL("ALTER TABLE `debts` ADD COLUMN `dueEpochDay` INTEGER")
+        }
+    }
+
     /** v8: money categories table, seeded with the default set. */
     val MIGRATION_7_8: Migration = object : Migration(7, 8) {
         override fun migrate(db: SupportSQLiteDatabase) {

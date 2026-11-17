@@ -125,12 +125,13 @@ class PlanViewModel(private val plan: PlanRepository) : ViewModel() {
         viewModelScope.launch { plan.payInstallment(debt) }
     }
 
-    fun addDebt(title: String, amountText: String, iOwe: Boolean, installmentsText: String = "") {
+    fun addDebt(title: String, amountText: String, iOwe: Boolean, installmentsText: String = "", due: com.shadowsystem.core.Jalali.Date? = null) {
         val toman = PersianText.parseLong(amountText)
         if (title.isBlank()) return notify(PlanNotice.EMPTY_TITLE)
         if (toman == null || toman <= 0) return notify(PlanNotice.INVALID_AMOUNT)
         viewModelScope.launch {
-            plan.addDebt(title, toman, iOwe, PersianText.parseLong(installmentsText)?.toInt() ?: 0)
+            val dueDay = due?.let { com.shadowsystem.core.Jalali.toGregorian(it.year, it.month, it.day).toEpochDay() }
+            plan.addDebt(title, toman, iOwe, PersianText.parseLong(installmentsText)?.toInt() ?: 0, dueDay)
             notify(PlanNotice.SAVED)
         }
     }

@@ -458,4 +458,10 @@
     <string name="reports_daily_avg">Daily average this month: %1$s</string>
     <string name="reports_year_total">Total spent in the last 12 months: %1$s</string>
     <string name="reports_top">Largest expenses this month</string>
+    <string name="avatar_shop_bought">Purchased.</string>
+    <string name="avatar_shop_failed">Purchase failed: not enough gold, already owned, or reward-only.</string>
+    <string name="settings_hunter_title">Hunter</string>
+    <string name="settings_wake_title">Wake time (the morning reminder fires then)</string>
+    <string name="debt_due">Due date (first installment or payment)</string>
+    <string name="reminder_due_extra">%1$s cheque or debt is due soon or overdue.</string>
 </resources>

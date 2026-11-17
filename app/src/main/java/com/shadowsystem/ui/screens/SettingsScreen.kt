@@ -107,6 +107,41 @@ fun SettingsScreen(vm: SettingsViewModel, onBack: () -> Unit) {
 
         val quietStart by vm.quietStart.collectAsStateWithLifecycle()
         val quietEnd by vm.quietEnd.collectAsStateWithLifecycle()
+        val hunterName by vm.hunterName.collectAsStateWithLifecycle()
+        val avatarBase by vm.avatarBase.collectAsStateWithLifecycle()
+        val wakeHour by vm.wakeHour.collectAsStateWithLifecycle()
+        ShadowCard {
+            SectionTitle(stringResource(R.string.settings_hunter_title))
+            OutlinedTextField(
+                value = hunterName,
+                onValueChange = { vm.setHunterName(it.take(com.shadowsystem.data.prefs.AppPrefs.MAX_NAME)) },
+                singleLine = true,
+                label = { Text(stringResource(R.string.onb_name_hint)) },
+                modifier = Modifier.fillMaxWidth()
+            )
+            Text(stringResource(R.string.onb_q_base_title), color = ShadowColors.TextMuted)
+            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                listOf(R.string.onb_base_1, R.string.onb_base_2, R.string.onb_base_3).forEachIndexed { i, label ->
+                    androidx.compose.material3.FilterChip(
+                        selected = avatarBase == i,
+                        onClick = { vm.setAvatarBase(i) },
+                        label = { Text(stringResource(label)) },
+                        modifier = Modifier.heightIn(min = 48.dp)
+                    )
+                }
+            }
+            Text(stringResource(R.string.settings_wake_title), color = ShadowColors.TextMuted)
+            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                WAKE_HOURS.forEach { h ->
+                    androidx.compose.material3.FilterChip(
+                        selected = wakeHour == h,
+                        onClick = { vm.setWakeHour(h) },
+                        label = { Text(PersianText.toFa(h) + ":" + PersianText.toFa(0) + PersianText.toFa(0)) },
+                        modifier = Modifier.heightIn(min = 48.dp)
+                    )
+                }
+            }
+        }
         ShadowCard {
             SectionTitle(stringResource(R.string.quiet_title))
             Text(stringResource(R.string.quiet_help), color = ShadowColors.TextMuted)

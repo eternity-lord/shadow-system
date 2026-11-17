@@ -44,7 +44,9 @@ class ReminderReceiver : BroadcastReceiver() {
                 val game = app.container.game
                 val report = game.dailyReport(game.today())
                 val (title, text) = textFor(context, morning, report)
-                show(context, morning, title, text)
+                val due = app.container.plan.dueAttentionCount(game.today())
+                val full = if (due > 0) text + "\n" + context.getString(R.string.reminder_due_extra, PersianText.toFa(due)) else text
+                show(context, morning, title, full)
             } finally {
                 pending.finish()
             }

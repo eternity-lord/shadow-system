@@ -49,7 +49,7 @@ class ProfileViewModel(
         }
     }
 
-    fun buy(item: ShopItem, topStats: Set<Stat>, onResult: (Boolean) -> Unit) {
+    fun buy(item: ShopItem, onResult: (Boolean) -> Unit) {
         viewModelScope.launch {
             val ok = game.buyAvatarItem(item)
             refreshShop()

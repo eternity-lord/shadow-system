@@ -1,5 +1,6 @@
 package com.shadowsystem.data.repo
 
+import com.shadowsystem.core.DueRules
 import com.shadowsystem.core.FinanceRules
 import com.shadowsystem.core.MoneyRules
 import com.shadowsystem.core.RecurrenceRules
@@ -117,16 +118,28 @@ class PlanRepository(
         goals.deleteById(id)
     }
 
-    suspend fun addDebt(title: String, toman: Long, iOwe: Boolean, installments: Int = 0) {
+    suspend fun addDebt(title: String, toman: Long, iOwe: Boolean, installments: Int = 0, dueEpochDay: Long? = null) {
         debts.insert(
             DebtEntity(
                 title = title.trim(),
                 totalRial = MoneyRules.tomanToRial(toman),
                 paidRial = 0L,
                 iOwe = iOwe,
-                installmentCount = installments.coerceIn(0, 120)
+                installmentCount = installments.coerceIn(0, 120),
+                dueEpochDay = dueEpochDay
             )
         )
+    }
+
+    /** Unpaid cheques and debts due within three days or already overdue. Shown in the reminders. */
+    suspend fun dueAttentionCount(today: Long): Int {
+        val cheques = db.chequeDao().all().count { !it.cleared && DueRules.needsAttention(it.dueEpochDay, today, false) }
+        val debtItems = debts.all().count { d ->
+            val due = DueRules.debtDueDay(d.dueEpochDay, d.installmentCount, d.installmentsPaid) ?: return@count false
+            val done = d.paidRial >= d.totalRial || (d.installmentCount > 0 && d.installmentsPaid >= d.installmentCount)
+            DueRules.needsAttention(due, today, done)
+        }
+        return cheques + debtItems
     }
 
     suspend fun payDebt(debt: DebtEntity, toman: Long) {

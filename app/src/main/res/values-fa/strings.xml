@@ -452,4 +452,10 @@
     <string name="onb_base_2">آبی سرد</string>
     <string name="onb_base_3">کهربایی گرم</string>
     <string name="onb_q_wake_title">معمولاً ساعت چند بیدار می‌شوی؟ یادآور صبح همان‌جا می‌آید</string>
+    <string name="reports_compare_title">مقایسه و میانگین</string>
+    <string name="reports_compare">این ماه نسبت به ماه قبل: %1$s</string>
+    <string name="reports_compare_none">برای مقایسه با ماه قبل هزینه‌ای ثبت نشده.</string>
+    <string name="reports_daily_avg">میانگین روزانه‌ی این ماه: %1$s</string>
+    <string name="reports_year_total">مجموع هزینه‌ی ۱۲ ماه اخیر: %1$s</string>
+    <string name="reports_top">بیشترین هزینه‌های این ماه</string>
 </resources>

@@ -81,7 +81,7 @@ This audit was run on 2026-11-16 against the code on the branch. It is the list 
 | Savings goals with estimated finish | Done | `SavingsEstimateTest` |
 | Debts (direction, partial payments, reminders) | Partial | payments done; reminders not verified |
 | Installments and cheques with status and reminders | Partial | status done; reminders not verified |
-| Reports: monthly/yearly, donut, bars, trend, comparison, top expenses, daily average | Partial | check each chart exists (donut and yearly comparison to verify) |
+| Reports: monthly/yearly, donut, bars, trend, comparison, top expenses, daily average | Done | donut by category, six-month bars, 30-day line, this month vs last month (%), daily average, 12-month total, five largest expenses. The yearly view is a 12-month total, not a year-over-year chart |
 | Search and filters: text, date range, category, wallet, amount range, tags | Done | text, income/expense, category, wallet, amount range (toman), date presets (7/30/90 days, all time), #tag in note. Missing: custom date picker for the range |
 | CSV export and encrypted backup (AES-256-GCM, PBKDF2) | Done | `BudgetAndCryptoTest` |
 | App lock PIN (salted hash), biometric, hide balances, FLAG_SECURE | Done | FLAG_SECURE set in `MainActivity` |
@@ -92,7 +92,7 @@ This audit was run on 2026-11-16 against the code on the branch. It is the list 
 | Transaction gives small XP to INT and Iron soldier, max 10/day | Done | `MoneyRules` |
 | 'Log all today's expenses' quest, confirm button | Done | |
 | 'Stay under budget today' quest | Done | |
-| Savings goal as boss, heavy reward on finish | Partial | goal progress shown; heavy reward on completion to verify |
+| Savings goal as boss, heavy reward on finish | Done | goal progress shown; the deposit that reaches the target grants heavy frame `frame_sovereign` once (`FinanceRules.goalJustCompleted`, tested) |
 | Spending never gives XP or Gold | Done | |
 
 ## Section 10 — screens
@@ -141,7 +141,7 @@ This audit was run on 2026-11-16 against the code on the branch. It is the list 
 | Item | Status | Notes |
 |---|---|---|
 | Unit tests for XP, rank, planner by mood, daily score, comeback, Jalali, budget, recurrence, savings, backup | Done | comeback added this round |
-| Compose previews for main components | Partial | three added this round (button, radar, avatar stack); the main screens and cards still need previews |
+| Compose previews for main components | Partial | cards and controls: button, radar, avatar stack, daily report (morning and night), money summary, category chips, entry card, transaction row. Full screens are not previewed because they need ViewModels |
 | LazyColumn keys, no main-thread blocking | Partial | keys used in some lists; check all lists |
 | Process death, timezone change, 04:00 day boundary | Done | `DayRules` boundary 04:00 |
 | Accessibility: content descriptions, font scaling, contrast | Partial | descriptions added to art; device check not done |

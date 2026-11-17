@@ -452,4 +452,10 @@
     <string name="onb_base_2">Cool blue</string>
     <string name="onb_base_3">Warm amber</string>
     <string name="onb_q_wake_title">What time do you usually wake up? The morning reminder fires then.</string>
+    <string name="reports_compare_title">Comparison and average</string>
+    <string name="reports_compare">This month vs last month: %1$s</string>
+    <string name="reports_compare_none">No spending last month to compare with.</string>
+    <string name="reports_daily_avg">Daily average this month: %1$s</string>
+    <string name="reports_year_total">Total spent in the last 12 months: %1$s</string>
+    <string name="reports_top">Largest expenses this month</string>
 </resources>

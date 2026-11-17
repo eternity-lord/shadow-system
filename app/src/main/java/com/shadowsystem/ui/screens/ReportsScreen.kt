@@ -59,6 +59,23 @@ fun ReportsScreen(vm: ReportsViewModel, onBack: () -> Unit) {
             }
         }
         ShadowCard {
+            SectionTitle(stringResource(R.string.reports_compare_title))
+            val pct = state.changePercent
+            Text(
+                if (pct == null) stringResource(R.string.reports_compare_none)
+                else stringResource(R.string.reports_compare, (if (pct > 0) "+" else "") + PersianText.percent(pct.toFloat())),
+                style = MaterialTheme.typography.bodyMedium
+            )
+            Text(stringResource(R.string.reports_daily_avg, PersianText.formatMoney(state.dailyAverage)), style = MaterialTheme.typography.bodyMedium)
+            Text(stringResource(R.string.reports_year_total, PersianText.formatMoney(state.yearTotal)), style = MaterialTheme.typography.bodyMedium)
+            if (state.topExpenses.isNotEmpty()) {
+                Text(stringResource(R.string.reports_top), style = MaterialTheme.typography.titleSmall)
+                state.topExpenses.forEach { (label, value) ->
+                    Text("$label · ${PersianText.formatMoney(value)}", style = MaterialTheme.typography.bodyMedium)
+                }
+            }
+        }
+        ShadowCard {
             SectionTitle(stringResource(R.string.reports_six_months))
             BarChart(state.monthTotals.map { it.first }, state.monthTotals.map { it.second })
         }

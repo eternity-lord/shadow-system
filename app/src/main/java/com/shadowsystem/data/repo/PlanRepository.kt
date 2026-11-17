@@ -104,8 +104,13 @@ class PlanRepository(
         )
     }
 
+    /** Adds money to a goal. Reaching the target grants the heavy frame once (spec: savings goal as boss). */
     suspend fun depositGoal(goal: GoalEntity, toman: Long) {
-        goals.update(goal.copy(savedRial = goal.savedRial + MoneyRules.tomanToRial(toman)))
+        val after = goal.savedRial + MoneyRules.tomanToRial(toman)
+        goals.update(goal.copy(savedRial = after))
+        if (FinanceRules.goalJustCompleted(goal.targetRial, goal.savedRial, after)) {
+            db.keyValueDao().upsert(com.shadowsystem.data.db.KeyValueEntity("owned_$GOAL_REWARD", 1L))
+        }
     }
 
     suspend fun deleteGoal(id: Long) {
@@ -143,5 +148,10 @@ class PlanRepository(
 
     suspend fun deleteDebt(id: Long) {
         debts.deleteById(id)
+    }
+
+    companion object {
+        /** Heavy cosmetic given for completing a savings goal. */
+        const val GOAL_REWARD = "frame_sovereign"
     }
 }

@@ -32,6 +32,7 @@ object AvatarData {
         ShopItem("aura_dark", "هاله تاریک زنده", "aura", 0, heavy = true, description = "فقط از محاکمه رتبه S"),
         ShopItem("frame_basic", "قاب ساده", "frame", 20, description = "قاب ساده پروفایل"),
         ShopItem("frame_neon", "قاب نئونی", "frame", 70, description = "قاب نئونی بنفش"),
+        ShopItem("frame_sovereign", "قاب فرمانروا", "frame", 0, heavy = true, description = "فقط از تکمیل هدف پس‌انداز"),
         ShopItem("bg_gate", "پس‌زمینه دروازه", "background", 50, description = "پس‌زمینه دروازه تاریک"),
         ShopItem("bg_throne", "پس‌زمینه تخت سایه", "background", 0, heavy = true, description = "فقط از باس هفتگی")
     )

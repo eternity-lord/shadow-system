@@ -39,11 +39,22 @@ object FinanceRules {
      * Days until a savings goal is reached at the average daily saving rate.
      * Null when there is no saving yet (no estimate is possible). 0 when the goal is already met.
      */
+    /** True only on the deposit that first reaches the target. The savings-goal heavy reward is granted once. */
+    fun goalJustCompleted(targetRial: Long, savedBefore: Long, savedAfter: Long): Boolean =
+        targetRial > 0 && savedBefore < targetRial && savedAfter >= targetRial
+
     fun savingsEstimateDays(remaining: Long, savedPerDay: Double): Long? = when {
         remaining <= 0L -> 0L
         savedPerDay <= 0.0 || savedPerDay.isNaN() -> null
         else -> Math.ceil(remaining / savedPerDay).toLong()
     }
+
+    /** Percent change from [previous] to [current], rounded. Null when there was no spending before. */
+    fun changePercent(current: Long, previous: Long): Int? =
+        if (previous <= 0L) null else Math.round((current - previous) * 100.0 / previous).toInt()
+
+    /** Average per day so far this month. Zero before the first day. */
+    fun dailyAverage(total: Long, daysSoFar: Long): Long = if (daysSoFar <= 0L) 0L else total / daysSoFar
 
     fun debtRemaining(total: Long, paid: Long): Long = (total - paid).coerceAtLeast(0L)
 

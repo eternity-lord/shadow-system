@@ -82,7 +82,7 @@ This audit was run on 2026-11-16 against the code on the branch. It is the list 
 | Debts (direction, partial payments, reminders) | Partial | payments done; reminders not verified |
 | Installments and cheques with status and reminders | Partial | status done; reminders not verified |
 | Reports: monthly/yearly, donut, bars, trend, comparison, top expenses, daily average | Partial | check each chart exists (donut and yearly comparison to verify) |
-| Search and filters: text, date range, category, wallet, amount range, tags | Partial | text search and income/expense filter only; the rest missing |
+| Search and filters: text, date range, category, wallet, amount range, tags | Done | text, income/expense, category, wallet, amount range (toman), date presets (7/30/90 days, all time), #tag in note. Missing: custom date picker for the range |
 | CSV export and encrypted backup (AES-256-GCM, PBKDF2) | Done | `BudgetAndCryptoTest` |
 | App lock PIN (salted hash), biometric, hide balances, FLAG_SECURE | Done | FLAG_SECURE set in `MainActivity` |
 
@@ -152,8 +152,7 @@ This audit was run on 2026-11-16 against the code on the branch. It is the list 
 Phases 0–3 are built in code. The Phase 3 acceptance ("every feature in this document works") is not met until the Missing and Partial rows above are closed.
 
 ## Next steps, in order
-1. Search filters: category, wallet, amount range, date range, tags. (Section 8)
-2. Onboarding: name, avatar base, usual wake time question. Wake time sets the morning reminder. (Section 10)
-3. Previews for the main cards and screens. (Section 15)
-4. Verify the Partial rows that need a check in code, and fix any gaps found.
-5. Art: WebP conversion and the stat overlay files named per tier.
+1. Onboarding: name, avatar base, usual wake time question. Wake time sets the morning reminder. (Section 10)
+2. Previews for the main cards and screens. (Section 15)
+3. Verify the Partial rows that need a check in code, and fix any gaps found.
+4. Art: WebP conversion and the stat overlay files named per tier.

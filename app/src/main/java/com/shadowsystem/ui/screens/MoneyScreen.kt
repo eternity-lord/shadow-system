@@ -30,6 +30,7 @@ import com.shadowsystem.ui.components.TransactionRow
 import com.shadowsystem.ui.theme.ShadowColors
 import com.shadowsystem.ui.vm.MoneyViewModel
 import com.shadowsystem.ui.components.CategoryEditorDialog
+import com.shadowsystem.ui.components.MoneyFilterPanel
 import com.shadowsystem.ui.components.rememberCategoryNames
 import com.shadowsystem.ui.vm.TypeFilter
 
@@ -143,6 +144,7 @@ fun MoneyScreen(vm: MoneyViewModel, onPlan: () -> Unit, onReports: () -> Unit, o
                 )
             }
         }
+        item { MoneyFilterPanel(state, vm) }
         if (state.entries.isEmpty()) {
             item { Text(stringResource(R.string.money_empty), color = ShadowColors.TextMuted) }
         }

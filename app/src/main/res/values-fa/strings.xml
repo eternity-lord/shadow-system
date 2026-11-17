@@ -430,4 +430,19 @@
     <string name="category_err_exists">این نام از قبل وجود دارد.</string>
     <string name="category_done">ذخیره شد.</string>
     <string name="category_archive_help">دسته‌ی بایگانی‌شده در ثبت تازه دیده نمی‌شود؛ تراکنش‌های قبلی سر جایشان می‌مانند.</string>
+    <string name="filter_more">فیلتر بیشتر</string>
+    <string name="filter_less">بستن فیلترها</string>
+    <string name="filter_category">دسته</string>
+    <string name="filter_wallet">حساب</string>
+    <string name="filter_date">بازه‌ی زمانی</string>
+    <string name="filter_date_all">همه‌ی زمان‌ها</string>
+    <string name="filter_date_7">۷ روز اخیر</string>
+    <string name="filter_date_30">۳۰ روز اخیر</string>
+    <string name="filter_date_90">۹۰ روز اخیر</string>
+    <string name="filter_amount">بازه‌ی مبلغ (تومان)</string>
+    <string name="filter_min">از</string>
+    <string name="filter_max">تا</string>
+    <string name="filter_tag">برچسب</string>
+    <string name="filter_tag_hint">مثلاً قهوه (بدون #)</string>
+    <string name="filter_clear">پاک کردن فیلترها</string>
 </resources>

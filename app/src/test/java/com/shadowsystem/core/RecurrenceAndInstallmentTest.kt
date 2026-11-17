@@ -63,7 +63,8 @@ class RecurrenceAndInstallmentTest {
     fun yearlyRuleAdvancesTwelveJalaliMonthsPerOccurrence() {
         val anchor = day(1404, 3, 10)
         assertEquals(day(1405, 3, 10), RecurrenceRules.occurrence(anchor, 1, RecurrencePeriod.YEARLY))
-        assertEquals(1, RecurrenceRules.dueCount(anchor, 0, day(1405, 3, 10), RecurrencePeriod.YEARLY))
+        // The anchor itself and the first renewal are both due on 1405/3/10.
+        assertEquals(2, RecurrenceRules.dueCount(anchor, 0, day(1405, 3, 10), RecurrencePeriod.YEARLY))
     }
 
     @Test

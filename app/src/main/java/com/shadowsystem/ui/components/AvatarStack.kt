@@ -101,14 +101,15 @@ private fun equippedLook(context: android.content.Context, equipped: Set<String>
 }
 
 /**
- * Mood pose picture: 1 standing, 2 determined, 3 tired but satisfied. Pose 4 (low energy) and no score (0)
- * have no picture and fall back to the rank picture.
+ * Mood pose picture: 1 standing, 2 determined, 3 tired but satisfied, 4 low energy. No score (0) has no
+ * picture and falls back to the rank picture.
  */
 private fun poseAssetName(context: android.content.Context, pose: Int): String? {
     val name = when (pose) {
         1 -> "avatar_pose_standing"
         2 -> "avatar_pose_determined"
         3 -> "avatar_pose_tired"
+        4 -> "avatar_pose_low"
         else -> return null
     }
     return if (AssetRegistry.hasAsset(context, name)) name else null

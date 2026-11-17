@@ -68,7 +68,7 @@ class AvatarLayerRulesTest {
 
     @Test
     fun moodPoseImagesExistForStandingDeterminedAndTired() {
-        listOf("standing", "determined", "tired").forEach { p ->
+        listOf("standing", "determined", "tired", "low").forEach { p ->
             assertTrue("missing pose $p", java.io.File("src/main/res/drawable-nodpi/avatar_pose_$p.png").exists())
         }
     }

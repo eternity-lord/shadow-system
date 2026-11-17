@@ -15,6 +15,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -40,8 +41,8 @@ import com.shadowsystem.ui.vm.BudgetRow
 
 @Composable
 fun BudgetSection(rows: List<BudgetRow>, onSave: (String, String) -> Unit, onRemove: (String) -> Unit) {
-    var category by remember { mutableStateOf(MoneyRules.CATEGORIES.first()) }
-    var amount by remember { mutableStateOf("") }
+    var category by rememberSaveable { mutableStateOf(MoneyRules.CATEGORIES.first()) }
+    var amount by rememberSaveable { mutableStateOf("") }
     val categories = rememberCategoryNames(false)
     val alert = remember(rows) { rows.any { it.level != FinanceRules.BudgetState.OK } }
     val phrase = remember(alert) { PhraseBank.budget() }
@@ -93,10 +94,10 @@ fun BudgetSection(rows: List<BudgetRow>, onSave: (String, String) -> Unit, onRem
 
 @Composable
 fun RecurringSection(rules: List<RecurringEntity>, onAdd: (String, String, String, Boolean, com.shadowsystem.core.RecurrencePeriod) -> Unit, onDelete: (Long) -> Unit) {
-    var title by remember { mutableStateOf("") }
-    var amount by remember { mutableStateOf("") }
-    var category by remember { mutableStateOf(MoneyRules.CATEGORIES.first()) }
-    var income by remember { mutableStateOf(false) }
+    var title by rememberSaveable { mutableStateOf("") }
+    var amount by rememberSaveable { mutableStateOf("") }
+    var category by rememberSaveable { mutableStateOf(MoneyRules.CATEGORIES.first()) }
+    var income by rememberSaveable { mutableStateOf(false) }
     var period by remember { mutableStateOf(com.shadowsystem.core.RecurrencePeriod.MONTHLY) }
     val categories = rememberCategoryNames(income)
     ShadowCard {
@@ -145,11 +146,12 @@ fun GoalSection(
     onDeposit: (GoalEntity, String) -> Unit,
     onDelete: (Long) -> Unit
 ) {
-    var title by remember { mutableStateOf("") }
-    var target by remember { mutableStateOf("") }
-    var hasDeadline by remember { mutableStateOf(false) }
-    var deadline by remember { mutableStateOf(com.shadowsystem.core.Jalali.fromMillis(System.currentTimeMillis() + 90L * 86_400_000L)) }
-    var walletId by remember { mutableStateOf<Long?>(null) }
+    var title by rememberSaveable { mutableStateOf("") }
+    var target by rememberSaveable { mutableStateOf("") }
+    var hasDeadline by rememberSaveable { mutableStateOf(false) }
+    // The deadline is kept as an epoch day so it survives process death; the picker shows it in Jalali.
+    var deadlineDay by rememberSaveable { mutableStateOf(java.time.LocalDate.now().toEpochDay() + 90L) }
+    var walletId by rememberSaveable { mutableStateOf<Long?>(null) }
     val walletNames = wallets.associate { it.id to it.name }
     ShadowCard {
         SectionTitle(stringResource(R.string.goal_section))
@@ -163,7 +165,13 @@ fun GoalSection(
             label = { Text(stringResource(R.string.goal_deadline_toggle)) },
             modifier = Modifier.heightIn(min = 48.dp)
         )
-        if (hasDeadline) com.shadowsystem.ui.components.JalaliDatePicker(deadline) { deadline = it }
+        if (hasDeadline) {
+            com.shadowsystem.ui.components.JalaliDatePicker(
+                com.shadowsystem.core.Jalali.fromGregorian(java.time.LocalDate.ofEpochDay(deadlineDay))
+            ) { picked ->
+                deadlineDay = com.shadowsystem.core.Jalali.toGregorian(picked.year, picked.month, picked.day).toEpochDay()
+            }
+        }
         Text(stringResource(R.string.goal_wallet_pick), color = ShadowColors.TextMuted)
         Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
             FilterChip(
@@ -182,7 +190,7 @@ fun GoalSection(
             }
         }
         PrimaryButton(stringResource(R.string.goal_save), onClick = {
-            val due = if (hasDeadline) com.shadowsystem.core.Jalali.toGregorian(deadline.year, deadline.month, deadline.day).toEpochDay() else null
+            val due = if (hasDeadline) deadlineDay else null
             onAdd(title, target, due, walletId)
         })
     }

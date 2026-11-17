@@ -88,7 +88,6 @@ Auras and frames are still vector. Per-item PNG layers for them would need a mat
 
 ## Mood pose pictures (PNG, 512×512)
 
-`avatar_pose_{standing,determined,tired}.png`, made from `avatar_rank_a.png` as reference. Chosen by the day's score (`TitleRules.pose`): 80 and up standing, 50 and up determined, 20 and up tired but satisfied. Priority on the avatar: equipped outfit look, then pose, then the rank picture.
+`avatar_pose_{standing,determined,tired,low}.png`, made from `avatar_rank_a.png` as reference. Chosen by the day's score (`TitleRules.pose`): 80 and up standing, 50 and up determined, 20 and up tired but satisfied. Priority on the avatar: equipped outfit look, then pose, then the rank picture.
 
-Missing: the low-energy pose (score under 20). That case shows the rank picture. Its image was not generated because the image limit for the turn was reached. Add `avatar_pose_low.png` and map pose 4 in `poseAssetName` to finish it.
-
+All four moods have a picture. Score 0 (no score yet) shows the rank picture.

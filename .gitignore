@@ -1,0 +1,20 @@
+# Gradle / Android build output
+.gradle/
+build/
+app/build/
+*.apk
+*.aab
+local.properties
+.idea/
+*.iml
+captures/
+.externalNativeBuild/
+.cxx/
+# Keep Room schemas (app/schemas) tracked: they are the migration history.
+# Secrets / keystores
+*.jks
+*.keystore
+.env
+# OS
+.DS_Store
+Thumbs.db

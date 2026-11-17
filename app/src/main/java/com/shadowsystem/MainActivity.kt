@@ -24,6 +24,7 @@ class MainActivity : FragmentActivity() {
         super.onCreate(savedInstanceState)
         window.setFlags(WindowManager.LayoutParams.FLAG_SECURE, WindowManager.LayoutParams.FLAG_SECURE)
         val app = application as ShadowApp
+        com.shadowsystem.util.PendingRoute.from(intent)
         setContent {
             ShadowTheme {
                 CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Rtl) {
@@ -33,6 +34,11 @@ class MainActivity : FragmentActivity() {
                 }
             }
         }
+    }
+
+    override fun onNewIntent(intent: android.content.Intent) {
+        super.onNewIntent(intent)
+        com.shadowsystem.util.PendingRoute.from(intent)
     }
 
     override fun onStop() {

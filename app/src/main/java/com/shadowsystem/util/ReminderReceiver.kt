@@ -14,6 +14,7 @@ import androidx.core.app.NotificationManagerCompat
 import com.shadowsystem.MainActivity
 import com.shadowsystem.R
 import com.shadowsystem.ShadowApp
+import com.shadowsystem.core.DailyReport
 import com.shadowsystem.core.PersianText
 import com.shadowsystem.core.QuietHours
 import com.shadowsystem.data.repo.DayReport
@@ -34,7 +35,8 @@ class ReminderReceiver : BroadcastReceiver() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU &&
             ActivityCompat.checkSelfPermission(context, Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED
         ) return
-        val morning = intent.getIntExtra(Reminders.EXTRA_KIND, Reminders.KIND_MORNING) == Reminders.KIND_MORNING
+        // The report follows the clock, not the alarm kind: 20:00–03:59 is the night report, otherwise the morning briefing.
+        val morning = !DailyReport.isNightHour(hour)
         val pending = goAsync()
         val app = context.applicationContext as ShadowApp
         CoroutineScope(SupervisorJob() + Dispatchers.IO).launch {
@@ -64,8 +66,10 @@ class ReminderReceiver : BroadcastReceiver() {
     }
 
     private fun show(context: Context, morning: Boolean, title: String, text: String) {
+        val target = Intent(context, MainActivity::class.java)
+            .putExtra(PendingRoute.EXTRA, if (morning) PendingRoute.NOW else PendingRoute.REPORT)
         val open = PendingIntent.getActivity(
-            context, 0, Intent(context, MainActivity::class.java),
+            context, if (morning) 1 else 2, target,
             PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
         )
         val notification: Notification = NotificationCompat.Builder(context, Reminders.CHANNEL_ID)

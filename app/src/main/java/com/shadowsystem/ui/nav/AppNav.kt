@@ -14,6 +14,7 @@ import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
@@ -108,6 +109,15 @@ private fun MainNavigation(app: ShadowApp, game: GameViewModel) {
     val profileVm: com.shadowsystem.ui.vm.ProfileViewModel = viewModel(factory = com.shadowsystem.ui.vm.ProfileViewModel.factory(app))
     val bossVm: com.shadowsystem.ui.vm.BossViewModel = viewModel(factory = com.shadowsystem.ui.vm.BossViewModel.factory(app))
     val soldierVm: com.shadowsystem.ui.vm.SoldierViewModel = viewModel(factory = com.shadowsystem.ui.vm.SoldierViewModel.factory(app))
+    val pendingRoute by com.shadowsystem.util.PendingRoute.route.collectAsStateWithLifecycle()
+
+    // A reminder tap opens its screen once the nav graph exists (backStack is non-null only then).
+    LaunchedEffect(pendingRoute, backStack) {
+        val target = pendingRoute ?: return@LaunchedEffect
+        if (backStack == null) return@LaunchedEffect
+        com.shadowsystem.util.PendingRoute.route.value = null
+        if (target == com.shadowsystem.util.PendingRoute.REPORT) nav.navigate(Routes.DAILY_REPORT) else navigateTab(nav, Tab.NOW.route)
+    }
 
     Scaffold(
         bottomBar = {

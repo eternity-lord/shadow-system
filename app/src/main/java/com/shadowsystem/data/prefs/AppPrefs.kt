@@ -25,6 +25,26 @@ class AppPrefs(context: Context) {
         reminders.value = value
     }
 
+    /** Hunter name, avatar base and usual wake hour. Set during onboarding and kept on this device. */
+    fun hunterName(): String = sp.getString(KEY_NAME, "") ?: ""
+
+    fun setHunterName(value: String) {
+        sp.edit().putString(KEY_NAME, value.trim().take(MAX_NAME)).apply()
+    }
+
+    fun avatarBase(): Int = sp.getInt(KEY_AVATAR_BASE, 0)
+
+    fun setAvatarBase(value: Int) {
+        sp.edit().putInt(KEY_AVATAR_BASE, value).apply()
+    }
+
+    /** Usual wake hour (0–23). The morning reminder fires at this hour. */
+    fun wakeHour(): Int = sp.getInt(KEY_WAKE_HOUR, DEFAULT_WAKE_HOUR)
+
+    fun setWakeHour(value: Int) {
+        sp.edit().putInt(KEY_WAKE_HOUR, value).apply()
+    }
+
     /** Quiet hours window (0–23). Reminders are skipped inside it. */
     val quietStart = MutableStateFlow(sp.getInt(KEY_QUIET_START, QuietHours.DEFAULT_START))
     val quietEnd = MutableStateFlow(sp.getInt(KEY_QUIET_END, QuietHours.DEFAULT_END))
@@ -71,6 +91,11 @@ class AppPrefs(context: Context) {
     }
 
     private companion object {
+        const val KEY_NAME = "hunter_name"
+        const val KEY_AVATAR_BASE = "avatar_base"
+        const val KEY_WAKE_HOUR = "wake_hour"
+        const val DEFAULT_WAKE_HOUR = 8
+        const val MAX_NAME = 20
         const val KEY_HIDE = "hide_balances"
         const val KEY_REDUCE_MOTION = "reduce_motion"
         const val KEY_REMINDERS = "reminders_on"

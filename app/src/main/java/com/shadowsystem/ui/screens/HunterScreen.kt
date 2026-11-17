@@ -73,6 +73,9 @@ fun HunterScreen(vm: GameViewModel, soldiers: SoldierViewModel, profile: Profile
     val weekly = extras.weeklyTop.takeIf { it.size == 2 } ?: top
     val topStats = statLevels.entries.sortedByDescending { it.value }.take(2).map { it.key.name to "${statLabel(it.key)} ${PersianText.toFa(it.value)}" }
     val aura = extras.equipped.any { it.contains("aura") }
+    val prefs = (androidx.compose.ui.platform.LocalContext.current.applicationContext as com.shadowsystem.ShadowApp).container.prefs
+    val hunterName = remember { prefs.hunterName() }
+    val avatarTint = remember { com.shadowsystem.core.AvatarBase.tint(prefs.avatarBase()) }
     LaunchedEffect(top) { profile.refresh(top) }
 
     Column(
@@ -98,8 +101,11 @@ fun HunterScreen(vm: GameViewModel, soldiers: SoldierViewModel, profile: Profile
                     )
                 }
             Row(verticalAlignment = Alignment.CenterVertically) {
-                AvatarStack(rank = rank, topStats = topStats, aura = aura)
+                AvatarStack(rank = rank, topStats = topStats, aura = aura, tint = avatarTint)
                 Column(modifier = Modifier.padding(start = 12.dp)) {
+                    if (hunterName.isNotBlank()) {
+                        Text(hunterName, style = MaterialTheme.typography.titleMedium)
+                    }
                     Text(stringResource(R.string.level_label, PersianText.toFa(level)), style = MaterialTheme.typography.titleLarge)
                     Text(stringResource(R.string.rank_label, rank.name), color = ShadowColors.Gold)
                     Text(

@@ -18,7 +18,6 @@ object Reminders {
     const val EXTRA_KIND = "reminder_kind"
     const val KIND_MORNING = 0
     const val KIND_NIGHT = 1
-    private const val MORNING_HOUR = 8
     private const val NIGHT_HOUR = 21
 
     /** Enables or disables both reminders. */
@@ -30,9 +29,14 @@ object Reminders {
             return
         }
         ensureChannel(context)
-        schedule(context, alarms, KIND_MORNING, MORNING_HOUR)
+        schedule(context, alarms, KIND_MORNING, morningHour(context))
         schedule(context, alarms, KIND_NIGHT, NIGHT_HOUR)
     }
+
+    /** The morning reminder fires at the wake hour chosen in onboarding (default 08:00). */
+    private fun morningHour(context: Context): Int =
+        context.getSharedPreferences("shadow_prefs", Context.MODE_PRIVATE)
+            .getInt(com.shadowsystem.data.prefs.AppPrefs.KEY_WAKE_HOUR, com.shadowsystem.data.prefs.AppPrefs.DEFAULT_WAKE_HOUR)
 
     private fun schedule(context: Context, alarms: AlarmManager, kind: Int, hour: Int) {
         val cal = Calendar.getInstance().apply {

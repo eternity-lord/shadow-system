@@ -445,4 +445,11 @@
     <string name="filter_tag">برچسب</string>
     <string name="filter_tag_hint">مثلاً قهوه (بدون #)</string>
     <string name="filter_clear">پاک کردن فیلترها</string>
+    <string name="onb_q_name_title">اسمت را انتخاب کن، شکارچی</string>
+    <string name="onb_name_hint">نام شکارچی (حداکثر ۲۰ نویسه)</string>
+    <string name="onb_q_base_title">پایه‌ی ظاهر آواتار</string>
+    <string name="onb_base_1">بدون رنگ (اصلی)</string>
+    <string name="onb_base_2">آبی سرد</string>
+    <string name="onb_base_3">کهربایی گرم</string>
+    <string name="onb_q_wake_title">معمولاً ساعت چند بیدار می‌شوی؟ یادآور صبح همان‌جا می‌آید</string>
 </resources>

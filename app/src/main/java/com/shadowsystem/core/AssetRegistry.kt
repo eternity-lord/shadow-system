@@ -66,7 +66,8 @@ fun AssetImage(
     size: Dp = 96.dp,
     placeholderColor: Color = Color(0xFF7C4DFF),
     stage: Int = 1,
-    contentDescription: String? = null
+    contentDescription: String? = null,
+    tint: Color? = null
 ) {
     val context = LocalContext.current
     val resId = AssetRegistry.drawableId(context, name)
@@ -75,7 +76,8 @@ fun AssetImage(
             painter = painterResource(resId),
             contentDescription = contentDescription,
             modifier = modifier.size(size),
-            contentScale = ContentScale.Fit
+            contentScale = ContentScale.Fit,
+            colorFilter = tint?.let { androidx.compose.ui.graphics.ColorFilter.tint(it, androidx.compose.ui.graphics.BlendMode.Modulate) }
         )
     } else {
         ProceduralPlaceholder(

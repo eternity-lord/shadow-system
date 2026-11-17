@@ -88,6 +88,9 @@ fun AppRoot(app: ShadowApp) {
         )
         !gameState.profile.onboarded -> OnboardingScreen { a ->
             game.finishOnboarding(a.focus, a.struggle, a.minutes)
+            app.container.prefs.setHunterName(a.name)
+            app.container.prefs.setAvatarBase(a.base)
+            app.container.prefs.setWakeHour(a.wakeHour)
             app.container.prefs.setReminders(a.reminders)
             com.shadowsystem.util.Reminders.apply(app, a.reminders)
         }

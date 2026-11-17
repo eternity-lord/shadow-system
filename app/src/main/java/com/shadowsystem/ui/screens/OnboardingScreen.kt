@@ -18,6 +18,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -30,11 +31,27 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.shadowsystem.R
+import com.shadowsystem.core.PersianText
+import com.shadowsystem.data.prefs.AppPrefs
 import com.shadowsystem.ui.components.PrimaryButton
 import com.shadowsystem.ui.theme.ShadowColors
 
-/** Answers from the question screens. Index values match the chip order on each screen. */
-data class OnboardingAnswers(val focus: Int, val struggle: Int, val minutes: Int, val reminders: Boolean)
+/**
+ * Answers from the question screens. Index values match the chip order on each screen.
+ * [wakeHour] is the hour chosen; the morning reminder fires at it.
+ */
+data class OnboardingAnswers(
+    val name: String,
+    val base: Int,
+    val wakeHour: Int,
+    val focus: Int,
+    val struggle: Int,
+    val minutes: Int,
+    val reminders: Boolean
+)
+
+/** Wake hours offered on the wake-time screen. */
+val WAKE_HOURS = listOf(5, 6, 7, 8, 9, 10)
 
 private val introPages = listOf(
     R.string.onb_title_1 to R.string.onb_body_1,
@@ -43,22 +60,28 @@ private val introPages = listOf(
     R.string.onb_title_4 to R.string.onb_body_4
 )
 
-/** Four intro pages, then four question screens. The last question starts the app. */
+/** Four intro pages, then name, avatar base, wake time and four questions. The last question starts the app. */
 @Composable
 fun OnboardingScreen(onDone: (OnboardingAnswers) -> Unit) {
     val context = LocalContext.current
     var index by remember { mutableIntStateOf(0) }
+    var name by remember { mutableStateOf("") }
+    var base by remember { mutableIntStateOf(-1) }
+    var wake by remember { mutableIntStateOf(-1) }
     var focus by remember { mutableIntStateOf(-1) }
     var struggle by remember { mutableIntStateOf(-1) }
     var minutes by remember { mutableIntStateOf(-1) }
     var reminders by remember { mutableStateOf<Boolean?>(null) }
-    val total = introPages.size + 4
+    val total = introPages.size + 7
     val last = index == total - 1
     val answered = when (index - introPages.size) {
-        0 -> focus >= 0
-        1 -> struggle >= 0
-        2 -> minutes >= 0
-        3 -> reminders != null
+        0 -> name.trim().isNotEmpty()
+        1 -> base >= 0
+        2 -> wake >= 0
+        3 -> focus >= 0
+        4 -> struggle >= 0
+        5 -> minutes >= 0
+        6 -> reminders != null
         else -> true
     }
     val notifPermission = rememberLauncherForActivityResult(ActivityResultContracts.RequestPermission()) { }
@@ -80,28 +103,51 @@ fun OnboardingScreen(onDone: (OnboardingAnswers) -> Unit) {
                 Spacer(Modifier.height(12.dp))
                 Text(stringResource(body), style = MaterialTheme.typography.bodyLarge, color = ShadowColors.TextMuted)
             }
-            introPages.size -> QuestionBlock(
-                title = R.string.onb_title_5,
-                options = listOf(R.string.onb_focus_1, R.string.onb_focus_2, R.string.onb_focus_3),
+            introPages.size -> {
+                Text(stringResource(R.string.onb_q_name_title), style = MaterialTheme.typography.headlineMedium)
+                Spacer(Modifier.height(12.dp))
+                OutlinedTextField(
+                    value = name,
+                    onValueChange = { name = it.take(AppPrefs.MAX_NAME) },
+                    singleLine = true,
+                    label = { Text(stringResource(R.string.onb_name_hint)) },
+                    modifier = Modifier.fillMaxWidth()
+                )
+            }
+            introPages.size + 1 -> QuestionBlock(
+                title = stringResource(R.string.onb_q_base_title),
+                options = listOf(R.string.onb_base_1, R.string.onb_base_2, R.string.onb_base_3).map { stringResource(it) },
+                selected = base,
+                onSelect = { base = it }
+            )
+            introPages.size + 2 -> QuestionBlock(
+                title = stringResource(R.string.onb_q_wake_title),
+                options = WAKE_HOURS.map { PersianText.toFa(it) + ":" + PersianText.toFa(0) + PersianText.toFa(0) },
+                selected = wake,
+                onSelect = { wake = it }
+            )
+            introPages.size + 3 -> QuestionBlock(
+                title = stringResource(R.string.onb_title_5),
+                options = listOf(R.string.onb_focus_1, R.string.onb_focus_2, R.string.onb_focus_3).map { stringResource(it) },
                 selected = focus,
                 onSelect = { focus = it }
             )
-            introPages.size + 1 -> QuestionBlock(
-                title = R.string.onb_q_struggle_title,
-                options = listOf(R.string.onb_struggle_1, R.string.onb_struggle_2, R.string.onb_struggle_3, R.string.onb_struggle_4),
+            introPages.size + 4 -> QuestionBlock(
+                title = stringResource(R.string.onb_q_struggle_title),
+                options = listOf(R.string.onb_struggle_1, R.string.onb_struggle_2, R.string.onb_struggle_3, R.string.onb_struggle_4).map { stringResource(it) },
                 selected = struggle,
                 onSelect = { struggle = it }
             )
-            introPages.size + 2 -> QuestionBlock(
-                title = R.string.onb_q_time_title,
-                options = listOf(R.string.onb_time_1, R.string.onb_time_2, R.string.onb_time_3),
+            introPages.size + 5 -> QuestionBlock(
+                title = stringResource(R.string.onb_q_time_title),
+                options = listOf(R.string.onb_time_1, R.string.onb_time_2, R.string.onb_time_3).map { stringResource(it) },
                 selected = minutes,
                 onSelect = { minutes = it }
             )
             else -> {
                 QuestionBlock(
-                    title = R.string.onb_q_reminder_title,
-                    options = listOf(R.string.onb_reminder_on, R.string.onb_reminder_off),
+                    title = stringResource(R.string.onb_q_reminder_title),
+                    options = listOf(stringResource(R.string.onb_reminder_on), stringResource(R.string.onb_reminder_off)),
                     selected = when (reminders) { true -> 0; false -> 1; null -> -1 },
                     onSelect = { reminders = it == 0 }
                 )
@@ -130,7 +176,17 @@ fun OnboardingScreen(onDone: (OnboardingAnswers) -> Unit) {
                         if (reminders == true && Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
                             notifPermission.launch(Manifest.permission.POST_NOTIFICATIONS)
                         }
-                        onDone(OnboardingAnswers(focus, struggle, minutes, reminders == true))
+                        onDone(
+                            OnboardingAnswers(
+                                name = name.trim(),
+                                base = base,
+                                wakeHour = WAKE_HOURS[wake],
+                                focus = focus,
+                                struggle = struggle,
+                                minutes = minutes,
+                                reminders = reminders == true
+                            )
+                        )
                     }
                 }
             )
@@ -139,15 +195,15 @@ fun OnboardingScreen(onDone: (OnboardingAnswers) -> Unit) {
 }
 
 @Composable
-private fun QuestionBlock(title: Int, options: List<Int>, selected: Int, onSelect: (Int) -> Unit) {
-    Text(stringResource(title), style = MaterialTheme.typography.headlineMedium)
+private fun QuestionBlock(title: String, options: List<String>, selected: Int, onSelect: (Int) -> Unit) {
+    Text(title, style = MaterialTheme.typography.headlineMedium)
     Spacer(Modifier.height(12.dp))
     Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
         options.forEachIndexed { i, label ->
             FilterChip(
                 selected = selected == i,
                 onClick = { onSelect(i) },
-                label = { Text(stringResource(label)) },
+                label = { Text(label) },
                 modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp)
             )
         }

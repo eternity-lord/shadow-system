@@ -27,7 +27,7 @@ import com.shadowsystem.ui.theme.ShadowColors
  * the stage badge, and the two strongest stats as small overlays. Art for the layers is a placeholder until it exists.
  */
 @Composable
-fun AvatarStack(rank: GameMath.Rank, topStats: List<Pair<String, String>>, aura: Boolean) {
+fun AvatarStack(rank: GameMath.Rank, topStats: List<Pair<String, String>>, aura: Boolean, tint: androidx.compose.ui.graphics.Color? = null) {
     val stage = (GameMath.Rank.values().indexOf(rank) + 1).coerceAtMost(5)
     Box(modifier = Modifier.size(112.dp), contentAlignment = Alignment.Center) {
         if (aura) {
@@ -38,7 +38,8 @@ fun AvatarStack(rank: GameMath.Rank, topStats: List<Pair<String, String>>, aura:
             size = 96.dp,
             placeholderColor = ShadowColors.Primary,
             stage = stage,
-            contentDescription = stringResource(R.string.content_desc_avatar)
+            contentDescription = stringResource(R.string.content_desc_avatar),
+            tint = tint
         )
         Text(
             stringResource(R.string.stage_badge, PersianText.toFa(stage)),

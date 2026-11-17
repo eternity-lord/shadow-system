@@ -99,7 +99,7 @@ This audit was run on 2026-11-16 against the code on the branch. It is the list 
 | Item | Status | Notes |
 |---|---|---|
 | Five tabs: Now, Quests, Dungeon, Money, Hunter | Done | |
-| Onboarding: 5 screens max; welcome, name/avatar base, 3 questions (goal, hardest area, wake time), notifications, done | Partial | 8 screens now (user asked for question screens; this overrides the 5-screen limit, recorded in DECISIONS). Missing: name, avatar base step, usual wake time question (asked: daily time instead) |
+| Onboarding: 5 screens max; welcome, name/avatar base, 3 questions (goal, hardest area, wake time), notifications, done | Done | 4 intro pages, then name, avatar base (tint), wake time, focus, struggle, daily minutes, reminders. The wake hour sets the morning reminder. The override of the 5-screen limit is in DECISIONS 36. Avatar base is a tint until the layered body art exists |
 | Morning briefing and night report | Done | |
 | Notifications linked to reports | Done | real numbers |
 
@@ -152,7 +152,6 @@ This audit was run on 2026-11-16 against the code on the branch. It is the list 
 Phases 0–3 are built in code. The Phase 3 acceptance ("every feature in this document works") is not met until the Missing and Partial rows above are closed.
 
 ## Next steps, in order
-1. Onboarding: name, avatar base, usual wake time question. Wake time sets the morning reminder. (Section 10)
-2. Previews for the main cards and screens. (Section 15)
-3. Verify the Partial rows that need a check in code, and fix any gaps found.
-4. Art: WebP conversion and the stat overlay files named per tier.
+1. Previews for the main cards and screens. (Section 15)
+2. Verify the Partial rows that need a check in code, and fix any gaps found.
+3. Art: WebP conversion and the stat overlay files named per tier.

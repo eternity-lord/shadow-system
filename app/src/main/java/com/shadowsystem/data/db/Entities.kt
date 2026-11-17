@@ -110,7 +110,9 @@ data class TransactionEntity(
     val epochDay: Long,
     val createdAt: Long,
     val walletId: Long? = null,
-    val receiptUri: String? = null
+    val receiptUri: String? = null,
+    val subcategory: String? = null,
+    val location: String? = null
 )
 
 @Entity(tableName = "budgets")
@@ -138,7 +140,9 @@ data class GoalEntity(
     val title: String,
     val targetRial: Long,
     val savedRial: Long,
-    val createdDay: Long
+    val createdDay: Long,
+    val deadlineEpochDay: Long? = null,
+    val walletId: Long? = null
 )
 
 @Entity(tableName = "debts")

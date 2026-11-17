@@ -467,4 +467,13 @@
     <string name="every_day">روزانه</string>
     <string name="every_year">سالانه</string>
     <string name="money_rial_setting">نمایش مبلغ‌ها به ریال (پیش‌فرض: تومان)</string>
+    <string name="money_quick_add">ثبت سریع</string>
+    <string name="money_subcategory_hint">زیردسته (اختیاری)</string>
+    <string name="money_location_hint">مکان (اختیاری)</string>
+    <string name="goal_deadline_toggle">مهلت دارد</string>
+    <string name="goal_wallet_pick">کیف پول مرتبط</string>
+    <string name="goal_no_wallet">بدون کیف پول</string>
+    <string name="goal_deadline_left">مهلت %1$s · %2$s روز مانده</string>
+    <string name="goal_deadline_passed">مهلت %1$s گذشته است</string>
+    <string name="goal_wallet_line">کیف پول: %1$s</string>
 </resources>

@@ -95,16 +95,20 @@ class PlanRepository(
         return total
     }
 
-    suspend fun addGoal(title: String, toman: Long) {
+    suspend fun addGoal(title: String, toman: Long, deadlineEpochDay: Long?, walletId: Long?) {
         goals.insert(
             GoalEntity(
                 title = title.trim(),
                 targetRial = MoneyRules.tomanToRial(toman),
                 savedRial = 0L,
-                createdDay = game.today()
+                createdDay = game.today(),
+                deadlineEpochDay = deadlineEpochDay,
+                walletId = walletId
             )
         )
     }
+
+    fun observeWallets(): Flow<List<com.shadowsystem.data.db.WalletEntity>> = db.walletDao().observeAll()
 
     /** Adds money to a goal. Reaching the target grants the heavy frame once (spec: savings goal as boss). */
     suspend fun depositGoal(goal: GoalEntity, toman: Long) {

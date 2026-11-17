@@ -137,21 +137,58 @@ fun RecurringSection(rules: List<RecurringEntity>, onAdd: (String, String, Strin
 }
 
 @Composable
-fun GoalSection(goals: List<GoalEntity>, onAdd: (String, String) -> Unit, onDeposit: (GoalEntity, String) -> Unit, onDelete: (Long) -> Unit) {
+fun GoalSection(
+    goals: List<GoalEntity>,
+    wallets: List<com.shadowsystem.data.db.WalletEntity>,
+    onAdd: (String, String, Long?, Long?) -> Unit,
+    onDeposit: (GoalEntity, String) -> Unit,
+    onDelete: (Long) -> Unit
+) {
     var title by remember { mutableStateOf("") }
     var target by remember { mutableStateOf("") }
+    var hasDeadline by remember { mutableStateOf(false) }
+    var deadline by remember { mutableStateOf(com.shadowsystem.core.Jalali.fromMillis(System.currentTimeMillis() + 90L * 86_400_000L)) }
+    var walletId by remember { mutableStateOf<Long?>(null) }
+    val walletNames = wallets.associate { it.id to it.name }
     ShadowCard {
         SectionTitle(stringResource(R.string.goal_section))
         if (goals.isEmpty()) Text(stringResource(R.string.goal_empty), color = ShadowColors.TextMuted)
-        goals.forEach { g -> GoalRow(g, onDeposit, onDelete) }
+        goals.forEach { g -> GoalRow(g, g.walletId?.let { walletNames[it] }, onDeposit, onDelete) }
         OutlinedTextField(title, { title = it.take(40) }, label = { Text(stringResource(R.string.plan_title_hint)) }, singleLine = true, modifier = Modifier.fillMaxWidth())
         AmountField(target, { target = PersianText.parseDigits(it).filter { c -> c.isDigit() } }, stringResource(R.string.goal_target_hint))
-        PrimaryButton(stringResource(R.string.goal_save), onClick = { onAdd(title, target) })
+        FilterChip(
+            selected = hasDeadline,
+            onClick = { hasDeadline = !hasDeadline },
+            label = { Text(stringResource(R.string.goal_deadline_toggle)) },
+            modifier = Modifier.heightIn(min = 48.dp)
+        )
+        if (hasDeadline) com.shadowsystem.ui.components.JalaliDatePicker(deadline) { deadline = it }
+        Text(stringResource(R.string.goal_wallet_pick), color = ShadowColors.TextMuted)
+        Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            FilterChip(
+                selected = walletId == null,
+                onClick = { walletId = null },
+                label = { Text(stringResource(R.string.goal_no_wallet)) },
+                modifier = Modifier.heightIn(min = 48.dp)
+            )
+            wallets.forEach { w ->
+                FilterChip(
+                    selected = walletId == w.id,
+                    onClick = { walletId = w.id },
+                    label = { Text(w.name) },
+                    modifier = Modifier.heightIn(min = 48.dp)
+                )
+            }
+        }
+        PrimaryButton(stringResource(R.string.goal_save), onClick = {
+            val due = if (hasDeadline) com.shadowsystem.core.Jalali.toGregorian(deadline.year, deadline.month, deadline.day).toEpochDay() else null
+            onAdd(title, target, due, walletId)
+        })
     }
 }
 
 @Composable
-private fun GoalRow(g: GoalEntity, onDeposit: (GoalEntity, String) -> Unit, onDelete: (Long) -> Unit) {
+private fun GoalRow(g: GoalEntity, walletName: String?, onDeposit: (GoalEntity, String) -> Unit, onDelete: (Long) -> Unit) {
     var deposit by remember(g.id) { mutableStateOf("") }
     val done = g.savedRial >= g.targetRial
     Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
@@ -162,6 +199,19 @@ private fun GoalRow(g: GoalEntity, onDeposit: (GoalEntity, String) -> Unit, onDe
         )
         if (done) Text(stringResource(R.string.goal_done), color = ShadowColors.Secondary, style = MaterialTheme.typography.bodyMedium)
         goalEstimate(g)?.let { Text(it, style = MaterialTheme.typography.bodyMedium, color = ShadowColors.TextMuted) }
+        g.deadlineEpochDay?.let { due ->
+            val left = due - java.time.LocalDate.now().toEpochDay()
+            val dateText = com.shadowsystem.core.Jalali.format(
+                com.shadowsystem.core.Jalali.fromGregorian(java.time.LocalDate.ofEpochDay(due))
+            )
+            Text(
+                if (left >= 0) stringResource(R.string.goal_deadline_left, dateText, PersianText.toFa(left.toInt()))
+                else stringResource(R.string.goal_deadline_passed, dateText),
+                style = MaterialTheme.typography.bodyMedium,
+                color = ShadowColors.TextMuted
+            )
+        }
+        walletName?.let { Text(stringResource(R.string.goal_wallet_line, it), style = MaterialTheme.typography.bodyMedium, color = ShadowColors.TextMuted) }
         Row(verticalAlignment = Alignment.CenterVertically) {
             AmountField(deposit, { deposit = PersianText.parseDigits(it).filter { c -> c.isDigit() } }, stringResource(R.string.goal_deposit_hint), modifier = Modifier.weight(1f))
             Button(onClick = { onDeposit(g, deposit); deposit = "" }, modifier = Modifier.heightIn(min = 48.dp)) { Text(stringResource(R.string.goal_deposit)) }

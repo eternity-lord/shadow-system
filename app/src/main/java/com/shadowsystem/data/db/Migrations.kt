@@ -89,6 +89,16 @@ object Migrations {
         }
     }
 
+    /** v11: transactions get subcategory and location; savings goals get a deadline and a linked wallet. */
+    val MIGRATION_10_11: Migration = object : Migration(10, 11) {
+        override fun migrate(db: SupportSQLiteDatabase) {
+            db.execSQL("ALTER TABLE `transactions` ADD COLUMN `subcategory` TEXT")
+            db.execSQL("ALTER TABLE `transactions` ADD COLUMN `location` TEXT")
+            db.execSQL("ALTER TABLE `savings_goals` ADD COLUMN `deadlineEpochDay` INTEGER")
+            db.execSQL("ALTER TABLE `savings_goals` ADD COLUMN `walletId` INTEGER")
+        }
+    }
+
     /** v10: recurring rules get daily and yearly periods. The table is rebuilt, mapping monthly to MONTHLY and the rest to WEEKLY. */
     val MIGRATION_9_10: Migration = object : Migration(9, 10) {
         override fun migrate(db: SupportSQLiteDatabase) {

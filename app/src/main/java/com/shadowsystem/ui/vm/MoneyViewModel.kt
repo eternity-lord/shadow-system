@@ -33,7 +33,9 @@ data class MoneyForm(
     val note: String = "",
     val isIncome: Boolean = false,
     val error: Boolean = false,
-    val walletId: Long? = null
+    val walletId: Long? = null,
+    val subcategory: String = "",
+    val location: String = ""
 )
 
 data class MoneyState(
@@ -143,6 +145,14 @@ class MoneyViewModel(
         form.value = form.value.copy(note = note.take(60))
     }
 
+    fun onSubcategory(text: String) {
+        form.value = form.value.copy(subcategory = text.take(30))
+    }
+
+    fun onLocation(text: String) {
+        form.value = form.value.copy(location = text.take(40))
+    }
+
     fun onIncomeToggle(income: Boolean) {
         form.value = form.value.copy(isIncome = income)
     }
@@ -199,8 +209,8 @@ class MoneyViewModel(
             return
         }
         viewModelScope.launch {
-            money.add(toman!!, f.category, f.note, f.isIncome, f.walletId)
-            form.value = f.copy(amountText = "", note = "", error = false)
+            money.add(toman!!, f.category, f.note, f.isIncome, f.walletId, f.subcategory, f.location)
+            form.value = f.copy(amountText = "", note = "", subcategory = "", location = "", error = false)
         }
     }
 

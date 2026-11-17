@@ -34,3 +34,9 @@ private fun AvatarStackPreview() = ShadowTheme {
         Text("B", modifier = Modifier.padding(start = 12.dp))
     }
 }
+
+@Preview(name = "Rank up", showBackground = true)
+@Composable
+private fun RankUpPreview() = ShadowTheme {
+    RankUpOverlay(rank = GameMath.Rank.B, onDismiss = {})
+}

@@ -105,12 +105,15 @@ class PlanViewModel(private val plan: PlanRepository) : ViewModel() {
         }
     }
 
-    fun addGoal(title: String, amountText: String) {
+    val wallets: StateFlow<List<com.shadowsystem.data.db.WalletEntity>> =
+        plan.observeWallets().stateIn(viewModelScope, SharingStarted.Eagerly, emptyList())
+
+    fun addGoal(title: String, amountText: String, deadlineEpochDay: Long?, walletId: Long?) {
         val toman = PersianText.parseLong(amountText)
         if (title.isBlank()) return notify(PlanNotice.EMPTY_TITLE)
         if (toman == null || toman <= 0) return notify(PlanNotice.INVALID_AMOUNT)
         viewModelScope.launch {
-            plan.addGoal(title, toman)
+            plan.addGoal(title, toman, deadlineEpochDay, walletId)
             notify(PlanNotice.SAVED)
         }
     }

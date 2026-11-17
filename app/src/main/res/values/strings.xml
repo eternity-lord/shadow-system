@@ -467,4 +467,13 @@
     <string name="every_day">Daily</string>
     <string name="every_year">Yearly</string>
     <string name="money_rial_setting">Show amounts in rial (default: toman)</string>
+    <string name="money_quick_add">Quick add</string>
+    <string name="money_subcategory_hint">Subcategory (optional)</string>
+    <string name="money_location_hint">Location (optional)</string>
+    <string name="goal_deadline_toggle">Has a deadline</string>
+    <string name="goal_wallet_pick">Linked wallet</string>
+    <string name="goal_no_wallet">No wallet</string>
+    <string name="goal_deadline_left">Deadline %1$s · %2$s days left</string>
+    <string name="goal_deadline_passed">Deadline %1$s has passed</string>
+    <string name="goal_wallet_line">Wallet: %1$s</string>
 </resources>

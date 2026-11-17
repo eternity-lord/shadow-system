@@ -65,7 +65,17 @@ fun AmountField(
 }
 
 @Composable
-fun EntryCard(form: MoneyForm, categories: List<String>, onIncome: (Boolean) -> Unit, onAmount: (String) -> Unit, onCategory: (String) -> Unit, onNote: (String) -> Unit, onSave: () -> Unit) {
+fun EntryCard(
+    form: MoneyForm,
+    categories: List<String>,
+    onIncome: (Boolean) -> Unit,
+    onAmount: (String) -> Unit,
+    onCategory: (String) -> Unit,
+    onNote: (String) -> Unit,
+    onSave: () -> Unit,
+    onSubcategory: (String) -> Unit = {},
+    onLocation: (String) -> Unit = {}
+) {
     ShadowCard {
         Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
             FilterChip(
@@ -94,6 +104,20 @@ fun EntryCard(form: MoneyForm, categories: List<String>, onIncome: (Boolean) -> 
             value = form.note,
             onValueChange = onNote,
             label = { Text(stringResource(R.string.money_note_hint)) },
+            singleLine = true,
+            modifier = Modifier.fillMaxWidth()
+        )
+        OutlinedTextField(
+            value = form.subcategory,
+            onValueChange = onSubcategory,
+            label = { Text(stringResource(R.string.money_subcategory_hint)) },
+            singleLine = true,
+            modifier = Modifier.fillMaxWidth()
+        )
+        OutlinedTextField(
+            value = form.location,
+            onValueChange = onLocation,
+            label = { Text(stringResource(R.string.money_location_hint)) },
             singleLine = true,
             modifier = Modifier.fillMaxWidth()
         )
@@ -133,7 +157,7 @@ fun TransactionRow(tx: TransactionEntity, hidden: Boolean, onReceipt: () -> Unit
                     color = if (tx.isIncome) ShadowColors.Secondary else ShadowColors.TextPrimary
                 )
                 Text(
-                    listOf(tx.category, tx.note).filter { it.isNotBlank() }.joinToString(" · ") +
+                    listOf(tx.category, tx.subcategory ?: "", tx.note, tx.location ?: "").filter { it.isNotBlank() }.joinToString(" · ") +
                         "  ·  " + Jalali.format(Jalali.fromGregorian(java.time.LocalDate.ofEpochDay(tx.epochDay))),
                     style = MaterialTheme.typography.bodyMedium,
                     color = ShadowColors.TextMuted

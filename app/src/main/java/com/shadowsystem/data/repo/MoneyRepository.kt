@@ -22,7 +22,15 @@ class MoneyRepository(
      * Stores a transaction. Logging gives a little INT XP (capped per day).
      * Returns the XP awarded.
      */
-    suspend fun add(toman: Long, category: String, note: String, isIncome: Boolean, walletId: Long? = null): Int {
+    suspend fun add(
+        toman: Long,
+        category: String,
+        note: String,
+        isIncome: Boolean,
+        walletId: Long? = null,
+        subcategory: String? = null,
+        location: String? = null
+    ): Int {
         val day = game.today()
         val loggedBefore = dao.countForDay(day)
         dao.insert(
@@ -33,7 +41,9 @@ class MoneyRepository(
                 isIncome = isIncome,
                 epochDay = day,
                 createdAt = clock(),
-                walletId = walletId
+                walletId = walletId,
+                subcategory = subcategory?.trim()?.ifBlank { null },
+                location = location?.trim()?.ifBlank { null }
             )
         )
         val xp = MoneyRules.logXpFor(loggedBefore)

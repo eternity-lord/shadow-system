@@ -26,7 +26,7 @@ import androidx.room.RoomDatabase
         ChequeEntity::class,
         CategoryEntity::class
     ],
-    version = 10,
+    version = 11,
     exportSchema = true
 )
 abstract class AppDatabase : RoomDatabase() {
@@ -54,7 +54,7 @@ abstract class AppDatabase : RoomDatabase() {
                 .addMigrations(
                     Migrations.MIGRATION_1_2, Migrations.MIGRATION_2_3, Migrations.MIGRATION_3_4, Migrations.MIGRATION_4_5,
                     Migrations.MIGRATION_5_6, Migrations.MIGRATION_6_7, Migrations.MIGRATION_7_8,
-                    Migrations.MIGRATION_8_9, Migrations.MIGRATION_9_10
+                    Migrations.MIGRATION_8_9, Migrations.MIGRATION_9_10, Migrations.MIGRATION_10_11
                 )
                 .addCallback(object : RoomDatabase.Callback() {
                     override fun onCreate(db: androidx.sqlite.db.SupportSQLiteDatabase) {

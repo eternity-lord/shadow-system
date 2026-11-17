@@ -90,7 +90,7 @@ class AppPrefs(context: Context) {
         sp.edit().remove(KEY_PIN_HASH).remove(KEY_PIN_SALT).apply()
     }
 
-    private companion object {
+    companion object {
         const val KEY_NAME = "hunter_name"
         const val KEY_AVATAR_BASE = "avatar_base"
         const val KEY_WAKE_HOUR = "wake_hour"

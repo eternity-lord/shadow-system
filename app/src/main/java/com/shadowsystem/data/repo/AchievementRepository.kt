@@ -1,6 +1,8 @@
 package com.shadowsystem.data.repo
 
 import androidx.sqlite.db.SimpleSQLiteQuery
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import com.shadowsystem.core.GameMath
 import com.shadowsystem.core.TitleRules
 import com.shadowsystem.data.db.AppDatabase
@@ -8,8 +10,10 @@ import com.shadowsystem.data.db.AppDatabase
 /** Collects the facts that title and achievement rules need. Read-only. */
 class AchievementRepository(private val db: AppDatabase, private val game: GameRepository) {
 
-    private fun scalar(sql: String): Long =
+    /** Raw one-value query. Runs off the main thread: Room refuses direct queries there. */
+    private suspend fun scalar(sql: String): Long = withContext(Dispatchers.IO) {
         db.query(SimpleSQLiteQuery(sql)).use { c -> if (c.moveToFirst()) c.getLong(0) else 0L }
+    }
 
     suspend fun facts(): TitleRules.Facts {
         val profile = game.profile()

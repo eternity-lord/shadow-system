@@ -1,6 +1,8 @@
 package com.shadowsystem.data.repo
 
 import androidx.sqlite.db.SimpleSQLiteQuery
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import com.shadowsystem.core.GameMath.Stat
 import com.shadowsystem.core.WeeklyBoss
 import com.shadowsystem.data.db.AppDatabase
@@ -10,8 +12,10 @@ import com.shadowsystem.data.db.KeyValueEntity
 class BossRepository(private val db: AppDatabase, private val game: GameRepository) {
     private val kv = db.keyValueDao()
 
-    private fun scalar(sql: String): Long =
+    /** Raw one-value query. Runs off the main thread: Room refuses direct queries there. */
+    private suspend fun scalar(sql: String): Long = withContext(Dispatchers.IO) {
         db.query(SimpleSQLiteQuery(sql)).use { c -> if (c.moveToFirst()) c.getLong(0) else 0L }
+    }
 
     private fun claimKey(week: Long) = "boss_claimed_$week"
 

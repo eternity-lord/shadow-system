@@ -72,4 +72,11 @@ class AvatarLayerRulesTest {
             assertTrue("missing pose $p", java.io.File("src/main/res/drawable-nodpi/avatar_pose_$p.png").exists())
         }
     }
+
+    @Test
+    fun baseImagesExistForBlueAndAmber() {
+        listOf("blue", "amber").forEach { b ->
+            assertTrue("missing base $b", java.io.File("src/main/res/drawable-nodpi/avatar_base_$b.png").exists())
+        }
+    }
 }

@@ -34,7 +34,8 @@ fun AvatarStack(
     aura: Boolean,
     tint: androidx.compose.ui.graphics.Color? = null,
     equipped: Set<String> = emptySet(),
-    pose: Int = 0
+    pose: Int = 0,
+    base: Int = 0
 ) {
     val stage = (GameMath.Rank.values().indexOf(rank) + 1).coerceAtMost(5)
     val context = androidx.compose.ui.platform.LocalContext.current
@@ -54,9 +55,10 @@ fun AvatarStack(
             }
         }
         // An equipped outfit with its own look image replaces the rank picture and skips the tint and vector outfit.
-        // Priority: outfit look, then the mood pose, then the rank picture. The tint only applies to the rank picture.
+        // Priority: outfit look, then the chosen base, then the mood pose, then the rank picture.
+        // The tint only applies to the rank picture.
         val look = equippedLook(context, equipped)
-        val pic = look ?: poseAssetName(context, pose)
+        val pic = look ?: baseAssetName(context, base) ?: poseAssetName(context, pose)
         AssetImage(
             name = pic ?: AvatarData.rankAssetName(rank),
             size = 96.dp,
@@ -110,6 +112,16 @@ private fun poseAssetName(context: android.content.Context, pose: Int): String? 
         2 -> "avatar_pose_determined"
         3 -> "avatar_pose_tired"
         4 -> "avatar_pose_low"
+        else -> return null
+    }
+    return if (AssetRegistry.hasAsset(context, name)) name else null
+}
+
+/** Base picture for the base chosen in onboarding (1 blue, 2 amber). Base 0 has none. */
+private fun baseAssetName(context: android.content.Context, base: Int): String? {
+    val name = when (base) {
+        1 -> "avatar_base_blue"
+        2 -> "avatar_base_amber"
         else -> return null
     }
     return if (AssetRegistry.hasAsset(context, name)) name else null

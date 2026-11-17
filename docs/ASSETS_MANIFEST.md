@@ -91,3 +91,8 @@ Auras and frames are still vector. Per-item PNG layers for them would need a mat
 `avatar_pose_{standing,determined,tired,low}.png`, made from `avatar_rank_a.png` as reference. Chosen by the day's score (`TitleRules.pose`): 80 and up standing, 50 and up determined, 20 and up tired but satisfied. Priority on the avatar: equipped outfit look, then pose, then the rank picture.
 
 All four moods have a picture. Score 0 (no score yet) shows the rank picture.
+
+## Base pictures (PNG, 512×512)
+
+`avatar_base_{blue,amber}.png`: the rank-A hunter with blue or amber energy and hair highlights, made from `avatar_rank_a.png` as reference. They replace the old colour tint for the onboarding base choice. Priority on the avatar: equipped outfit look, then base, then mood pose, then the rank picture. The tint remains as a fallback if a base picture is missing.
+

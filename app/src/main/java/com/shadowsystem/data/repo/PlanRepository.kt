@@ -3,6 +3,7 @@ package com.shadowsystem.data.repo
 import com.shadowsystem.core.DueRules
 import com.shadowsystem.core.FinanceRules
 import com.shadowsystem.core.MoneyRules
+import com.shadowsystem.core.RecurrencePeriod
 import com.shadowsystem.core.RecurrenceRules
 import com.shadowsystem.data.db.AppDatabase
 import com.shadowsystem.data.db.BudgetEntity
@@ -46,14 +47,14 @@ class PlanRepository(
         budgets.delete(category)
     }
 
-    suspend fun addRecurring(title: String, toman: Long, category: String, isIncome: Boolean, monthly: Boolean) {
+    suspend fun addRecurring(title: String, toman: Long, category: String, isIncome: Boolean, period: RecurrencePeriod) {
         recurring.insert(
             RecurringEntity(
                 title = title.trim(),
                 amountRial = MoneyRules.tomanToRial(toman),
                 category = category,
                 isIncome = isIncome,
-                monthly = monthly,
+                period = period.name,
                 anchorEpochDay = game.today(),
                 posted = 0,
                 active = true
@@ -74,7 +75,7 @@ class PlanRepository(
         val today = game.today()
         var total = 0
         for (rule in recurring.activeRules()) {
-            val due = RecurrenceRules.dueCount(rule.anchorEpochDay, rule.posted, today, rule.monthly)
+            val due = RecurrenceRules.dueCount(rule.anchorEpochDay, rule.posted, today, RecurrencePeriod.parse(rule.period))
             if (due == 0) continue
             for (i in 0 until due) {
                 tx.insert(
@@ -83,7 +84,7 @@ class PlanRepository(
                         category = rule.category,
                         note = "${rule.title} (خودکار)",
                         isIncome = rule.isIncome,
-                        epochDay = RecurrenceRules.occurrence(rule.anchorEpochDay, rule.posted + i, rule.monthly),
+                        epochDay = RecurrenceRules.occurrence(rule.anchorEpochDay, rule.posted + i, RecurrencePeriod.parse(rule.period)),
                         createdAt = clock()
                     )
                 )

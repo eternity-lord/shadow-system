@@ -2,6 +2,9 @@ package com.shadowsystem.core
 
 /** Persian digit conversion and number formatting for display. */
 object PersianText {
+    /** Global display unit. False shows toman (the default); true shows rial. Set from settings at start and on change. */
+    @Volatile var rialMode: Boolean = false
+
 
     private const val FA_DIGITS = "۰۱۲۳۴۵۶۷۸۹"
 
@@ -42,7 +45,7 @@ object PersianText {
     /** Rials (stored) -> Toman display (default). */
     fun rialToToman(rials: Long): Long = rials / 10
 
-    fun formatMoney(rials: Long, showToman: Boolean = true): String {
+    fun formatMoney(rials: Long, showToman: Boolean = !rialMode): String {
         val amount = if (showToman) rialToToman(rials) else rials
         val unit = if (showToman) "تومان" else "ریال"
         return "${grouped(amount)} $unit"

@@ -62,6 +62,15 @@ class AppPrefs(context: Context) {
     }
 
     /** Calmer UI: short or no transitions for overlays and the soldier animation. */
+    /** Show money in rial instead of toman (spec section 8). */
+    val rialMode = MutableStateFlow(sp.getBoolean(KEY_RIAL_MODE, false))
+
+    fun setRialMode(value: Boolean) {
+        sp.edit().putBoolean(KEY_RIAL_MODE, value).apply()
+        rialMode.value = value
+        com.shadowsystem.core.PersianText.rialMode = value
+    }
+
     val reduceMotion = MutableStateFlow(sp.getBoolean(KEY_REDUCE_MOTION, false))
 
     fun setReduceMotion(value: Boolean) {
@@ -91,6 +100,7 @@ class AppPrefs(context: Context) {
     }
 
     companion object {
+        const val KEY_RIAL_MODE = "money_rial_mode"
         const val KEY_NAME = "hunter_name"
         const val KEY_AVATAR_BASE = "avatar_base"
         const val KEY_WAKE_HOUR = "wake_hour"

@@ -44,7 +44,7 @@ object BackupCodec {
         }
         s.budgets.forEach { line("budget", it.category, it.limitRial) }
         s.recurring.forEach {
-            line("rec", it.id, it.title, it.amountRial, it.category, it.isIncome, it.monthly, it.anchorEpochDay, it.posted, it.active)
+            line("rec", it.id, it.title, it.amountRial, it.category, it.isIncome, it.period, it.anchorEpochDay, it.posted, it.active)
         }
         s.goals.forEach { line("goal", it.id, it.title, it.targetRial, it.savedRial, it.createdDay) }
         s.debts.forEach { line("debt", it.id, it.title, it.totalRial, it.paidRial, it.iOwe, it.installmentCount, it.installmentsPaid) }
@@ -83,7 +83,7 @@ object BackupCodec {
                 "budget" -> budgets += BudgetEntity(category = f[1], limitRial = f[2].toLong())
                 "rec" -> recs += RecurringEntity(
                     id = f[1].toLong(), title = f[2], amountRial = f[3].toLong(), category = f[4],
-                    isIncome = f[5].toBoolean(), monthly = f[6].toBoolean(), anchorEpochDay = f[7].toLong(),
+                    isIncome = f[5].toBoolean(), period = parseRecurrence(f[6]), anchorEpochDay = f[7].toLong(),
                     posted = f[8].toInt(), active = f[9].toBoolean()
                 )
                 "goal" -> goals += GoalEntity(
@@ -133,4 +133,11 @@ object BackupCodec {
         }
         return sb.toString()
     }
+}
+
+/** Old backups stored the monthly flag as true/false. New ones store the period name. */
+private fun parseRecurrence(v: String): String = when (v) {
+    "true" -> "MONTHLY"
+    "false" -> "WEEKLY"
+    else -> com.shadowsystem.core.RecurrencePeriod.parse(v).name
 }

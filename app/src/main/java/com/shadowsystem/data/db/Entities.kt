@@ -126,7 +126,7 @@ data class RecurringEntity(
     val amountRial: Long,
     val category: String,
     val isIncome: Boolean,
-    val monthly: Boolean,
+    val period: String = "MONTHLY",
     val anchorEpochDay: Long,
     val posted: Int,
     val active: Boolean

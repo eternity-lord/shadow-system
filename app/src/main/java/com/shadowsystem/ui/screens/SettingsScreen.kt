@@ -89,6 +89,13 @@ fun SettingsScreen(vm: SettingsViewModel, onBack: () -> Unit) {
         notice?.let { n -> MessageBanner(noticeText(n)) { vm.clearNotice() } }
 
         val reduceMotion by vm.reduceMotion.collectAsStateWithLifecycle()
+        val rialMode by vm.rialMode.collectAsStateWithLifecycle()
+        ShadowCard {
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Text(stringResource(R.string.money_rial_setting), modifier = Modifier.weight(1f))
+                Switch(checked = rialMode, onCheckedChange = { vm.toggleRialMode() })
+            }
+        }
         ShadowCard {
             SectionTitle(stringResource(R.string.reduce_motion_title))
             Row(verticalAlignment = Alignment.CenterVertically) {

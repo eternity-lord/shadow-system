@@ -464,4 +464,7 @@
     <string name="settings_wake_title">ساعت بیداری (یادآور صبح همان‌جا می‌آید)</string>
     <string name="debt_due">سررسید (اولین قسط یا پرداخت)</string>
     <string name="reminder_due_extra">%1$s چک یا بدهی نزدیک سررسید یا گذشته دارید.</string>
+    <string name="every_day">روزانه</string>
+    <string name="every_year">سالانه</string>
+    <string name="money_rial_setting">نمایش مبلغ‌ها به ریال (پیش‌فرض: تومان)</string>
 </resources>

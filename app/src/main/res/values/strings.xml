@@ -464,4 +464,7 @@
     <string name="settings_wake_title">Wake time (the morning reminder fires then)</string>
     <string name="debt_due">Due date (first installment or payment)</string>
     <string name="reminder_due_extra">%1$s cheque or debt is due soon or overdue.</string>
+    <string name="every_day">Daily</string>
+    <string name="every_year">Yearly</string>
+    <string name="money_rial_setting">Show amounts in rial (default: toman)</string>
 </resources>

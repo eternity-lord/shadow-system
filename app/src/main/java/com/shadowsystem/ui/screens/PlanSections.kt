@@ -92,12 +92,12 @@ fun BudgetSection(rows: List<BudgetRow>, onSave: (String, String) -> Unit, onRem
 }
 
 @Composable
-fun RecurringSection(rules: List<RecurringEntity>, onAdd: (String, String, String, Boolean, Boolean) -> Unit, onDelete: (Long) -> Unit) {
+fun RecurringSection(rules: List<RecurringEntity>, onAdd: (String, String, String, Boolean, com.shadowsystem.core.RecurrencePeriod) -> Unit, onDelete: (Long) -> Unit) {
     var title by remember { mutableStateOf("") }
     var amount by remember { mutableStateOf("") }
     var category by remember { mutableStateOf(MoneyRules.CATEGORIES.first()) }
     var income by remember { mutableStateOf(false) }
-    var monthly by remember { mutableStateOf(true) }
+    var period by remember { mutableStateOf(com.shadowsystem.core.RecurrencePeriod.MONTHLY) }
     val categories = rememberCategoryNames(income)
     ShadowCard {
         SectionTitle(stringResource(R.string.recurring_section))
@@ -106,7 +106,7 @@ fun RecurringSection(rules: List<RecurringEntity>, onAdd: (String, String, Strin
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Text(
                     "${r.title} · ${PersianText.formatMoney(r.amountRial)} · " +
-                        stringResource(if (r.monthly) R.string.every_month else R.string.every_week),
+                        stringResource(periodLabel(com.shadowsystem.core.RecurrencePeriod.parse(r.period))),
                     style = MaterialTheme.typography.bodyMedium,
                     modifier = Modifier.weight(1f)
                 )
@@ -120,11 +120,19 @@ fun RecurringSection(rules: List<RecurringEntity>, onAdd: (String, String, Strin
         Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
             FilterChip(selected = !income, onClick = { income = false }, label = { Text(stringResource(R.string.money_expense)) }, modifier = Modifier.heightIn(min = 48.dp))
             FilterChip(selected = income, onClick = { income = true }, label = { Text(stringResource(R.string.money_income)) }, modifier = Modifier.heightIn(min = 48.dp))
-            FilterChip(selected = monthly, onClick = { monthly = true }, label = { Text(stringResource(R.string.every_month)) }, modifier = Modifier.heightIn(min = 48.dp))
-            FilterChip(selected = !monthly, onClick = { monthly = false }, label = { Text(stringResource(R.string.every_week)) }, modifier = Modifier.heightIn(min = 48.dp))
+        }
+        Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            com.shadowsystem.core.RecurrencePeriod.values().forEach { p ->
+                FilterChip(
+                    selected = period == p,
+                    onClick = { period = p },
+                    label = { Text(stringResource(periodLabel(p))) },
+                    modifier = Modifier.heightIn(min = 48.dp)
+                )
+            }
         }
         CategoryChips(category, categories) { category = it }
-        PrimaryButton(stringResource(R.string.recurring_save), onClick = { onAdd(title, amount, category, income, monthly) })
+        PrimaryButton(stringResource(R.string.recurring_save), onClick = { onAdd(title, amount, category, income, period) })
     }
 }
 
@@ -237,4 +245,11 @@ private fun goalEstimate(g: GoalEntity): String? {
         estimate == 0L -> null
         else -> stringResource(R.string.goal_estimate, PersianText.toFa(estimate))
     }
+}
+
+private fun periodLabel(p: com.shadowsystem.core.RecurrencePeriod): Int = when (p) {
+    com.shadowsystem.core.RecurrencePeriod.DAILY -> R.string.every_day
+    com.shadowsystem.core.RecurrencePeriod.WEEKLY -> R.string.every_week
+    com.shadowsystem.core.RecurrencePeriod.MONTHLY -> R.string.every_month
+    com.shadowsystem.core.RecurrencePeriod.YEARLY -> R.string.every_year
 }

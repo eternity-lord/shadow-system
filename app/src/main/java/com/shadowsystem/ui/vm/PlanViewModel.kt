@@ -95,12 +95,12 @@ class PlanViewModel(private val plan: PlanRepository) : ViewModel() {
         }
     }
 
-    fun addRecurring(title: String, amountText: String, category: String, isIncome: Boolean, monthly: Boolean) {
+    fun addRecurring(title: String, amountText: String, category: String, isIncome: Boolean, period: com.shadowsystem.core.RecurrencePeriod) {
         val toman = PersianText.parseLong(amountText)
         if (title.isBlank()) return notify(PlanNotice.EMPTY_TITLE)
         if (toman == null || toman <= 0) return notify(PlanNotice.INVALID_AMOUNT)
         viewModelScope.launch {
-            plan.addRecurring(title, toman, category, isIncome, monthly)
+            plan.addRecurring(title, toman, category, isIncome, period)
             notify(PlanNotice.SAVED)
         }
     }

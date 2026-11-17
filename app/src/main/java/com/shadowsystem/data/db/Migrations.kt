@@ -89,6 +89,25 @@ object Migrations {
         }
     }
 
+    /** v10: recurring rules get daily and yearly periods. The table is rebuilt, mapping monthly to MONTHLY and the rest to WEEKLY. */
+    val MIGRATION_9_10: Migration = object : Migration(9, 10) {
+        override fun migrate(db: SupportSQLiteDatabase) {
+            db.execSQL(
+                "CREATE TABLE IF NOT EXISTS `recurring_rules_v10` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, " +
+                    "`title` TEXT NOT NULL, `amountRial` INTEGER NOT NULL, `category` TEXT NOT NULL, " +
+                    "`isIncome` INTEGER NOT NULL, `period` TEXT NOT NULL, `anchorEpochDay` INTEGER NOT NULL, " +
+                    "`posted` INTEGER NOT NULL, `active` INTEGER NOT NULL)"
+            )
+            db.execSQL(
+                "INSERT INTO `recurring_rules_v10` (`id`,`title`,`amountRial`,`category`,`isIncome`,`period`,`anchorEpochDay`,`posted`,`active`) " +
+                    "SELECT `id`,`title`,`amountRial`,`category`,`isIncome`, " +
+                    "CASE WHEN `monthly` = 1 THEN 'MONTHLY' ELSE 'WEEKLY' END, `anchorEpochDay`,`posted`,`active` FROM `recurring_rules`"
+            )
+            db.execSQL("DROP TABLE `recurring_rules`")
+            db.execSQL("ALTER TABLE `recurring_rules_v10` RENAME TO `recurring_rules`")
+        }
+    }
+
     /** v9: debts get a first due day (installments fall on the same day each month). */
     val MIGRATION_8_9: Migration = object : Migration(8, 9) {
         override fun migrate(db: SupportSQLiteDatabase) {

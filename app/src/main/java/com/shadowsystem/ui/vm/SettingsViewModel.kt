@@ -80,6 +80,12 @@ class SettingsViewModel(
 
     val reduceMotion: StateFlow<Boolean> = prefs.reduceMotion
 
+    val rialMode: StateFlow<Boolean> = prefs.rialMode
+
+    fun toggleRialMode() {
+        prefs.setRialMode(!prefs.rialMode.value)
+    }
+
     fun toggleReduceMotion() {
         prefs.setReduceMotion(!prefs.reduceMotion.value)
     }

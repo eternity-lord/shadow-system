@@ -155,3 +155,14 @@ Phases 0–3 are built in code. The Phase 3 acceptance ("every feature in this d
 1. Previews for the main cards and screens. (Section 15)
 2. Verify the Partial rows that need a check in code, and fix any gaps found.
 3. Art: WebP conversion and the stat overlay files named per tier.
+
+## Open after section 7–9 review (this round)
+
+Checked against the text of sections 7, 8 and 9 in `docs/original-prompt.pdf`.
+
+- **Quick add (sec. 8):** no floating button and no sheet with a big numpad. Entry is an inline card on the Money tab. Needs a sheet, a three-tap flow, and "last used" wallet defaults.
+- **Transactions (sec. 8):** no subcategory and no location text. Needs two nullable columns, and a Jalali date picker for backdating.
+- **Savings goals (sec. 8, 9):** no deadline and no linked wallet. Goal reward is done; the HP bar is shown as progress, not as a boss bar.
+- **Categories icons and colours (sec. 8):** colours are stored but not shown; no icons yet.
+- **Art and avatar (sec. 7):** layered body, hair, face, outfit, weapon, headgear and aura art, the evolution silhouette, and the mood pose. The mood pose is coded, but no pose art exists yet.
+- **Verified in code:** class names from the top two stats (`GameMath.className`) with the weekly class stored; rank-up overlay of 5 s, skippable; rial/toman setting; daily, weekly, monthly and yearly recurrence; logging XP capped at 10 per day; budget-pace quest logic exists in `GameRepository` (not yet exercised on a device).

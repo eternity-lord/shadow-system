@@ -64,13 +64,17 @@ Still missing: monster variants (`_2`, `_3`) if wanted, category icons (`icon_ca
 
 Still missing: more background art (only `bg_gate` and `bg_throne` exist for the shop), monster variants beyond level 1.
 
-## Vector layers over the avatar (no PNG)
+## Outfit look images (PNG, 512×512)
 
-Equipped shop items are drawn as vector shapes by `ui/components/AvatarLayers.kt`, with colours and sizes in `core/AvatarLayerRules.kt`:
-- outfit: a torso band in the item colour (5 outfits),
+`avatar_look_outfit_{street,sport,leather,armor,shadow}.png` (5 files). Each is the rank-A hunter redrawn in that outfit, made from `avatar_rank_a.png` as the reference so the figure, pose and style match. When an outfit is equipped and its look exists, it replaces the rank picture (no base tint).
+
+## Vector layers over the avatar
+
+Weapons, auras and frames, and the outfit torso band when no look image exists, are drawn as vector shapes by `ui/components/AvatarLayers.kt`, with colours and sizes in `core/AvatarLayerRules.kt`:
+- outfit (fallback only): a torso band in the item colour,
 - weapon: a blade whose length grows from dagger to dark blade (3 weapons),
 - aura: the border colour follows the equipped aura (4 auras),
 - frame: the border width and colour follow the equipped frame (3 frames).
 
-These stand in for per-item layer art. Replacing them with PNG layers needs a matching base silhouette, which is not yet available.
+Weapons, auras and frames are still vector. Per-item PNG layers for them would need a matching base silhouette; the outfit looks above avoid that by redrawing the whole figure.
 

@@ -18,8 +18,8 @@ import com.shadowsystem.core.AvatarLayerRules
  * Expects the modifier to set the size; the drawing scales with it.
  */
 @Composable
-fun AvatarLayers(equipped: Set<String>, modifier: Modifier = Modifier.size(96.dp)) {
-    val outfit = AvatarLayerRules.equippedIn(equipped, "outfit_")?.let { AvatarLayerRules.outfitArgb(it) }
+fun AvatarLayers(equipped: Set<String>, modifier: Modifier = Modifier.size(96.dp), drawOutfit: Boolean = true) {
+    val outfit = if (drawOutfit) AvatarLayerRules.equippedIn(equipped, "outfit_")?.let { AvatarLayerRules.outfitArgb(it) } else null
     val weaponKey = AvatarLayerRules.equippedIn(equipped, "weapon_")
     val frameKey = AvatarLayerRules.equippedIn(equipped, "frame_")
     Canvas(modifier = modifier) {

@@ -44,15 +44,17 @@ fun AvatarStack(
                 ?: ShadowColors.Gold
             Box(modifier = Modifier.size(108.dp).border(3.dp, auraColor, RectangleShape))
         }
+        // An equipped outfit with its own look image replaces the rank picture and skips the tint and vector outfit.
+        val look = equippedLook(androidx.compose.ui.platform.LocalContext.current, equipped)
         AssetImage(
-            name = AvatarData.rankAssetName(rank),
+            name = look ?: AvatarData.rankAssetName(rank),
             size = 96.dp,
             placeholderColor = ShadowColors.Primary,
             stage = stage,
             contentDescription = stringResource(R.string.content_desc_avatar),
-            tint = tint
+            tint = if (look == null) tint else null
         )
-        AvatarLayers(equipped)
+        AvatarLayers(equipped, drawOutfit = look == null)
         Text(
             stringResource(R.string.stage_badge, PersianText.toFa(stage)),
             style = MaterialTheme.typography.labelSmall,
@@ -79,3 +81,11 @@ private fun StatBadge(stat: String, label: String, modifier: Modifier) {
         Text(label, style = MaterialTheme.typography.labelSmall, modifier = modifier.background(Color.Black.copy(alpha = 0.6f)).padding(2.dp))
     }
 }
+
+/** Drawable name of the look image for the equipped outfit, or null when none exists. */
+private fun equippedLook(context: android.content.Context, equipped: Set<String>): String? {
+    val key = AvatarLayerRules.equippedIn(equipped, "outfit_") ?: return null
+    val name = "avatar_look_$key"
+    return if (AssetRegistry.hasAsset(context, name)) name else null
+}
+

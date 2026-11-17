@@ -39,4 +39,13 @@ class AvatarLayerRulesTest {
         assertEquals(6f, AvatarLayerRules.frameWidthDp("frame_sovereign"), 0.001f)
         assertEquals(3f, AvatarLayerRules.frameWidthDp("frame_basic"), 0.001f)
     }
+
+    @Test
+    fun everyOutfitHasALookImageInTheDrawableFolder() {
+        // Unit tests run from the module directory.
+        AvatarData.SHOP_ITEMS.filter { it.category == "outfit" }.forEach { item ->
+            val file = java.io.File("src/main/res/drawable-nodpi/avatar_look_${item.key}.png")
+            assertTrue("missing look image for ${item.key}", file.exists())
+        }
+    }
 }

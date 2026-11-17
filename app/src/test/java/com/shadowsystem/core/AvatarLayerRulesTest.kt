@@ -65,4 +65,11 @@ class AvatarLayerRulesTest {
             assertTrue("missing sprite for ${item.key}", file.exists())
         }
     }
+
+    @Test
+    fun moodPoseImagesExistForStandingDeterminedAndTired() {
+        listOf("standing", "determined", "tired").forEach { p ->
+            assertTrue("missing pose $p", java.io.File("src/main/res/drawable-nodpi/avatar_pose_$p.png").exists())
+        }
+    }
 }

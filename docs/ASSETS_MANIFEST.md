@@ -86,3 +86,9 @@ Used only when a sprite is missing. Drawn by `ui/components/AvatarLayers.kt`, wi
 
 Auras and frames are still vector. Per-item PNG layers for them would need a matching base silhouette; the outfit looks above avoid that by redrawing the whole figure.
 
+## Mood pose pictures (PNG, 512×512)
+
+`avatar_pose_{standing,determined,tired}.png`, made from `avatar_rank_a.png` as reference. Chosen by the day's score (`TitleRules.pose`): 80 and up standing, 50 and up determined, 20 and up tired but satisfied. Priority on the avatar: equipped outfit look, then pose, then the rank picture.
+
+Missing: the low-energy pose (score under 20). That case shows the rank picture. Its image was not generated because the image limit for the turn was reached. Add `avatar_pose_low.png` and map pose 4 in `poseAssetName` to finish it.
+

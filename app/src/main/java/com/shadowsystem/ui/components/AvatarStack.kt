@@ -33,7 +33,8 @@ fun AvatarStack(
     topStats: List<Pair<String, String>>,
     aura: Boolean,
     tint: androidx.compose.ui.graphics.Color? = null,
-    equipped: Set<String> = emptySet()
+    equipped: Set<String> = emptySet(),
+    pose: Int = 0
 ) {
     val stage = (GameMath.Rank.values().indexOf(rank) + 1).coerceAtMost(5)
     val context = androidx.compose.ui.platform.LocalContext.current
@@ -53,14 +54,16 @@ fun AvatarStack(
             }
         }
         // An equipped outfit with its own look image replaces the rank picture and skips the tint and vector outfit.
-        val look = equippedLook(androidx.compose.ui.platform.LocalContext.current, equipped)
+        // Priority: outfit look, then the mood pose, then the rank picture. The tint only applies to the rank picture.
+        val look = equippedLook(context, equipped)
+        val pic = look ?: poseAssetName(context, pose)
         AssetImage(
-            name = look ?: AvatarData.rankAssetName(rank),
+            name = pic ?: AvatarData.rankAssetName(rank),
             size = 96.dp,
             placeholderColor = ShadowColors.Primary,
             stage = stage,
             contentDescription = stringResource(R.string.content_desc_avatar),
-            tint = if (look == null) tint else null
+            tint = if (pic == null) tint else null
         )
         AvatarLayers(equipped, drawOutfit = look == null)
         Text(
@@ -94,6 +97,20 @@ private fun StatBadge(stat: String, label: String, modifier: Modifier) {
 private fun equippedLook(context: android.content.Context, equipped: Set<String>): String? {
     val key = AvatarLayerRules.equippedIn(equipped, "outfit_") ?: return null
     val name = "avatar_look_$key"
+    return if (AssetRegistry.hasAsset(context, name)) name else null
+}
+
+/**
+ * Mood pose picture: 1 standing, 2 determined, 3 tired but satisfied. Pose 4 (low energy) and no score (0)
+ * have no picture and fall back to the rank picture.
+ */
+private fun poseAssetName(context: android.content.Context, pose: Int): String? {
+    val name = when (pose) {
+        1 -> "avatar_pose_standing"
+        2 -> "avatar_pose_determined"
+        3 -> "avatar_pose_tired"
+        else -> return null
+    }
     return if (AssetRegistry.hasAsset(context, name)) name else null
 }
 

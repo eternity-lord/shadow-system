@@ -480,4 +480,5 @@
     <string name="reports_year_chart">Last 12 months</string>
     <string name="reports_trend">Last 3 months vs the 3 before: %1$s</string>
     <string name="reports_trend_none">Not enough data for a trend yet</string>
+    <string name="goal_wallet_short">The linked wallet does not cover the rest of the goal</string>
 </resources>

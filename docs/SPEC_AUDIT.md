@@ -164,10 +164,12 @@ Checked against the text of sections 7, 8 and 9 in `docs/original-prompt.pdf`.
 - **Transactions (sec. 8):** subcategory and location are stored (Room v11, backup fields 11 and 12) and shown in the row. Backdating through the Jalali picker is done (DECISIONS 51). Backdated entries earn no XP.
 - **Savings goals (sec. 8, 9):** deadline (optional, Jalali picker) and linked wallet are stored and shown, with days left or passed. Still open: the goal's estimate does not yet check the linked wallet balance.
 - **Categories icons and colours (sec. 8):** colours are stored but not shown; no icons yet.
-- **Art and avatar (sec. 7):** layered body, hair, face, outfit, weapon, headgear and aura art, the evolution silhouette, and the mood pose. The mood pose is coded, but no pose art exists yet.
+- **Art and avatar (sec. 7):** outfit, weapon, aura and frame are drawn as vector layers (DECISIONS 52). Still open: PNG layer art for body, hair and headgear, the evolution silhouette, and the mood pose art. The mood pose is coded, but no pose art exists yet.
 - **Verified in code:** class names from the top two stats (`GameMath.className`) with the weekly class stored; rank-up overlay of 5 s, skippable; rial/toman setting; daily, weekly, monthly and yearly recurrence; logging XP capped at 10 per day; budget-pace quest logic exists in `GameRepository` (not yet exercised on a device).
 - **Reminder taps:** done. Morning opens the Now tab and night opens the daily report (`PendingRoute`, `ReminderReceiver`).
 - **Onboarding:** done. Name, avatar base, wake hour (sets the morning reminder), and the four question screens are all in `OnboardingScreen`, and `AppNav` saves the answers.
 - **Reduce motion:** done in `BodyDouble` (no bob when on).
+- **Goal and wallet (sec. 9):** the goal row warns when the linked wallet balance cannot cover the rest of the goal.
+- **Section 15:** day boundary at 04:00 has a test (`DayRulesTest`); category chips use stable keys.
 - **Reports (sec. 11):** yearly chart (12 months) and a trend (last 3 months against the 3 before) are done.
 - **PIN and biometric:** built earlier (PBKDF2 hash, biometric unlock). Not re-checked on a device in this round.

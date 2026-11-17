@@ -52,7 +52,11 @@ private data class PlanData(
     val debts: List<DebtEntity>
 )
 
-class PlanViewModel(private val plan: PlanRepository) : ViewModel() {
+class PlanViewModel(private val plan: PlanRepository, private val walletRepo: com.shadowsystem.data.repo.WalletRepository) : ViewModel() {
+
+    /** Wallet balances in rial, used to warn when a linked wallet cannot cover a goal. */
+    val balances: StateFlow<Map<Long, Long>> = walletRepo.observeBalances()
+        .stateIn(viewModelScope, SharingStarted.Eagerly, emptyMap())
 
     private val now = System.currentTimeMillis()
     private val pending = MutableStateFlow<PendingDelete?>(null)
@@ -180,7 +184,7 @@ class PlanViewModel(private val plan: PlanRepository) : ViewModel() {
         fun factory(app: ShadowApp): ViewModelProvider.Factory = object : ViewModelProvider.Factory {
             @Suppress("UNCHECKED_CAST")
             override fun <T : ViewModel> create(modelClass: Class<T>, extras: CreationExtras): T =
-                PlanViewModel(app.container.plan) as T
+                PlanViewModel(app.container.plan, app.container.wallets) as T
         }
     }
 }

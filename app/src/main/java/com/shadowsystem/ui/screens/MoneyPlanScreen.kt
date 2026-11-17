@@ -24,6 +24,7 @@ import com.shadowsystem.ui.vm.PlanViewModel
 fun MoneyPlanScreen(vm: PlanViewModel, onBack: () -> Unit) {
     val state by vm.state.collectAsStateWithLifecycle()
     val wallets by vm.wallets.collectAsStateWithLifecycle()
+    val balances by vm.balances.collectAsStateWithLifecycle()
     state.pending?.let { p ->
         ConfirmDialog(
             text = stringResource(R.string.plan_delete_confirm),
@@ -48,7 +49,7 @@ fun MoneyPlanScreen(vm: PlanViewModel, onBack: () -> Unit) {
                 onDelete = { vm.ask("recurring", id = it) }
             )
         }
-        item { GoalSection(state.goals, wallets, onAdd = vm::addGoal, onDeposit = vm::depositGoal, onDelete = { vm.ask("goal", id = it) }) }
+        item { GoalSection(state.goals, wallets, balances, onAdd = vm::addGoal, onDeposit = vm::depositGoal, onDelete = { vm.ask("goal", id = it) }) }
         item { DebtSection(state.debts, onAdd = vm::addDebt, onPay = vm::payDebt, onDelete = { vm.ask("debt", id = it) }, onInstall = vm::payInstallment) }
         item { Text(stringResource(R.string.plan_note), style = MaterialTheme.typography.bodyMedium) }
     }

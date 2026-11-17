@@ -40,3 +40,16 @@ private fun AvatarStackPreview() = ShadowTheme {
 private fun RankUpPreview() = ShadowTheme {
     RankUpOverlay(rank = GameMath.Rank.B, onDismiss = {})
 }
+
+@Preview(name = "Avatar with equipped layers", showBackground = true)
+@Composable
+private fun AvatarLayersPreview() = ShadowTheme {
+    Row(modifier = Modifier.padding(16.dp)) {
+        AvatarStack(
+            rank = GameMath.Rank.A,
+            topStats = emptyList(),
+            aura = true,
+            equipped = setOf("outfit_armor", "weapon_sword", "aura_gold", "frame_neon")
+        )
+    }
+}

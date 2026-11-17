@@ -34,7 +34,7 @@ fun moneyText(rial: Long, hidden: Boolean): String =
 @Composable
 fun CategoryChips(selected: String, categories: List<String>, onSelect: (String) -> Unit) {
     LazyRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-        items(categories) { cat ->
+        items(categories, key = { it }) { cat ->
             FilterChip(
                 selected = selected == cat,
                 onClick = { onSelect(cat) },

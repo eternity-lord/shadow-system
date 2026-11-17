@@ -140,6 +140,7 @@ fun RecurringSection(rules: List<RecurringEntity>, onAdd: (String, String, Strin
 fun GoalSection(
     goals: List<GoalEntity>,
     wallets: List<com.shadowsystem.data.db.WalletEntity>,
+    balances: Map<Long, Long>,
     onAdd: (String, String, Long?, Long?) -> Unit,
     onDeposit: (GoalEntity, String) -> Unit,
     onDelete: (Long) -> Unit
@@ -153,7 +154,7 @@ fun GoalSection(
     ShadowCard {
         SectionTitle(stringResource(R.string.goal_section))
         if (goals.isEmpty()) Text(stringResource(R.string.goal_empty), color = ShadowColors.TextMuted)
-        goals.forEach { g -> GoalRow(g, g.walletId?.let { walletNames[it] }, onDeposit, onDelete) }
+        goals.forEach { g -> GoalRow(g, g.walletId?.let { walletNames[it] }, g.walletId?.let { balances[it] }, onDeposit, onDelete) }
         OutlinedTextField(title, { title = it.take(40) }, label = { Text(stringResource(R.string.plan_title_hint)) }, singleLine = true, modifier = Modifier.fillMaxWidth())
         AmountField(target, { target = PersianText.parseDigits(it).filter { c -> c.isDigit() } }, stringResource(R.string.goal_target_hint))
         FilterChip(
@@ -188,7 +189,7 @@ fun GoalSection(
 }
 
 @Composable
-private fun GoalRow(g: GoalEntity, walletName: String?, onDeposit: (GoalEntity, String) -> Unit, onDelete: (Long) -> Unit) {
+private fun GoalRow(g: GoalEntity, walletName: String?, walletBalance: Long?, onDeposit: (GoalEntity, String) -> Unit, onDelete: (Long) -> Unit) {
     var deposit by remember(g.id) { mutableStateOf("") }
     val done = g.savedRial >= g.targetRial
     Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
@@ -212,6 +213,9 @@ private fun GoalRow(g: GoalEntity, walletName: String?, onDeposit: (GoalEntity, 
             )
         }
         walletName?.let { Text(stringResource(R.string.goal_wallet_line, it), style = MaterialTheme.typography.bodyMedium, color = ShadowColors.TextMuted) }
+        if (walletBalance != null && !done && walletBalance < g.targetRial - g.savedRial) {
+            Text(stringResource(R.string.goal_wallet_short), style = MaterialTheme.typography.bodyMedium, color = ShadowColors.Danger)
+        }
         Row(verticalAlignment = Alignment.CenterVertically) {
             AmountField(deposit, { deposit = PersianText.parseDigits(it).filter { c -> c.isDigit() } }, stringResource(R.string.goal_deposit_hint), modifier = Modifier.weight(1f))
             Button(onClick = { onDeposit(g, deposit); deposit = "" }, modifier = Modifier.heightIn(min = 48.dp)) { Text(stringResource(R.string.goal_deposit)) }

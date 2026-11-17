@@ -35,6 +35,7 @@ fun AvatarLayers(equipped: Set<String>, modifier: Modifier = Modifier.size(96.dp
         ?.let { "avatar_weapon_" + it.removePrefix("weapon_") }
         ?.takeIf { AssetRegistry.hasAsset(context, it) }
     val frameKey = AvatarLayerRules.equippedIn(equipped, "frame_")
+    val frameSprite = frameKey?.let { "avatar_$it" }?.takeIf { AssetRegistry.hasAsset(context, it) }
     Box(modifier = modifier) {
         Canvas(modifier = Modifier.fillMaxSize()) {
             val w = size.width
@@ -63,7 +64,8 @@ fun AvatarLayers(equipped: Set<String>, modifier: Modifier = Modifier.size(96.dp
                     }
                 }
             }
-            frameKey?.let { k ->
+            // Vector border only when there is no frame sprite.
+            if (frameSprite == null) frameKey?.let { k ->
                 AvatarLayerRules.frameArgb(k)?.let { c ->
                     drawRect(
                         color = Color(c),
@@ -71,6 +73,9 @@ fun AvatarLayers(equipped: Set<String>, modifier: Modifier = Modifier.size(96.dp
                     )
                 }
             }
+        }
+        frameSprite?.let { name ->
+            AssetImage(name = name, size = 104.dp, modifier = Modifier.align(Alignment.Center))
         }
         weaponSprite?.let { name ->
             AssetImage(

@@ -72,9 +72,13 @@ Still missing: more background art (only `bg_gate` and `bg_throne` exist for the
 
 `avatar_weapon_{dagger,sword,blade}.png`. Generated on a flat green background and keyed to transparency. They are drawn at the lower right of the avatar (48 dp). Without a sprite, a vector blade is drawn.
 
-## Vector layers over the avatar
+## Aura and frame sprites (PNG, 512×512, transparent)
 
-Auras and frames, and the outfit torso band when no look image exists, are drawn as vector shapes by `ui/components/AvatarLayers.kt`, with colours and sizes in `core/AvatarLayerRules.kt`:
+`avatar_aura_{blue,purple,gold,dark}.png` (behind the avatar, 112 dp) and `avatar_frame_{basic,neon,sovereign}.png` (over the avatar, 104 dp). Generated on green and keyed to transparency. Without a sprite, the coloured square border or vector frame is drawn.
+
+## Vector fallbacks over the avatar
+
+Used only when a sprite is missing. Drawn by `ui/components/AvatarLayers.kt`, with colours and sizes in `core/AvatarLayerRules.kt`:
 - outfit (fallback only): a torso band in the item colour,
 - weapon: a blade whose length grows from dagger to dark blade (3 weapons),
 - aura: the border colour follows the equipped aura (4 auras),

@@ -57,4 +57,12 @@ class AvatarLayerRulesTest {
             assertTrue("missing weapon sprite $name", file.exists())
         }
     }
+
+    @Test
+    fun everyAuraAndFrameHasASpriteInTheDrawableFolder() {
+        AvatarData.SHOP_ITEMS.filter { it.category == "aura" || it.category == "frame" }.forEach { item ->
+            val file = java.io.File("src/main/res/drawable-nodpi/avatar_${item.key}.png")
+            assertTrue("missing sprite for ${item.key}", file.exists())
+        }
+    }
 }

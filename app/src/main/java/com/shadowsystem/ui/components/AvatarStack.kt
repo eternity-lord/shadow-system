@@ -36,13 +36,21 @@ fun AvatarStack(
     equipped: Set<String> = emptySet()
 ) {
     val stage = (GameMath.Rank.values().indexOf(rank) + 1).coerceAtMost(5)
+    val context = androidx.compose.ui.platform.LocalContext.current
     Box(modifier = Modifier.size(112.dp), contentAlignment = Alignment.Center) {
         if (aura) {
-            val auraColor = AvatarLayerRules.equippedIn(equipped, "aura_")
-                ?.let { AvatarLayerRules.auraArgb(it) }
-                ?.let { Color(it) }
-                ?: ShadowColors.Gold
-            Box(modifier = Modifier.size(108.dp).border(3.dp, auraColor, RectangleShape))
+            // The aura art when it exists, otherwise a coloured square border.
+            val auraKey = AvatarLayerRules.equippedIn(equipped, "aura_")
+            val auraSprite = auraKey?.let { "avatar_$it" }?.takeIf { AssetRegistry.hasAsset(context, it) }
+            if (auraSprite != null) {
+                AssetImage(name = auraSprite, size = 112.dp)
+            } else {
+                val auraColor = auraKey
+                    ?.let { AvatarLayerRules.auraArgb(it) }
+                    ?.let { Color(it) }
+                    ?: ShadowColors.Gold
+                Box(modifier = Modifier.size(108.dp).border(3.dp, auraColor, RectangleShape))
+            }
         }
         // An equipped outfit with its own look image replaces the rank picture and skips the tint and vector outfit.
         val look = equippedLook(androidx.compose.ui.platform.LocalContext.current, equipped)

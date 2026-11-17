@@ -74,7 +74,8 @@ fun EntryCard(
     onNote: (String) -> Unit,
     onSave: () -> Unit,
     onSubcategory: (String) -> Unit = {},
-    onLocation: (String) -> Unit = {}
+    onLocation: (String) -> Unit = {},
+    onDate: (Long?) -> Unit = {}
 ) {
     ShadowCard {
         Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
@@ -107,6 +108,27 @@ fun EntryCard(
             singleLine = true,
             modifier = Modifier.fillMaxWidth()
         )
+        val todayDay = com.shadowsystem.core.DayRules.gameDay(System.currentTimeMillis())
+        if (form.epochDay == null) {
+            FilterChip(
+                selected = false,
+                onClick = { onDate(todayDay) },
+                label = { Text(stringResource(R.string.money_other_day)) },
+                modifier = Modifier.heightIn(min = 48.dp)
+            )
+        } else {
+            FilterChip(
+                selected = true,
+                onClick = { onDate(null) },
+                label = { Text(stringResource(R.string.money_today)) },
+                modifier = Modifier.heightIn(min = 48.dp)
+            )
+            JalaliDatePicker(
+                com.shadowsystem.core.Jalali.fromGregorian(java.time.LocalDate.ofEpochDay(form.epochDay))
+            ) { picked ->
+                onDate(com.shadowsystem.core.Jalali.toGregorian(picked.year, picked.month, picked.day).toEpochDay())
+            }
+        }
         OutlinedTextField(
             value = form.subcategory,
             onValueChange = onSubcategory,

@@ -29,9 +29,11 @@ class MoneyRepository(
         isIncome: Boolean,
         walletId: Long? = null,
         subcategory: String? = null,
-        location: String? = null
+        location: String? = null,
+        epochDay: Long? = null
     ): Int {
-        val day = game.today()
+        val today = game.today()
+        val day = epochDay?.coerceAtMost(today) ?: today
         val loggedBefore = dao.countForDay(day)
         dao.insert(
             TransactionEntity(
@@ -46,7 +48,8 @@ class MoneyRepository(
                 location = location?.trim()?.ifBlank { null }
             )
         )
-        val xp = MoneyRules.logXpFor(loggedBefore)
+        // Only entries for today earn XP; backdated entries are recorded without a reward.
+        val xp = if (day == today) MoneyRules.logXpFor(loggedBefore) else 0
         if (xp > 0) game.addXp(xp, GameMath.Stat.INT.name, gold = 0)
         game.refreshScore()
         return xp

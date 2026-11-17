@@ -1,5 +1,6 @@
 package com.shadowsystem.ui.vm
 
+import kotlinx.coroutines.flow.map
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
@@ -35,7 +36,9 @@ data class MoneyForm(
     val error: Boolean = false,
     val walletId: Long? = null,
     val subcategory: String = "",
-    val location: String = ""
+    val location: String = "",
+    /** Epoch day for the entry; null means today. Never later than today. */
+    val epochDay: Long? = null
 )
 
 data class MoneyState(
@@ -52,7 +55,9 @@ data class MoneyState(
     val canGoForward: Boolean = false,
     val wallets: List<WalletEntity> = emptyList(),
     val advanced: MoneyFilter = MoneyFilter(),
-    val balances: Map<Long, Long> = emptyMap()
+    val balances: Map<Long, Long> = emptyMap(),
+    /** How many entries each category has, all time. Used to order the category chips. */
+    val categoryUsage: Map<String, Int> = emptyMap()
 )
 
 private data class Controls(val offset: Int, val query: String, val filter: TypeFilter, val hidden: Boolean, val adv: MoneyFilter)
@@ -118,8 +123,12 @@ class MoneyViewModel(
             )
         }.stateIn(viewModelScope, SharingStarted.Eagerly, MoneyState())
 
-    val state: StateFlow<MoneyState> = combine(baseState, wallets.observeWallets(), wallets.observeBalances()) { s, ws, b ->
-        s.copy(wallets = ws, balances = b)
+    private val usage: StateFlow<Map<String, Int>> = money.observeRange(0L, Long.MAX_VALUE)
+        .map { rows -> rows.groupingBy { it.category }.eachCount() }
+        .stateIn(viewModelScope, SharingStarted.Eagerly, emptyMap())
+
+    val state: StateFlow<MoneyState> = combine(baseState, wallets.observeWallets(), wallets.observeBalances(), usage) { s, ws, b, u ->
+        s.copy(wallets = ws, balances = b, categoryUsage = u)
     }.stateIn(viewModelScope, SharingStarted.Eagerly, MoneyState())
 
     fun onWallet(id: Long?) {
@@ -147,6 +156,12 @@ class MoneyViewModel(
 
     fun onSubcategory(text: String) {
         form.value = form.value.copy(subcategory = text.take(30))
+    }
+
+    fun onDate(day: Long?) {
+        form.value = form.value.copy(
+            epochDay = day?.coerceAtMost(com.shadowsystem.core.DayRules.gameDay(System.currentTimeMillis()))
+        )
     }
 
     fun onLocation(text: String) {
@@ -209,8 +224,8 @@ class MoneyViewModel(
             return
         }
         viewModelScope.launch {
-            money.add(toman!!, f.category, f.note, f.isIncome, f.walletId, f.subcategory, f.location)
-            form.value = f.copy(amountText = "", note = "", subcategory = "", location = "", error = false)
+            money.add(toman!!, f.category, f.note, f.isIncome, f.walletId, f.subcategory, f.location, f.epochDay)
+            form.value = f.copy(amountText = "", note = "", subcategory = "", location = "", epochDay = null, error = false)
         }
     }
 

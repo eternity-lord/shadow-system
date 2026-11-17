@@ -21,7 +21,11 @@ data class ReportsState(
     val changePercent: Int? = null,
     val dailyAverage: Long = 0,
     val yearTotal: Long = 0,
-    val topExpenses: List<Pair<String, Long>> = emptyList()
+    val topExpenses: List<Pair<String, Long>> = emptyList(),
+    /** Spending for each of the last 12 months, oldest first. */
+    val yearMonths: List<Pair<String, Long>> = emptyList(),
+    /** Last three months against the three before them. Null when there is nothing to compare. */
+    val trendPercent: Int? = null
 )
 
 /** Expense reports: this month by category, last six months, and the last 30 days. */
@@ -59,6 +63,12 @@ class ReportsViewModel(private val money: MoneyRepository, private val game: Gam
             .sortedByDescending { it.amountRial }
             .take(5)
             .map { (it.note.ifBlank { it.category }) to it.amountRial }
+        val yearMonths = (-11..0).map { o ->
+            val (a, b) = FinanceRules.monthRange(o, now)
+            FinanceRules.monthLabel(o, now) to money.range(a, b).filter { !it.isIncome }.sumOf { it.amountRial }
+        }
+        val recent3 = yearMonths.takeLast(3).sumOf { it.second }
+        val prior3 = yearMonths.dropLast(3).takeLast(3).sumOf { it.second }
         _state.value = ReportsState(
             monthLabel = FinanceRules.monthLabel(0, now),
             categories = categories,
@@ -67,7 +77,9 @@ class ReportsViewModel(private val money: MoneyRepository, private val game: Gam
             changePercent = FinanceRules.changePercent(spentNow, spentBefore),
             dailyAverage = FinanceRules.dailyAverage(spentNow, daysSoFar),
             yearTotal = yearTotal,
-            topExpenses = top
+            topExpenses = top,
+            yearMonths = yearMonths,
+            trendPercent = FinanceRules.changePercent(recent3, prior3)
         )
     }
 

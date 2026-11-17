@@ -74,7 +74,7 @@ This audit was run on 2026-11-16 against the code on the branch. It is the list 
 | Persian digits, separators, input in both digit sets | Done | |
 | Wallets, opening balance, transfers | Done | |
 | Transactions: type, wallet, category + subcategory, Jalali date, note, tags, receipt, location | Partial | tags and location text not in the model; subcategory not in the model |
-| Quick add: 3 taps, numpad, frequent categories | Partial | floating button opens a sheet with the numpad, categories, subcategory, location and save (`MoneyScreen`). Categories are not yet ordered by frequency. |
+| Quick add: 3 taps, numpad, frequent categories | Done | floating button opens a sheet with the numpad, categories ordered by use (all time), subcategory, location, optional date, and save (`MoneyScreen`) |
 | Categories: default set with icons; add, edit, archive | Partial | table `categories` (v8) with the default set; add, rename (updates transactions, budgets, recurring rules) and archive in the Money tab. Missing: category icons and colours in the UI, and categories are not in the encrypted backup yet |
 | Recurring rules daily/weekly/monthly/yearly, catch-up on open, pause | Done | `RecurrenceAndInstallmentTest` |
 | Budgets per category and overall, 80%/100%, rollover | Done | |
@@ -160,8 +160,8 @@ Phases 0–3 are built in code. The Phase 3 acceptance ("every feature in this d
 
 Checked against the text of sections 7, 8 and 9 in `docs/original-prompt.pdf`.
 
-- **Quick add (sec. 8):** done as a floating button with a bottom sheet (DECISIONS 50). Still open: categories sorted by frequency, and "last used" wallet as default.
-- **Transactions (sec. 8):** subcategory and location are stored (Room v11, backup fields 11 and 12) and shown in the row. Still open: backdating through the Jalali picker on the money form (the date defaults to today).
+- **Quick add (sec. 8):** done as a floating button with a bottom sheet, categories ordered by use, and a date option (DECISIONS 50, 51). Still open: "last used" wallet as default.
+- **Transactions (sec. 8):** subcategory and location are stored (Room v11, backup fields 11 and 12) and shown in the row. Backdating through the Jalali picker is done (DECISIONS 51). Backdated entries earn no XP.
 - **Savings goals (sec. 8, 9):** deadline (optional, Jalali picker) and linked wallet are stored and shown, with days left or passed. Still open: the goal's estimate does not yet check the linked wallet balance.
 - **Categories icons and colours (sec. 8):** colours are stored but not shown; no icons yet.
 - **Art and avatar (sec. 7):** layered body, hair, face, outfit, weapon, headgear and aura art, the evolution silhouette, and the mood pose. The mood pose is coded, but no pose art exists yet.
@@ -169,3 +169,5 @@ Checked against the text of sections 7, 8 and 9 in `docs/original-prompt.pdf`.
 - **Reminder taps:** done. Morning opens the Now tab and night opens the daily report (`PendingRoute`, `ReminderReceiver`).
 - **Onboarding:** done. Name, avatar base, wake hour (sets the morning reminder), and the four question screens are all in `OnboardingScreen`, and `AppNav` saves the answers.
 - **Reduce motion:** done in `BodyDouble` (no bob when on).
+- **Reports (sec. 11):** yearly chart (12 months) and a trend (last 3 months against the 3 before) are done.
+- **PIN and biometric:** built earlier (PBKDF2 hash, biometric unlock). Not re-checked on a device in this round.

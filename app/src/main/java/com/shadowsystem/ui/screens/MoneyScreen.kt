@@ -52,7 +52,8 @@ import com.shadowsystem.ui.vm.TypeFilter
 @Composable
 fun MoneyScreen(vm: MoneyViewModel, onPlan: () -> Unit, onReports: () -> Unit, onWallets: () -> Unit) {
     val state by vm.state.collectAsStateWithLifecycle()
-    val categories = rememberCategoryNames(state.form.isIncome)
+    // Most used categories first; ties keep the stored order.
+    val categories = rememberCategoryNames(state.form.isIncome).sortedByDescending { state.categoryUsage[it] ?: 0 }
     val appContext = androidx.compose.ui.platform.LocalContext.current.applicationContext as com.shadowsystem.ShadowApp
     val categoryVm: com.shadowsystem.ui.vm.CategoryViewModel = androidx.lifecycle.viewmodel.compose.viewModel(
         factory = com.shadowsystem.ui.vm.CategoryViewModel.factory(appContext)
@@ -111,7 +112,8 @@ fun MoneyScreen(vm: MoneyViewModel, onPlan: () -> Unit, onReports: () -> Unit, o
                         vm.save()
                     },
                     onSubcategory = vm::onSubcategory,
-                    onLocation = vm::onLocation
+                    onLocation = vm::onLocation,
+                    onDate = vm::onDate
                 )
             }
         }

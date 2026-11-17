@@ -476,4 +476,8 @@
     <string name="goal_deadline_left">مهلت %1$s · %2$s روز مانده</string>
     <string name="goal_deadline_passed">مهلت %1$s گذشته است</string>
     <string name="goal_wallet_line">کیف پول: %1$s</string>
+    <string name="money_other_day">ثبت برای روز دیگر</string>
+    <string name="reports_year_chart">۱۲ ماه گذشته</string>
+    <string name="reports_trend">روند سه ماه اخیر نسبت به سه ماه قبل: %1$s</string>
+    <string name="reports_trend_none">برای مقایسه روند داده کافی نیست</string>
 </resources>

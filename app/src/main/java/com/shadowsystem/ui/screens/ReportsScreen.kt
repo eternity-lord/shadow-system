@@ -76,6 +76,16 @@ fun ReportsScreen(vm: ReportsViewModel, onBack: () -> Unit) {
             }
         }
         ShadowCard {
+            SectionTitle(stringResource(R.string.reports_year_chart))
+            BarChart(state.yearMonths.map { it.first }, state.yearMonths.map { it.second })
+            val trend = state.trendPercent
+            Text(
+                if (trend == null) stringResource(R.string.reports_trend_none)
+                else stringResource(R.string.reports_trend, (if (trend > 0) "+" else "") + PersianText.percent(trend.toFloat())),
+                style = MaterialTheme.typography.bodyMedium
+            )
+        }
+        ShadowCard {
             SectionTitle(stringResource(R.string.reports_six_months))
             BarChart(state.monthTotals.map { it.first }, state.monthTotals.map { it.second })
         }

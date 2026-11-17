@@ -102,7 +102,7 @@ fun HunterScreen(vm: GameViewModel, soldiers: SoldierViewModel, profile: Profile
                     )
                 }
             Row(verticalAlignment = Alignment.CenterVertically) {
-                AvatarStack(rank = rank, topStats = topStats, aura = aura, tint = avatarTint)
+                AvatarStack(rank = rank, topStats = topStats, aura = aura, tint = avatarTint, equipped = extras.equipped)
                 Column(modifier = Modifier.padding(start = 12.dp)) {
                     if (hunterName.isNotBlank()) {
                         Text(hunterName, style = MaterialTheme.typography.titleMedium)

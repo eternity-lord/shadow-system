@@ -1,5 +1,6 @@
 package com.shadowsystem.ui.vm
 
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
@@ -132,6 +133,7 @@ class MoneyViewModel(
     }.stateIn(viewModelScope, SharingStarted.Eagerly, MoneyState())
 
     fun onWallet(id: Long?) {
+        if (id != null) prefs.setLastWallet(id)
         form.value = form.value.copy(walletId = id)
     }
 
@@ -139,6 +141,11 @@ class MoneyViewModel(
         viewModelScope.launch {
             wallets.ensureDefault()
             plan.processRecurring()
+            // Default to the last wallet used if it still exists, otherwise the first wallet.
+            val all = wallets.observeWallets().first()
+            val saved = prefs.lastWallet()
+            val pick = all.firstOrNull { it.id == saved }?.id ?: all.firstOrNull()?.id
+            if (form.value.walletId == null) form.value = form.value.copy(walletId = pick)
         }
     }
 

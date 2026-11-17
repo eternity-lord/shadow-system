@@ -63,3 +63,14 @@ Still missing: monster variants (`_2`, `_3`) if wanted, category icons (`icon_ca
 | `icon_cat_outfit.png`, `icon_cat_weapon.png`, `icon_cat_aura.png`, `icon_cat_frame.png`, `icon_cat_background.png` | Avatar shop category headers | 512×512 |
 
 Still missing: more background art (only `bg_gate` and `bg_throne` exist for the shop), monster variants beyond level 1.
+
+## Vector layers over the avatar (no PNG)
+
+Equipped shop items are drawn as vector shapes by `ui/components/AvatarLayers.kt`, with colours and sizes in `core/AvatarLayerRules.kt`:
+- outfit: a torso band in the item colour (5 outfits),
+- weapon: a blade whose length grows from dagger to dark blade (3 weapons),
+- aura: the border colour follows the equipped aura (4 auras),
+- frame: the border width and colour follow the equipped frame (3 frames).
+
+These stand in for per-item layer art. Replacing them with PNG layers needs a matching base silhouette, which is not yet available.
+

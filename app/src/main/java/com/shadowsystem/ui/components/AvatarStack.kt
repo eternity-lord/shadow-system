@@ -18,6 +18,7 @@ import com.shadowsystem.R
 import com.shadowsystem.core.AssetImage
 import com.shadowsystem.core.AssetRegistry
 import com.shadowsystem.core.AvatarData
+import com.shadowsystem.core.AvatarLayerRules
 import com.shadowsystem.core.GameMath
 import com.shadowsystem.core.PersianText
 import com.shadowsystem.ui.theme.ShadowColors
@@ -27,11 +28,21 @@ import com.shadowsystem.ui.theme.ShadowColors
  * the stage badge, and the two strongest stats as small overlays. Art for the layers is a placeholder until it exists.
  */
 @Composable
-fun AvatarStack(rank: GameMath.Rank, topStats: List<Pair<String, String>>, aura: Boolean, tint: androidx.compose.ui.graphics.Color? = null) {
+fun AvatarStack(
+    rank: GameMath.Rank,
+    topStats: List<Pair<String, String>>,
+    aura: Boolean,
+    tint: androidx.compose.ui.graphics.Color? = null,
+    equipped: Set<String> = emptySet()
+) {
     val stage = (GameMath.Rank.values().indexOf(rank) + 1).coerceAtMost(5)
     Box(modifier = Modifier.size(112.dp), contentAlignment = Alignment.Center) {
         if (aura) {
-            Box(modifier = Modifier.size(108.dp).border(3.dp, ShadowColors.Gold, RectangleShape))
+            val auraColor = AvatarLayerRules.equippedIn(equipped, "aura_")
+                ?.let { AvatarLayerRules.auraArgb(it) }
+                ?.let { Color(it) }
+                ?: ShadowColors.Gold
+            Box(modifier = Modifier.size(108.dp).border(3.dp, auraColor, RectangleShape))
         }
         AssetImage(
             name = AvatarData.rankAssetName(rank),
@@ -41,6 +52,7 @@ fun AvatarStack(rank: GameMath.Rank, topStats: List<Pair<String, String>>, aura:
             contentDescription = stringResource(R.string.content_desc_avatar),
             tint = tint
         )
+        AvatarLayers(equipped)
         Text(
             stringResource(R.string.stage_badge, PersianText.toFa(stage)),
             style = MaterialTheme.typography.labelSmall,

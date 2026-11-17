@@ -71,6 +71,13 @@ class AppPrefs(context: Context) {
         com.shadowsystem.core.PersianText.rialMode = value
     }
 
+    /** The wallet the user last picked on the money form; null if none was picked yet. */
+    fun lastWallet(): Long? = sp.getLong(KEY_LAST_WALLET, -1L).takeIf { it >= 0 }
+
+    fun setLastWallet(id: Long) {
+        sp.edit().putLong(KEY_LAST_WALLET, id).apply()
+    }
+
     val reduceMotion = MutableStateFlow(sp.getBoolean(KEY_REDUCE_MOTION, false))
 
     fun setReduceMotion(value: Boolean) {
@@ -101,6 +108,7 @@ class AppPrefs(context: Context) {
 
     companion object {
         const val KEY_RIAL_MODE = "money_rial_mode"
+        const val KEY_LAST_WALLET = "money_last_wallet"
         const val KEY_NAME = "hunter_name"
         const val KEY_AVATAR_BASE = "avatar_base"
         const val KEY_WAKE_HOUR = "wake_hour"

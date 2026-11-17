@@ -83,7 +83,8 @@ private fun QuestCardPreview() = ShadowTheme {
         QuestCard(
             quest = QuestEntity(
                 id = 1, title = "ورزش ۲۰ دقیقه‌ای", description = "", stat = "STR", rank = "E",
-                minutes = 20, mandatory = true, lowEnergy = false, gameDay = 100
+                minutes = 20, mandatory = true, lowEnergy = false, gameDay = 100,
+                xpReward = 20, goldReward = 10, stepsDone = 1, stepsTotal = 2
             ),
             steps = listOf(
                 QuestStepEntity(id = 1, questId = 1, position = 0, text = "گرم کردن", done = true),

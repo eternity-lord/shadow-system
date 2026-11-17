@@ -96,3 +96,7 @@ All four moods have a picture. Score 0 (no score yet) shows the rank picture.
 
 `avatar_base_{blue,amber}.png`: the rank-A hunter with blue or amber energy and hair highlights, made from `avatar_rank_a.png` as reference. They replace the old colour tint for the onboarding base choice. Priority on the avatar: equipped outfit look, then base, then mood pose, then the rank picture. The tint remains as a fallback if a base picture is missing.
 
+## Hair and headgear (vector, no images)
+
+Hair (`hair_short`, `hair_spiky`) and headgear (`headgear_hood`, `headgear_crown`) are vector shapes drawn in `AvatarLayers` over the head area. Their colours are in `AvatarLayerRules`. Generated overlay images were tried and rejected because they did not align (DECISIONS 60).
+

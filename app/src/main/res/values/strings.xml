@@ -257,6 +257,8 @@
     <string name="avatar_cat_outfit">لباس</string>
     <string name="avatar_cat_weapon">سلاح</string>
     <string name="avatar_cat_aura">هاله</string>
+    <string name="avatar_cat_hair">مو</string>
+    <string name="avatar_cat_headgear">کلاه سر</string>
     <string name="avatar_cat_frame">قاب پروفایل</string>
     <string name="avatar_cat_background">پس‌زمینه</string>
     <string name="shop_heavy_hint">فقط از پاداش باس یا محاکمه، نه با طلا</string>

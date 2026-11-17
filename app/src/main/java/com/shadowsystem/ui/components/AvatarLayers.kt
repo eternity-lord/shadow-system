@@ -11,6 +11,9 @@ import androidx.compose.ui.geometry.CornerRadius
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.drawscope.DrawScope
+import androidx.compose.ui.graphics.Path
+import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.platform.LocalContext
@@ -30,6 +33,8 @@ import com.shadowsystem.core.AvatarLayerRules
 fun AvatarLayers(equipped: Set<String>, modifier: Modifier = Modifier.size(96.dp), drawOutfit: Boolean = true) {
     val context = LocalContext.current
     val outfit = if (drawOutfit) AvatarLayerRules.equippedIn(equipped, "outfit_")?.let { AvatarLayerRules.outfitArgb(it) } else null
+    val hairKey = AvatarLayerRules.equippedIn(equipped, "hair_")
+    val headgearKey = AvatarLayerRules.equippedIn(equipped, "headgear_")
     val weaponKey = AvatarLayerRules.equippedIn(equipped, "weapon_")
     val weaponSprite = weaponKey
         ?.let { "avatar_weapon_" + it.removePrefix("weapon_") }
@@ -49,6 +54,9 @@ fun AvatarLayers(equipped: Set<String>, modifier: Modifier = Modifier.size(96.dp
                     alpha = 0.85f
                 )
             }
+            // Hair and headgear sit on the head area of the picture. Vector shapes, so they align by construction.
+            hairKey?.let { k -> AvatarLayerRules.hairArgb(k)?.let { c -> drawHair(k, Color(c), w, h) } }
+            headgearKey?.let { k -> AvatarLayerRules.headgearArgb(k)?.let { c -> drawHeadgear(k, Color(c), w, h) } }
             // Vector blade only when there is no weapon sprite.
             if (weaponSprite == null) {
                 weaponKey?.let { k ->
@@ -86,3 +94,43 @@ fun AvatarLayers(equipped: Set<String>, modifier: Modifier = Modifier.size(96.dp
         }
     }
 }
+
+/** Short hair: a dome over the top of the head. Spiky hair: a row of points on the dome. */
+private fun DrawScope.drawHair(key: String, color: Color, w: Float, h: Float) {
+    val path = Path()
+    if (key == "hair_spiky") {
+        path.moveTo(w * 0.31f, h * 0.22f)
+        val peaks = listOf(0.36f to 0.02f, 0.42f to 0.12f, 0.49f to 0.0f, 0.56f to 0.12f, 0.63f to 0.01f, 0.69f to 0.22f)
+        peaks.forEach { (x, y) -> path.lineTo(w * x, h * y) }
+        path.close()
+    } else {
+        path.addArc(Rect(w * 0.31f, h * 0.04f, w * 0.69f, h * 0.30f), 180f, 180f)
+        path.close()
+    }
+    drawPath(path, color = color, alpha = 0.9f)
+}
+
+/** Hood: a dark cowl with a gold rim. Crown: gold-tipped points on a dark band. */
+private fun DrawScope.drawHeadgear(key: String, color: Color, w: Float, h: Float) {
+    if (key == "headgear_hood") {
+        val hood = Path().apply {
+            addArc(Rect(w * 0.27f, h * 0.02f, w * 0.73f, h * 0.34f), 180f, 180f)
+            close()
+        }
+        drawPath(hood, color = color, alpha = 0.92f)
+        drawPath(hood, color = Color(0xFFC9A227), style = Stroke(width = w * 0.02f))
+    } else {
+        val crown = Path().apply {
+            moveTo(w * 0.33f, h * 0.15f)
+            lineTo(w * 0.36f, h * 0.02f)
+            lineTo(w * 0.42f, h * 0.10f)
+            lineTo(w * 0.50f, h * -0.01f)
+            lineTo(w * 0.58f, h * 0.10f)
+            lineTo(w * 0.64f, h * 0.02f)
+            lineTo(w * 0.67f, h * 0.15f)
+            close()
+        }
+        drawPath(crown, color = color)
+    }
+}
+

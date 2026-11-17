@@ -79,4 +79,14 @@ class AvatarLayerRulesTest {
             assertTrue("missing base $b", java.io.File("src/main/res/drawable-nodpi/avatar_base_$b.png").exists())
         }
     }
+
+    @Test
+    fun everyHairAndHeadgearShopItemHasAColour() {
+        AvatarData.SHOP_ITEMS.filter { it.category == "hair" }.forEach {
+            assertTrue("no hair colour for ${it.key}", AvatarLayerRules.hairArgb(it.key) != null)
+        }
+        AvatarData.SHOP_ITEMS.filter { it.category == "headgear" }.forEach {
+            assertTrue("no headgear colour for ${it.key}", AvatarLayerRules.headgearArgb(it.key) != null)
+        }
+    }
 }

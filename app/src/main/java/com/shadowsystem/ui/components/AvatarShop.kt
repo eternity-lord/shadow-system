@@ -35,7 +35,7 @@ fun AvatarShop(
 ) {
     ShadowCard {
         SectionTitle(stringResource(R.string.avatar_shop_title))
-        listOf("outfit", "weapon", "aura", "frame", "background").forEach { category ->
+        listOf("hair", "headgear", "outfit", "weapon", "aura", "frame", "background").forEach { category ->
             androidx.compose.foundation.layout.Row(
                 verticalAlignment = androidx.compose.ui.Alignment.CenterVertically,
                 horizontalArrangement = androidx.compose.foundation.layout.Arrangement.spacedBy(8.dp)
@@ -91,6 +91,8 @@ private fun categoryLabel(category: String): String = stringResource(
         "weapon" -> R.string.avatar_cat_weapon
         "aura" -> R.string.avatar_cat_aura
         "frame" -> R.string.avatar_cat_frame
+        "hair" -> R.string.avatar_cat_hair
+        "headgear" -> R.string.avatar_cat_headgear
         else -> R.string.avatar_cat_background
     }
 )

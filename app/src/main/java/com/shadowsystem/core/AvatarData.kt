@@ -6,7 +6,7 @@ import com.shadowsystem.core.GameMath.Rank
 data class ShopItem(
     val key: String,
     val name: String,
-    val category: String, // outfit | weapon | aura | frame | background
+    val category: String, // outfit | weapon | aura | frame | hair | headgear | background
     val priceGold: Int,
     val heavy: Boolean = false, // unlocked via boss/trial, not gold
     val description: String
@@ -33,6 +33,10 @@ object AvatarData {
         ShopItem("frame_basic", "قاب ساده", "frame", 20, description = "قاب ساده پروفایل"),
         ShopItem("frame_neon", "قاب نئونی", "frame", 70, description = "قاب نئونی بنفش"),
         ShopItem("frame_sovereign", "قاب فرمانروا", "frame", 0, heavy = true, description = "فقط از تکمیل هدف پس‌انداز"),
+        ShopItem("hair_short", "مو کوتاه مرتب", "hair", 20, description = "مو کوتاه و مرتب"),
+        ShopItem("hair_spiky", "مو سیخی سایه", "hair", 55, description = "موی سیخی و وحشی"),
+        ShopItem("headgear_hood", "کلاه کاپشن سایه", "headgear", 70, description = "کلاه با لبه طلایی"),
+        ShopItem("headgear_crown", "تاج سایه", "headgear", 150, description = "تاج تیز سایه"),
         ShopItem("bg_gate", "پس‌زمینه دروازه", "background", 50, description = "پس‌زمینه دروازه تاریک"),
         ShopItem("bg_throne", "پس‌زمینه تخت سایه", "background", 0, heavy = true, description = "فقط از باس هفتگی")
     )

@@ -26,6 +26,20 @@ object AvatarLayerRules {
         else -> null
     }
 
+    /** Hair colour for a hair key, or null. */
+    fun hairArgb(key: String): Long? = when (key) {
+        "hair_short" -> 0xFF1B1B24L
+        "hair_spiky" -> 0xFF2A2233L
+        else -> null
+    }
+
+    /** Headgear colour for a headgear key, or null. */
+    fun headgearArgb(key: String): Long? = when (key) {
+        "headgear_hood" -> 0xFF15151CL
+        "headgear_crown" -> 0xFFFFC857L
+        else -> null
+    }
+
     /** Weapon length as a fraction of the avatar height: dagger shortest, dark blade longest. */
     fun weaponLength(key: String): Float = when (key) {
         "weapon_dagger" -> 0.25f

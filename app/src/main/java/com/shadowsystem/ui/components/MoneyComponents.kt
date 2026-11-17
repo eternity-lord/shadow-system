@@ -2,6 +2,12 @@ package com.shadowsystem.ui.components
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.heightIn
@@ -32,16 +38,36 @@ fun moneyText(rial: Long, hidden: Boolean): String =
     if (hidden) "••••" else PersianText.formatMoney(rial)
 
 @Composable
-fun CategoryChips(selected: String, categories: List<String>, onSelect: (String) -> Unit) {
+fun CategoryChips(
+    selected: String,
+    categories: List<String>,
+    onSelect: (String) -> Unit,
+    colours: Map<String, Long> = emptyMap()
+) {
     LazyRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
         items(categories, key = { it }) { cat ->
             FilterChip(
                 selected = selected == cat,
                 onClick = { onSelect(cat) },
                 label = { Text(cat) },
+                leadingIcon = { CategoryDot(cat, colours[cat]) },
                 modifier = Modifier.heightIn(min = 48.dp)
             )
         }
+    }
+}
+
+/** Category icon: a round colour mark with the first letter of the name. */
+@Composable
+fun CategoryDot(name: String, colourArgb: Long?) {
+    Box(
+        contentAlignment = Alignment.Center,
+        modifier = Modifier
+            .size(20.dp)
+            .clip(CircleShape)
+            .background(colourArgb?.let { Color(it) } ?: ShadowColors.TextMuted)
+    ) {
+        Text(name.take(1), style = MaterialTheme.typography.labelSmall, color = Color.Black)
     }
 }
 
@@ -100,7 +126,7 @@ fun EntryCard(
         if (form.error) {
             Text(stringResource(R.string.money_amount_invalid), color = ShadowColors.Danger, style = MaterialTheme.typography.bodyMedium)
         }
-        CategoryChips(form.category, categories, onCategory)
+        CategoryChips(form.category, categories, onCategory, rememberCategoryColours())
         OutlinedTextField(
             value = form.note,
             onValueChange = onNote,

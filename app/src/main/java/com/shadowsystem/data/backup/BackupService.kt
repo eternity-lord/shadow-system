@@ -19,7 +19,8 @@ class BackupService(private val db: AppDatabase) {
         debts = db.debtDao().all(),
         wallets = db.walletDao().all(),
         transfers = db.transferDao().all(),
-        cheques = db.chequeDao().all()
+        cheques = db.chequeDao().all(),
+        categories = db.categoryDao().all()
     )
 
     suspend fun exportEncrypted(password: CharArray): ByteArray = withContext(Dispatchers.IO) {
@@ -46,6 +47,16 @@ class BackupService(private val db: AppDatabase) {
             db.walletDao().insertAll(s.wallets)
             db.transferDao().insertAll(s.transfers)
             db.chequeDao().insertAll(s.cheques)
+            // Backups from before categories were saved have none: start from the defaults.
+            if (s.categories.isEmpty()) {
+                db.categoryDao().insertAll(
+                    com.shadowsystem.core.CategoryRules.DEFAULTS.mapIndexed { i, d ->
+                        com.shadowsystem.data.db.CategoryEntity(d.name, d.isIncome, false, d.colorArgb, i)
+                    }
+                )
+            } else {
+                db.categoryDao().insertAll(s.categories)
+            }
         }
     }
 }

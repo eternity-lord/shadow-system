@@ -74,4 +74,8 @@ object FinanceRules {
 
     private fun monthStart(offset: Int, nowMillis: Long): Jalali.Date =
         Jalali.addMonths(Jalali.fromMillis(nowMillis), offset).copy(day = 1)
+
+    /** Amount the linked wallet is short of the rest of a goal. Zero when there is no wallet or it covers the rest. */
+    fun walletShortfall(remaining: Long, balance: Long?): Long =
+        if (balance == null) 0L else (remaining - balance).coerceAtLeast(0L)
 }

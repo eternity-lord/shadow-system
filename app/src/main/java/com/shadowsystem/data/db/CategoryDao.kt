@@ -14,6 +14,12 @@ interface CategoryDao {
     @Query("SELECT * FROM categories WHERE archived = 0 AND isIncome = :isIncome ORDER BY sortOrder, name")
     fun observeActive(isIncome: Boolean): Flow<List<CategoryEntity>>
 
+    @Query("SELECT * FROM categories")
+    suspend fun all(): List<CategoryEntity>
+
+    @Insert(onConflict = OnConflictStrategy.ABORT)
+    suspend fun insertAll(categories: List<CategoryEntity>)
+
     @Query("SELECT name FROM categories")
     suspend fun names(): List<String>
 

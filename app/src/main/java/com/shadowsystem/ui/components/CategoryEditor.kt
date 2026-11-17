@@ -41,6 +41,15 @@ fun rememberCategoryNames(isIncome: Boolean): List<String> {
     return names
 }
 
+/** Colour of every category by name, for the chip marks. Empty outside the app (previews). */
+@Composable
+fun rememberCategoryColours(): Map<String, Long> {
+    val app = LocalContext.current.applicationContext as? ShadowApp ?: return emptyMap()
+    val flow = remember { app.container.categories.observeAll() }
+    val rows by flow.collectAsStateWithLifecycle(initialValue = emptyList())
+    return remember(rows) { rows.associate { it.name to it.colorArgb } }
+}
+
 /** Add, rename and archive money categories. Archived ones stay on old transactions. */
 @Composable
 fun CategoryEditorDialog(vm: CategoryViewModel, onDismiss: () -> Unit) {

@@ -173,3 +173,12 @@ Checked against the text of sections 7, 8 and 9 in `docs/original-prompt.pdf`.
 - **Section 15:** day boundary at 04:00 has a test (`DayRulesTest`); category chips use stable keys.
 - **Reports (sec. 11):** yearly chart (12 months) and a trend (last 3 months against the 3 before) are done.
 - **PIN and biometric:** built earlier (PBKDF2 hash, biometric unlock). Not re-checked on a device in this round.
+
+## Batch 62
+
+- Categories are in the backup (`cat` record), with defaults for old backups.
+- Category chips show a colour mark and first letter as the icon. Open: category icon art is not drawn per category.
+- Goal warning shows the wallet shortfall amount. The day estimate still uses the saving pace, not the wallet.
+- Previews: QuestCard, InboxCard, LootDialog, SoldierImage added. DailyReportCard, SummaryCard, TransactionRow and StatRadar already had them.
+- Wake-hour label verified correct.
+

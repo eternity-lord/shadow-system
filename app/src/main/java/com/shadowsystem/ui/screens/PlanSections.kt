@@ -31,6 +31,7 @@ import com.shadowsystem.data.db.GoalEntity
 import com.shadowsystem.data.db.RecurringEntity
 import com.shadowsystem.ui.components.AmountField
 import com.shadowsystem.ui.components.CategoryChips
+import com.shadowsystem.ui.components.rememberCategoryColours
 import com.shadowsystem.ui.components.rememberCategoryNames
 import com.shadowsystem.ui.components.PrimaryButton
 import com.shadowsystem.ui.components.SectionTitle
@@ -86,7 +87,7 @@ fun BudgetSection(rows: List<BudgetRow>, onSave: (String, String) -> Unit, onRem
                 }
             }
         }
-        CategoryChips(category, categories) { category = it }
+        CategoryChips(category, categories, onSelect = { category = it }, colours = rememberCategoryColours())
         AmountField(amount, { amount = PersianText.parseDigits(it).filter { c -> c.isDigit() } }, stringResource(R.string.money_amount_hint))
         PrimaryButton(stringResource(R.string.budget_save), onClick = { onSave(category, amount) })
     }
@@ -132,7 +133,7 @@ fun RecurringSection(rules: List<RecurringEntity>, onAdd: (String, String, Strin
                 )
             }
         }
-        CategoryChips(category, categories) { category = it }
+        CategoryChips(category, categories, onSelect = { category = it }, colours = rememberCategoryColours())
         PrimaryButton(stringResource(R.string.recurring_save), onClick = { onAdd(title, amount, category, income, period) })
     }
 }
@@ -221,8 +222,9 @@ private fun GoalRow(g: GoalEntity, walletName: String?, walletBalance: Long?, on
             )
         }
         walletName?.let { Text(stringResource(R.string.goal_wallet_line, it), style = MaterialTheme.typography.bodyMedium, color = ShadowColors.TextMuted) }
-        if (walletBalance != null && !done && walletBalance < g.targetRial - g.savedRial) {
-            Text(stringResource(R.string.goal_wallet_short), style = MaterialTheme.typography.bodyMedium, color = ShadowColors.Danger)
+        val shortfall = if (done) 0L else FinanceRules.walletShortfall(g.targetRial - g.savedRial, walletBalance)
+        if (shortfall > 0) {
+            Text(stringResource(R.string.goal_wallet_short, PersianText.formatMoney(shortfall)), style = MaterialTheme.typography.bodyMedium, color = ShadowColors.Danger)
         }
         Row(verticalAlignment = Alignment.CenterVertically) {
             AmountField(deposit, { deposit = PersianText.parseDigits(it).filter { c -> c.isDigit() } }, stringResource(R.string.goal_deposit_hint), modifier = Modifier.weight(1f))

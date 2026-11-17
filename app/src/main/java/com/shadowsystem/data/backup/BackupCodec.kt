@@ -1,6 +1,7 @@
 package com.shadowsystem.data.backup
 
 import com.shadowsystem.data.db.BudgetEntity
+import com.shadowsystem.data.db.CategoryEntity
 import com.shadowsystem.data.db.ChequeEntity
 import com.shadowsystem.data.db.TransferEntity
 import com.shadowsystem.data.db.WalletEntity
@@ -22,7 +23,8 @@ data class BackupSnapshot(
     val debts: List<DebtEntity>,
     val wallets: List<WalletEntity> = emptyList(),
     val transfers: List<TransferEntity> = emptyList(),
-    val cheques: List<ChequeEntity> = emptyList()
+    val cheques: List<ChequeEntity> = emptyList(),
+    val categories: List<CategoryEntity> = emptyList()
 )
 
 /**
@@ -51,6 +53,7 @@ object BackupCodec {
         s.wallets.forEach { line("wallet", it.id, it.name, it.openingRial) }
         s.transfers.forEach { line("transfer", it.id, it.fromWalletId, it.toWalletId, it.amountRial, it.epochDay, it.createdAt) }
         s.cheques.forEach { line("cheque", it.id, it.title, it.amountRial, it.dueEpochDay, it.issuedByMe, it.cleared) }
+        s.categories.forEach { line("cat", it.name, it.isIncome, it.archived, it.colorArgb, it.sortOrder) }
         return out.toString()
     }
 
@@ -65,6 +68,7 @@ object BackupCodec {
         val wallets = mutableListOf<WalletEntity>()
         val transfers = mutableListOf<TransferEntity>()
         val cheques = mutableListOf<ChequeEntity>()
+        val categories = mutableListOf<CategoryEntity>()
         for (raw in text.lineSequence()) {
             if (raw.isBlank()) continue
             val f = raw.split(SEP).map { unescape(it) }
@@ -104,13 +108,17 @@ object BackupCodec {
                     id = f[1].toLong(), fromWalletId = f[2].toLong(), toWalletId = f[3].toLong(),
                     amountRial = f[4].toLong(), epochDay = f[5].toLong(), createdAt = f[6].toLong()
                 )
+                "cat" -> categories += CategoryEntity(
+                    name = f[1], isIncome = f[2].toBoolean(), archived = f[3].toBoolean(),
+                    colorArgb = f[4].toLong(), sortOrder = f[5].toInt()
+                )
                 "cheque" -> cheques += ChequeEntity(
                     id = f[1].toLong(), title = f[2], amountRial = f[3].toLong(), dueEpochDay = f[4].toLong(),
                     issuedByMe = f[5].toBoolean(), cleared = f[6].toBoolean()
                 )
             }
         }
-        return BackupSnapshot(profile, stats, txs, budgets, recs, goals, debts, wallets, transfers, cheques)
+        return BackupSnapshot(profile, stats, txs, budgets, recs, goals, debts, wallets, transfers, cheques, categories)
     }
 
     private fun escape(s: String): String =

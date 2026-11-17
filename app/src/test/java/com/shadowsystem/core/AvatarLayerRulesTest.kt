@@ -48,4 +48,13 @@ class AvatarLayerRulesTest {
             assertTrue("missing look image for ${item.key}", file.exists())
         }
     }
+
+    @Test
+    fun everyWeaponHasASpriteInTheDrawableFolder() {
+        AvatarData.SHOP_ITEMS.filter { it.category == "weapon" }.forEach { item ->
+            val name = "avatar_weapon_" + item.key.removePrefix("weapon_")
+            val file = java.io.File("src/main/res/drawable-nodpi/$name.png")
+            assertTrue("missing weapon sprite $name", file.exists())
+        }
+    }
 }

@@ -5,6 +5,7 @@ import kotlinx.coroutines.flow.map
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
+import androidx.lifecycle.createSavedStateHandle
 import androidx.lifecycle.viewmodel.CreationExtras
 import com.shadowsystem.ShadowApp
 import com.shadowsystem.core.FinanceRules
@@ -69,10 +70,23 @@ class MoneyViewModel(
     private val game: GameRepository,
     private val plan: PlanRepository,
     private val prefs: AppPrefs,
-    private val wallets: WalletRepository
+    private val wallets: WalletRepository,
+    private val handle: androidx.lifecycle.SavedStateHandle = androidx.lifecycle.SavedStateHandle()
 ) : ViewModel() {
 
-    private val form = MutableStateFlow(MoneyForm())
+    // The entry form survives process death: its fields are kept in the saved-state handle.
+    private val form = MutableStateFlow(
+        MoneyForm(
+            amountText = handle.get<String>("f_amount") ?: "",
+            category = handle.get<String>("f_category") ?: MoneyRules.CATEGORIES.first(),
+            note = handle.get<String>("f_note") ?: "",
+            isIncome = handle.get<Boolean>("f_income") ?: false,
+            walletId = handle.get<Long>("f_wallet"),
+            subcategory = handle.get<String>("f_sub") ?: "",
+            location = handle.get<String>("f_loc") ?: "",
+            epochDay = handle.get<Long>("f_day")
+        )
+    )
     private val pendingDelete = MutableStateFlow<TransactionEntity?>(null)
     private val offset = MutableStateFlow(0)
     private val query = MutableStateFlow("")
@@ -138,6 +152,18 @@ class MoneyViewModel(
     }
 
     init {
+        viewModelScope.launch {
+            form.collect { f ->
+                handle["f_amount"] = f.amountText
+                handle["f_category"] = f.category
+                handle["f_note"] = f.note
+                handle["f_income"] = f.isIncome
+                handle["f_wallet"] = f.walletId
+                handle["f_sub"] = f.subcategory
+                handle["f_loc"] = f.location
+                handle["f_day"] = f.epochDay
+            }
+        }
         viewModelScope.launch {
             wallets.ensureDefault()
             plan.processRecurring()
@@ -258,7 +284,10 @@ class MoneyViewModel(
         fun factory(app: ShadowApp): ViewModelProvider.Factory = object : ViewModelProvider.Factory {
             @Suppress("UNCHECKED_CAST")
             override fun <T : ViewModel> create(modelClass: Class<T>, extras: CreationExtras): T =
-                MoneyViewModel(app.container.money, app.container.game, app.container.plan, app.container.prefs, app.container.wallets) as T
+                MoneyViewModel(
+                    app.container.money, app.container.game, app.container.plan, app.container.prefs, app.container.wallets,
+                    extras.createSavedStateHandle()
+                ) as T
         }
     }
 }

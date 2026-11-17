@@ -68,13 +68,17 @@ Still missing: more background art (only `bg_gate` and `bg_throne` exist for the
 
 `avatar_look_outfit_{street,sport,leather,armor,shadow}.png` (5 files). Each is the rank-A hunter redrawn in that outfit, made from `avatar_rank_a.png` as the reference so the figure, pose and style match. When an outfit is equipped and its look exists, it replaces the rank picture (no base tint).
 
+## Weapon sprites (PNG, transparent, up to 256 px)
+
+`avatar_weapon_{dagger,sword,blade}.png`. Generated on a flat green background and keyed to transparency. They are drawn at the lower right of the avatar (48 dp). Without a sprite, a vector blade is drawn.
+
 ## Vector layers over the avatar
 
-Weapons, auras and frames, and the outfit torso band when no look image exists, are drawn as vector shapes by `ui/components/AvatarLayers.kt`, with colours and sizes in `core/AvatarLayerRules.kt`:
+Auras and frames, and the outfit torso band when no look image exists, are drawn as vector shapes by `ui/components/AvatarLayers.kt`, with colours and sizes in `core/AvatarLayerRules.kt`:
 - outfit (fallback only): a torso band in the item colour,
 - weapon: a blade whose length grows from dagger to dark blade (3 weapons),
 - aura: the border colour follows the equipped aura (4 auras),
 - frame: the border width and colour follow the equipped frame (3 frames).
 
-Weapons, auras and frames are still vector. Per-item PNG layers for them would need a matching base silhouette; the outfit looks above avoid that by redrawing the whole figure.
+Auras and frames are still vector. Per-item PNG layers for them would need a matching base silhouette; the outfit looks above avoid that by redrawing the whole figure.
 
